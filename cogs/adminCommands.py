@@ -81,7 +81,7 @@ class AdminCommandsCog(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def unblacklist(self, ctx: commands.Context, entity: int):
+    async def unblacklist(self, ctx: commands.Context, entity: int, reason: str):
         
         
         entity_type = ""
@@ -114,9 +114,21 @@ class AdminCommandsCog(commands.Cog):
 
         case_id = await get_next_case_id(ctx.guild.id)
         
+        case_entry = {
+            "case_id": case_id,
+            "guild_id": entity_id,
+            "user_id": ctx.guild.id,
+            "moderator_id": ctx.author.id,
+            "reason": reason,
+            "timestamp": int(time.time()),
+            "type": "blacklist",
+            "status": "cleared"
+        }
+        
         
         await blacklists.delete_one({"discord_id": entity_id, "type": entity_type})
-        await ctx.send(f"<:success:1326752811219947571> **Case #{case_id} - {entity}** has been unblacklisted.")
+        await cases.insert_one(case_entry)
+        await ctx.send(f"<:success:1326752811219947571> **Case #{case_id} - {entity}** has been unblacklisted for {reason}.")
         
         
         
@@ -126,7 +138,7 @@ class AdminCommandsCog(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def blacklist(self, ctx: commands.Context, entity: int):
+    async def blacklist(self, ctx: commands.Context, entity: int, reason: str):
         
         entity_type = ""
 
@@ -155,19 +167,32 @@ class AdminCommandsCog(commands.Cog):
             return await ctx.send(f"<:error:1326752911870660704> {entity} is already blacklisted.")
         
         
+        case_id = await get_next_case_id(ctx.guild.id)
+        
         # Creates, enters, and sends confirm message
         
         blacklist_entry = {
             "discord_id": entity_id,
-            "type": entity_type
+            "type": entity_type,
+            "reason": reason
         }
         
-        
-        case_id = await get_next_case_id(ctx.guild.id)
+        case_entry = {
+            "case_id": case_id,
+            "guild_id": ctx.guild.id,
+            "user_id": entity_id,
+            "moderator_id": ctx.author.id,
+            "reason": reason,
+            "timestamp": int(time.time()),
+            "type": "blacklist",
+            "status": "active"
+        }
         
 
         await blacklists.insert_one(blacklist_entry)
-        await ctx.send(f"<:success:1326752811219947571> **Case #{case_id} - {entity}** has been blacklisted.")
+        await cases.insert_one(case_entry)
+        await ctx.send(f"<:success:1326752811219947571> **Case #{case_id} - {entity}** has been blacklisted for {reason}.")
+        
         
 
 async def setup(strive):

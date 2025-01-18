@@ -321,36 +321,63 @@ class ModerationCommandCog(commands.Cog):
     
     
     @case.command(description="Searches cases by an Case ID.", with_app_command=True)
-    async def view(self, ctx: commands.Context, *, caseid: int):
-        
-        
+    async def view(self, ctx: commands.Context, caseid: int):
         case_info = await cases.find_one({'case_id': caseid, 'guild_id': ctx.guild.id})
         
         
         if case_info:
             
+            embed = discord.Embed(
+                title=f"{case_info.get('type').title()} | Case #{case_info.get('case_id')}",
+                description=f"Action took place on <t:{case_info.get('timestamp')}:F>.",
+                color=self.constants.strive_embed_color_setup(),
+            )
+
+            embed.add_field(
+                name="Member",
+                value=f"<@{case_info.get('user_id')}> (`{case_info.get('user_id')}`)",
+                inline=True
+            )
             
-            embed = discord.Embed(title=f"Case ID: {case_info.get('case_id')} | {case_info.get('type').title()}", 
-                                description=f"Status: **{case_info.get('status').title()}**\nUser: <@{case_info.get('user_id')}>\nModerator: <@{case_info.get('moderator_id')}>\nTimestamp: <t:{case_info.get('timestamp')}:F>\nReason: {case_info.get('reason')}",
-                                color=self.constants.strive_embed_color_setup())
-            
-            
-            member: discord.Member = await self.strive.fetch_user(case_info.get('user_id'))
-            
-            
+            embed.add_field(
+                name="Moderator",
+                value=f"<@{case_info.get('moderator_id')}> (`{case_info.get('moderator_id')}`)",
+                inline=True
+            )
+
+            embed.add_field(
+                name="Reason",
+                value=case_info.get('reason') or "No reason provided.",
+                inline=False
+            )
+
+
             try:
-                embed.set_author(name=f"{member.name}\'s Case", icon_url=member.avatar.url)
+                member: discord.Member = await self.bot.fetch_user(case_info.get('user_id'))
+                embed.set_author(name=f"@{member.name}", icon_url=member.avatar.url)
+                
+                
             except:
-                embed.set_author(name=f"{member.name}\'s Modlogs", icon_url=member.default_avatar.url)
+                embed.set_author(name="Unknown User")
+
+
             await ctx.send(embed=embed)
             
             
-        elif not case_info:
-            await ctx.send(f"**{caseid}** could not be found!")
+        else:
+            
+            embed = discord.Embed(
+                title="",
+                description=f"<:error:1326752911870660704> Case #{caseid} could not be found!",
+                color=discord.Color.red()
+            )
+            
+            
+            await ctx.send(embed=embed)
     
     
     
-    @case.command(description="Void/Clear a case by ID", with_app_command=True)
+    @case.command(description="Void a case by ID", with_app_command=True)
     async def void(self, ctx: commands.Context, *, caseid: int):
         
         
@@ -358,71 +385,129 @@ class ModerationCommandCog(commands.Cog):
         
         
         if case_info:
-            await ctx.send(f"Case ID: {caseid} has been voided!")
+            await ctx.send(f"<:success:1326752811219947571> Case #{caseid} has been voided!")
         
         
         elif not case_info:
-            await ctx.send(f"Case ID: {caseid} could not be found!")
+            await ctx.send(f"<:error:1326752911870660704> Case #{caseid} could not be found!")
             
            
             
     @commands.hybrid_group(description="Group command")
-    async def modlogs(self, ctx: commands.Context):
-        return
-    
-    
-    
-    @modlogs.command(description="View all modlogs for certain user", with_app_command=True, extras={"category": "Moderation"})
-    async def view(self, ctx, member: discord.Member):  
+    async def modlogs(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Please specify a valid subcommand (view, transfer, clear).")
+
+
+
+    @modlogs.command(description="View all modlogs for a certain user")
+    async def view(self, ctx, member: discord.Member):
         number = 0
-        
-        embed = discord.Embed(title=f"", description="", color=self.constants.strive_embed_color_setup(), timestamp=datetime.utcnow())
+        embed = discord.Embed(
+            title="",
+            description="",
+            color=self.constants.strive_embed_color_setup(),
+            timestamp=datetime.utcnow()
+        )
+
         results = cases.find({'user_id': member.id, "guild_id": ctx.guild.id})
+        
+        
         async for result in results:
             if result.get('status') == "active":
                 number += 1
-                embed.add_field(name=f"Case ID: {result.get('case_id')} | {result.get('type').title()}", value=f"Reason: {result.get('reason')}\nModerator: <@{result.get('moderator_id')}> ({result.get('moderator_id')})\nDate: <t:{result.get('timestamp')}:F>", inline=False)
-        
+                embed.add_field(
+                    name=f"Case ID: {result.get('case_id')} | {result.get('type').title()}",
+                    value=(
+                        f"Reason: {result.get('reason')}\n"
+                        f"Moderator: <@{result.get('moderator_id')}> ({result.get('moderator_id')})\n"
+                        f"Date: <t:{result.get('timestamp')}:F>"
+                    ),
+                    inline=False
+                )
+
+
         if number == 0:
-            embed = discord.Embed(title="Not Found", description="No mod logs could be found for this user!", color=self.constants.strive_embed_color_setup())
+            embed = discord.Embed(
+                title="",
+                description="<:error:1326752911870660704> No mod logs could be found for this user!",
+                color=self.constants.strive_embed_color_setup()
+            )
+            
+            
         else:
             try:
-                embed.set_author(name=f"{member.name}\'s Modlogs", icon_url=member.avatar.url)
-            except:
-                embed.set_author(name=f"{member.name}\'s Modlogs", icon_url=member.default_avatar.url)
+                embed.set_author(
+                    name=f"{member.name}'s Modlogs",
+                    icon_url=member.avatar.url
+                )
+                
+            except AttributeError:
+                embed.set_author(
+                    name=f"{member.name}'s Modlogs",
+                    icon_url=member.default_avatar.url
+                )
+                
+                
             embed.set_footer(text=f"ID: {member.id} • Total Modlogs: {number}")
+
+
         await ctx.send(embed=embed)
 
 
 
-    @modlogs.command(description="Transfer all modlogs to a different user", with_app_command=True, extras={"category": "Moderation"})
-    async def transfer(self, ctx, olduser: discord.Member = None, newuser: discord.Member = None): 
+    @modlogs.command(description="Transfer all modlogs to a different user")
+    async def transfer(self, ctx, olduser: discord.Member, newuser: discord.Member):
         results = cases.find({'user_id': olduser.id, "guild_id": ctx.guild.id})
+        failed_cases = []
+
+
         async for result in results:
-            is_deleted = await cases.find_one_and_update({'case_id': result.get('case_id'), 'user_id': result.get('user_id'), 'guild_id': result.get('guild_id')}, {'$set': {'user_id': newuser.id}})
-            if not is_deleted:
-                await ctx.send(f"{result.get('case_id')} was not able to be updated!")
-                
-                
+            updated_case = await cases.find_one_and_update(
+                {'case_id': result.get('case_id'), 'user_id': olduser.id, 'guild_id': ctx.guild.id},
+                {'$set': {'user_id': newuser.id}}
+            )
+            if not updated_case:
+                failed_cases.append(result.get('case_id'))
+
+
+        if failed_cases:
+            await ctx.send(f"<:error:1326752911870660704> The following cases could not be updated: {', '.join(map(str, failed_cases))}")
+
+
         embed = discord.Embed(
             title="",
-            description=f"<:success:1326752811219947571> All moderation logs for **{olduser.name}** have been transfered to **{newuser}**",
+            description=(
+                f"<:success:1326752811219947571> All moderation logs for **{olduser.name}** "
+                f"have been transferred to **{newuser.name}**."
+            ),
             color=discord.Color.green()
         )
         
         
         await ctx.send(embed=embed)
-            
-    
-    
-    @modlogs.command(description="Clear all modlogs for a certain user", with_app_command=True, extras={"category": "Moderation"})
-    async def clear(self, ctx, member: discord.Member = None):
+
+
+
+    @modlogs.command(description="Clear all modlogs for a certain user")
+    async def clear(self, ctx, member: discord.Member):
         results = cases.find({'user_id': member.id, "guild_id": ctx.guild.id})
+        failed_cases = []
+
+
         async for result in results:
-            case_info = await cases.find_one_and_update({'case_id': result.get('case_id'), 'guild_id': ctx.guild.id}, {'$set': {'status': 'cleared'}})
-            if not case_info:
-                await ctx.send(f"{result.get('case_id')} was not able to be deleted!")
-        
+            updated_case = await cases.find_one_and_update(
+                {'case_id': result.get('case_id'), 'guild_id': ctx.guild.id},
+                {'$set': {'status': 'cleared'}}
+            )
+            if not updated_case:
+                failed_cases.append(result.get('case_id'))
+
+
+        if failed_cases:
+            await ctx.send(f"<:error:1326752911870660704> The following cases could not be cleared: {', '.join(map(str, failed_cases))}")
+
+
         embed = discord.Embed(
             title="",
             description=f"<:success:1326752811219947571> All moderation logs have been cleared for **{member.name}**.",
