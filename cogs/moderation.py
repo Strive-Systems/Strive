@@ -353,7 +353,7 @@ class ModerationCommandCog(commands.Cog):
 
 
             try:
-                member: discord.Member = await self.bot.fetch_user(case_info.get('user_id'))
+                member: discord.Member = await self.strive.fetch_user(case_info.get('user_id'))
                 embed.set_author(name=f"@{member.name}", icon_url=member.avatar.url)
                 
                 
