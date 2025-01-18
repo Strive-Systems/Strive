@@ -5,7 +5,7 @@ from discord.ext import commands
 from utils.embeds import DebugEmbed, CheckGuildEmbed
 from utils.constants import StriveConstants
 from utils.utils import get_next_case_id
-from utils.constants import blacklists, blacklist_bypass
+from utils.constants import blacklists, blacklist_bypass, cases
 from datetime import timedelta
 from datetime import datetime
  
