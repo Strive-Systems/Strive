@@ -1,0 +1,56 @@
+import discord
+from discord.ext import commands
+from zuid import ZUID
+from utils.embeds import MissingArgsEmbed, BadArgumentEmbed, ForbiddenEmbed, MissingPermissionsEmbed, UserErrorEmbed, DeveloperErrorEmbed
+
+
+class OnCommandError(commands.Cog):
+    def __init__(self, strive):
+        self.strive = strive
+        
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx: commands.Context, error):
+        error_id = ZUID(prefix="error_", length=10)
+        error_id = error_id()
+        
+        if isinstance(error, commands.MissingRequiredArgument):
+            embed = MissingArgsEmbed(error.param.name)
+            return await ctx.send(embed=embed)
+
+
+
+        elif isinstance(error, commands.BadArgument):
+            embed = BadArgumentEmbed()
+            return await ctx.send(embed=embed)
+
+
+
+        elif isinstance(error, discord.Forbidden):
+            embed = ForbiddenEmbed()
+            return await ctx.send(embed=embed)
+
+
+
+        elif isinstance(error, commands.MissingPermissions):
+            embed = MissingPermissionsEmbed()
+            return await ctx.send(embed=embed)
+        
+        elif error == "You are blacklisted from using Strive.":
+            return
+
+
+        else:
+            user_embed = UserErrorEmbed(error_id)
+            await ctx.send(embed=user_embed)
+
+            dev_embed = DeveloperErrorEmbed(error, ctx, error_id)
+            guild = self.strive.get_guild(1326476818894557217)
+            if not guild:
+                guild = self.strive.get_guild(1326476818894557217)
+            channel = discord.utils.get(guild.channels, name='errors')
+            await channel.send(embed=dev_embed)
+        
+        
+
+async def setup(strive):
+    await strive.add_cog(OnCommandError(strive))
