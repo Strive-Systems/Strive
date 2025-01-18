@@ -116,7 +116,7 @@ class AdminCommandsCog(commands.Cog):
         
         
         await blacklists.delete_one({"discord_id": entity_id, "type": entity_type})
-        await ctx.send(ctx, f"<:success:1326752811219947571> **Case #{case_id} - {entity}** has been unblacklisted.")
+        await ctx.send(f"<:success:1326752811219947571> **Case #{case_id} - {entity}** has been unblacklisted.")
         
         
         
@@ -167,7 +167,7 @@ class AdminCommandsCog(commands.Cog):
         
 
         await blacklists.insert_one(blacklist_entry)
-        await ctx.send(ctx, f"<:success:1326752811219947571> **Case #{case_id} - {entity}** has been blacklisted.")
+        await ctx.send(f"<:success:1326752811219947571> **Case #{case_id} - {entity}** has been blacklisted.")
         
 
 async def setup(strive):
