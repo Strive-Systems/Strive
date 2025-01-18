@@ -84,7 +84,7 @@ class AdminCommandsCog(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def unblacklist(self, ctx: commands.Context, entity: int, reason: str):
+    async def unblacklist(self, ctx: commands.Context, entity: int, *, reason: str):
         
         
         entity_type = ""
@@ -141,7 +141,7 @@ class AdminCommandsCog(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def blacklist(self, ctx: commands.Context, entity: int, reason: str):
+    async def blacklist(self, ctx: commands.Context, entity: int, *, reason: str):
         
         entity_type = ""
 
