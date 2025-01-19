@@ -34,9 +34,13 @@ class ModerationCommandCog(commands.Cog):
 
         if member.guild_permissions.administrator:
             return True
+        
+        
+        if member.top_role >= ctx.author.top_role:
+            return True
 
 
-        blacklist_entry = await blacklist_bypass.find_one({"user_id": member.id})
+        blacklist_entry = await blacklist_bypass.find_one({"discord_id": member.id})
         if blacklist_entry:
             return True
 
