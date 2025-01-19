@@ -22,6 +22,16 @@ class ModerationCommandCog(commands.Cog):
     
     @staticmethod
     async def is_blacklisted_or_admin(ctx, member: discord.Member):
+        
+        
+        if isinstance(member, discord.User):
+            member = ctx.guild.get_member(member.id)
+
+
+        if member is None:
+            return False
+
+
         if member.guild_permissions.administrator:
             return True
 
