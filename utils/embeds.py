@@ -510,7 +510,7 @@ class UserInformationEmbed:
             # Check for staff roles
             
             if any(discord.utils.get(guild_member.roles, id=role_id) for role_id in staff_roles):
-                badges.append("> <:Strive:1329297547302277151> Strive Staff")
+                badges.append("> <:Strive:1330583510406267070> Strive Staff")
 
 
             # Check for Early Supporter role
