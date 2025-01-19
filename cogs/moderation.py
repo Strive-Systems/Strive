@@ -19,13 +19,12 @@ class ModerationCommandCog(commands.Cog):
         self.constants = StriveConstants()
         
         
-        
+    
+    @staticmethod
     async def is_blacklisted_or_admin(ctx, member: discord.Member):
-
-
         if member.guild_permissions.administrator:
             return True
-        
+
 
         blacklist_entry = await blacklist_bypass.find_one({"user_id": member.id, "guild_id": ctx.guild.id})
         if blacklist_entry:
@@ -40,7 +39,7 @@ class ModerationCommandCog(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def warn(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         
-        if await self.is_blacklisted_or_admin(ctx, member):
+        if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             
             
             embed = discord.Embed(
@@ -94,7 +93,7 @@ class ModerationCommandCog(commands.Cog):
     @commands.has_guild_permissions(ban_members=True)
     async def ban(self, ctx: commands.Context, member: discord.User, *, reason: str = "Nothing was provided"):
         
-        if await self.is_blacklisted_or_admin(ctx, member):
+        if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             
             
             embed = discord.Embed(
@@ -227,7 +226,7 @@ class ModerationCommandCog(commands.Cog):
     @commands.bot_has_permissions(ban_members=True)
     async def softban(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         
-        if await self.is_blacklisted_or_admin(ctx, member):
+        if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             
             
             embed = discord.Embed(
@@ -253,7 +252,7 @@ class ModerationCommandCog(commands.Cog):
     @commands.has_permissions(moderate_members=True)
     async def mute(self, ctx: commands.Context, member: discord.Member, time: str, *, reason: str = "No reason provided"):
         
-        if await self.is_blacklisted_or_admin(ctx, member):
+        if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             
             
             embed = discord.Embed(
@@ -356,7 +355,7 @@ class ModerationCommandCog(commands.Cog):
     async def kick(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         
         
-        if await self.is_blacklisted_or_admin(ctx, member):
+        if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             
             
             embed = discord.Embed(
