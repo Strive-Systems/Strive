@@ -17,6 +17,23 @@ class ModerationCommandCog(commands.Cog):
     def __init__(self, strive):
         self.strive = strive
         self.constants = StriveConstants()
+        
+        
+        
+    async def is_blacklisted_or_admin(ctx, member: discord.Member):
+
+
+        if member.guild_permissions.administrator:
+            return True
+        
+
+        blacklist_entry = await blacklist_bypass.find_one({"user_id": member.id, "guild_id": ctx.guild.id})
+        if blacklist_entry:
+            return True
+
+
+        return False
+
 
 
     @commands.hybrid_command(description="You can run this command to warn a user in your server.", with_app_command=True, extras={"category": "Moderation"})
@@ -604,22 +621,6 @@ class ModerationCommandCog(commands.Cog):
         
         
         await ctx.send(embed=embed)
-
-
-
-    async def is_blacklisted_or_admin(ctx, member: discord.Member):
-
-
-        if member.guild_permissions.administrator:
-            return True
-        
-
-        blacklist_entry = await blacklist_bypass.find_one({"user_id": member.id, "guild_id": ctx.guild.id})
-        if blacklist_entry:
-            return True
-
-
-        return False
 
 
 
