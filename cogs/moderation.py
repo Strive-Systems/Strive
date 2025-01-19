@@ -36,7 +36,7 @@ class ModerationCommandCog(commands.Cog):
             return True
 
 
-        blacklist_entry = await blacklist_bypass.find_one({"user_id": member.id, "guild_id": ctx.guild.id})
+        blacklist_entry = await blacklist_bypass.find_one({"user_id": member.id})
         if blacklist_entry:
             return True
 
@@ -85,6 +85,8 @@ class ModerationCommandCog(commands.Cog):
                 "type": "warn",
                 "status": "active"
             }
+            
+            
             await cases.insert_one(warn_entry)
 
 
