@@ -26,8 +26,7 @@ class ModerationCommandCog(commands.Cog):
         if await is_blacklisted_or_admin(ctx, member):
             
             
-            return await ctx.send(f"")
-                embed = discord.Embed(
+            embed = discord.Embed(
                 title="",
                 description=f"<:error:1326752911870660704> You cannot warn {member.mention} because they are an admin or bypassed from moderation.",
                 color=discord.Color.green()
@@ -81,8 +80,7 @@ class ModerationCommandCog(commands.Cog):
         if await is_blacklisted_or_admin(ctx, member):
             
             
-            return await ctx.send(f"")
-                embed = discord.Embed(
+            embed = discord.Embed(
                 title="",
                 description=f"<:error:1326752911870660704> You cannot ban {member.mention} because they are an admin or bypassed from moderation.",
                 color=discord.Color.green()
@@ -215,8 +213,7 @@ class ModerationCommandCog(commands.Cog):
         if await is_blacklisted_or_admin(ctx, member):
             
             
-            return await ctx.send(f"")
-                embed = discord.Embed(
+            embed = discord.Embed(
                 title="",
                 description=f"<:error:1326752911870660704> You cannot softban {member.mention} because they are an admin or bypassed from moderation.",
                 color=discord.Color.green()
@@ -242,8 +239,7 @@ class ModerationCommandCog(commands.Cog):
         if await is_blacklisted_or_admin(ctx, member):
             
             
-            return await ctx.send(f"")
-                embed = discord.Embed(
+            embed = discord.Embed(
                 title="",
                 description=f"<:error:1326752911870660704> You cannot mute {member.mention} because they are an admin or bypassed from moderation.",
                 color=discord.Color.green()
@@ -346,8 +342,7 @@ class ModerationCommandCog(commands.Cog):
         if await is_blacklisted_or_admin(ctx, member):
             
             
-            return await ctx.send(f"")
-                embed = discord.Embed(
+            embed = discord.Embed(
                 title="",
                 description=f"<:error:1326752911870660704> You cannot kick {member.mention} because they are an admin or bypassed from moderation.",
                 color=discord.Color.green()
