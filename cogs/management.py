@@ -227,7 +227,7 @@ class ManagementCommandCog(commands.Cog):
             return
 
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, delete_after=5)
     
     
     
