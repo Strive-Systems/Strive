@@ -245,30 +245,42 @@ class ManagementCommandCog(commands.Cog):
         
         
         
-    @commands.hybrid_command(description="Lists the amount of members a role is assigned to. You can pass specific_role to run the command.", with_app_command=True, extras={"category": "General"})
-    async def members(self, ctx, *, specific_role: discord.Role):
-
-        if not specific_role:
-            await ctx.send("Role not found.")
-            return
+   @commands.hybrid_group(name="members", description="Lists the amount of members a role is assigned to. You can pass specific_role to run the command.", with_app_command=True, extras={"category": "General"})
+    async def members(self, ctx):
+        pass    
         
+        
+        
+    @members.command(name="specific_role", description="Lists the amount of members a role is assigned to.", with_app_command=True)
+    async def specific_role(self, ctx, *, role: discord.Role):
+        
+        if not role:
+            await ctx.send(embed=ErrorEmbed(
+                title="",
+                description=f"<:error:1326752911870660704> Role not found."
+            ))
+            return
+
 
         await ctx.guild.chunk()
-        members_with_role = [member for member in ctx.guild.members if specific_role in member.roles]
-        
-        
+        members_with_role = [member for member in ctx.guild.members if role in member.roles]
+
+
         if not members_with_role:
-            await ctx.send(f"No members have the role {specific_role.name}.")
+            await ctx.send(embed=ErrorEmbed(
+                title="",
+                description=f"<:error:1326752911870660704> No members have the role {role.name}."
+            ))
             return
-        
-        
+
+
         embed = discord.Embed(
-            title=f"Members with the role `{specific_role.name}`",
+            title=f"Members with the role `{role.name}`",
             description=f"{len(members_with_role)} members have this role",
             color=constants.strive_embed_color_setup()
         )
-
         
+
         member_list = "\n".join([f"**{member.display_name}** (`{member.id}`)" for member in members_with_role])
 
 
@@ -277,9 +289,9 @@ class ManagementCommandCog(commands.Cog):
             value=member_list,
             inline=False
         )
-
         
-        await ctx.send(embed=embed)
+
+        await ctx.send(embed=embed)    
         
         
         
