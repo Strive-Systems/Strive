@@ -98,7 +98,7 @@ class HelpCommandsCog(commands.Cog):
                     if slash_command and hasattr(slash_command, 'id') and slash_command.id:
                         command_list += f"</{command_name}:{slash_command.id}> - {command_description}\n"
                     else:
-                        command_list += f"**/{command_name}** - {command_description}\n"
+                        command_list += f"`/{command_name}` - {command_description}\n"
 
                 return command_list.strip()
 

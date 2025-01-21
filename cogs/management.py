@@ -105,7 +105,7 @@ class ManagementCommandCog(commands.Cog):
         
         
     
-    @commands.hybrid_group(description='Group Command', with_app_command=True)
+    @commands.hybrid_group(description='Allows you to change user roles with Strive.', with_app_command=True)
     async def role(self, ctx: commands.Context):
         return
     
@@ -269,7 +269,7 @@ class ManagementCommandCog(commands.Cog):
         )
 
         
-        member_list = "\n".join([f"**{member.display_name}** ({member.id})" for member in members_with_role])
+        member_list = "\n".join([f"**{member.display_name}** (`{member.id}`)" for member in members_with_role])
 
 
         embed.add_field(
@@ -498,7 +498,7 @@ class ManagementCommandCog(commands.Cog):
                     
                     
                     
-    @commands.hybrid_group(description='Group Command', with_app_command=True)
+    @commands.hybrid_group(description='Allows modification of user notes.', with_app_command=True)
     async def note(self, ctx: commands.Context):
         return
     

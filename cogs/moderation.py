@@ -434,7 +434,7 @@ class ModerationCommandCog(commands.Cog):
             
         
         
-    @commands.hybrid_group(description="Group command")
+    @commands.hybrid_group(description="This is the command for case management.")
     async def case(self, ctx):
         return
     
@@ -513,7 +513,7 @@ class ModerationCommandCog(commands.Cog):
             
            
             
-    @commands.hybrid_group(description="Group command")
+    @commands.hybrid_group(description="Allows the lookup, transferring and modification of modlogs.")
     async def modlogs(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send("Please specify a valid subcommand (view, transfer, clear).")
