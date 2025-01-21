@@ -245,7 +245,7 @@ class ManagementCommandCog(commands.Cog):
         
         
         
-   @commands.hybrid_group(name="members", description="Lists the amount of members a role is assigned to. You can pass specific_role to run the command.", with_app_command=True, extras={"category": "General"})
+    @commands.hybrid_group(name="members", description="Lists the amount of members a role is assigned to. You can pass specific_role to run the command.", with_app_command=True, extras={"category": "General"})
     async def members(self, ctx):
         pass    
         
