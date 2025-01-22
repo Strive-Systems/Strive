@@ -88,7 +88,7 @@ class ManagementCommandCog(commands.Cog):
 
 
 
-    @commands.hybrid_command(description="Show all information about a certain user.", aliases=["w"], with_app_command=True, extras={"category": "General"})
+    @commands.hybrid_command(description="Show all information about a certain user.", aliases=["w", "ui"], with_app_command=True, extras={"category": "General"})
     async def whois(self, ctx, member: discord.User = None):
 
         if member is None:

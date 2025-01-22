@@ -551,9 +551,12 @@ class UserInformationEmbed:
 
 
     def get_permissions(self):
-        return ", ".join(
-            perm.replace("_", " ").title() for perm, value in self.member.guild_permissions if value
-        ) or "No Permissions"
+        permissions = [
+            perm.replace("_", " ").title()
+            for perm, value in self.member.guild_permissions
+            if value
+        ]
+        return ", ".join(permissions[:5]) or "No Permissions"  # Limit to 5 permissions
 
 
 
@@ -567,8 +570,17 @@ class UserInformationEmbed:
             user_id = self.member.id
             account_created = f"<t:{int(self.member.created_at.timestamp())}:F>"
             joined_server = f"<t:{int(self.member.joined_at.timestamp())}:F>" if self.member.joined_at else "N/A"
-            roles = [role.mention for role in self.member.roles if role.name != "@everyone"]
-            role_count = len(roles)
+            
+            
+            roles = sorted(
+                [role for role in self.member.roles if role.name != "@everyone"],
+                key=lambda role: role.position,
+                reverse=True,
+            )[:5]  # Sort roles by position and limit to 5
+
+
+            role_mentions = [role.mention for role in roles]
+            role_count = len(role_mentions)
 
 
             # Fetch badges and permissions
@@ -606,7 +618,13 @@ class UserInformationEmbed:
             # Add badges and roles
             
             embed.add_field(name="Badges", value="\n".join(badges) if badges else "No badges", inline=False)
-            embed.add_field(name=f"Roles ({role_count})", value=", ".join(roles) if roles else "No Roles", inline=False)
+            
+            embed.add_field(
+                name=f"Roles ({role_count})",
+                value=", ".join(role_mentions) if role_mentions else "No Roles",
+                inline=False,
+            )
+            
             embed.add_field(name="Permissions", value=permissions_display, inline=False)
 
 
