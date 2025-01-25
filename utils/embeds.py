@@ -370,7 +370,7 @@ class ServerInformationEmbed:
         
         owner = self.guild.owner
         member_count = self.guild.member_count
-        created_at = self.guild.created_at.strftime("%B %d, %Y")
+        created_at = f"<t:{int(self.guild.created_at.timestamp())}>"
         role_count = len(self.guild.roles)
         emoji_count = len(self.guild.emojis)
         text_channels = len(self.guild.text_channels)
