@@ -10,7 +10,15 @@ from utils.embeds import HelpCenterEmbed
 
 constants = StriveConstants()
 
-EXCLUDED_COMMANDS = ['jishaku', 'debug', 'addowner', 'removeowner', 'sync', 'checkguild', 'showowners']
+EXCLUDED_COMMANDS = ['jishaku', 
+                     'debug', 
+                     'addowner', 
+                     'removeowner', 
+                     'sync', 
+                     'checkguild', 
+                     'showowners', 
+                     'blacklist', 
+                     'unblacklist']
 
 
 # This is the help cog that shows how to use the bot a list of its commands.
