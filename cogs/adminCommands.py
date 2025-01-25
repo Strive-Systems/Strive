@@ -61,6 +61,104 @@ class AdminCommandsCog(commands.Cog):
             
             await ctx.send(f"<:success:1326752811219947571> {user.mention} has been removed from the bypass list.")
             
+            
+            
+    # This allows the searching of bot owners and people bypassed, this should only be owners and developers but we
+    # need a way to track it.
+    
+    @commands.command()
+    async def showowners(self, ctx: commands.Context):
+        role = discord.utils.get(ctx.guild.roles, id=1326485348326314054)
+        if ctx.guild.id != 1326476818894557217 or role not in ctx.author.roles:
+            return await ctx.send("<:error:1326752911870660704> You do not have permission to use this command.")
+
+
+        owners_cursor = blacklist_bypass.find({})
+        owners = await owners_cursor.to_list(length=None)
+        processed_ids = set()
+        owner_list = []
+
+
+        for owner in owners:
+            discord_id = owner.get("discord_id")
+            if discord_id and discord_id not in processed_ids:
+                user = await self.strive.fetch_user(discord_id)
+                if user:
+                    owner_list.append(f"{user.mention} (`{discord_id}`)")
+                    processed_ids.add(discord_id)
+
+
+        pages = []
+        page_size = 5
+        
+
+        for i in range(0, len(owner_list), page_size):
+            embed = discord.Embed(
+                title="Strive Owners and Developers",
+                description=(
+                    "Listed below are the owners and developers of <:Strive:1330583510406267070> **Strive**, "
+                    "when a new one is added using `s!addowner` or when one is removed with `s!removeowner` "
+                    "this list will update."
+                ),
+                color=constants.strive_embed_color_setup()
+            )
+
+
+            embed.add_field(
+                name="",
+                value="\n".join(owner_list[i:i + page_size]),
+                inline=False
+            )
+
+
+            embed.set_footer(text=f"Page {len(pages) + 1} of {((len(owner_list) - 1) // page_size) + 1}")
+            pages.append(embed)
+
+
+
+        # This is the class for the button navigation when records become more than 5. This is to prevent overflow.
+
+        class PaginationView(View):
+            def __init__(self, embeds):
+                super().__init__(timeout=60)
+                self.embeds = embeds
+                self.current_page = 0
+
+
+                self.previous_button = Button(emoji="<:left:1332555046956826646>", style=discord.ButtonStyle.gray, disabled=True)
+                self.previous_button.callback = self.previous_page
+
+
+                self.next_button = Button(emoji="<:right:1332554985153626113>", style=discord.ButtonStyle.gray, disabled=(len(embeds) <= 1))
+                self.next_button.callback = self.next_page
+
+
+                self.add_item(self.previous_button)
+                self.add_item(self.next_button)
+
+
+            async def update_message(self, interaction):
+                self.previous_button.disabled = self.current_page == 0
+                self.next_button.disabled = self.current_page == len(self.embeds) - 1
+                await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
+
+
+            async def previous_page(self, interaction: discord.Interaction):
+                if self.current_page > 0:
+                    self.current_page -= 1
+                    await self.update_message(interaction)
+
+
+            async def next_page(self, interaction: discord.Interaction):
+                if self.current_page < len(self.embeds) - 1:
+                    self.current_page += 1
+                    await self.update_message(interaction)
+
+
+
+        view = PaginationView(pages)
+        await ctx.send(embed=pages[0], view=view)
+            
 
 
     # This is a custom sync command cause JSK sync is broken, this will sync the commands with Discord
