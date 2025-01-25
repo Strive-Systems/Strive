@@ -518,11 +518,27 @@ class ModerationCommandCog(commands.Cog):
         
         
         if case_info:
-            await ctx.send(f"<:success:1326752811219947571> Case #{caseid} has been voided!")
+            
+            embed = discord.Embed(
+                title="",
+                description=f"<:success:1326752811219947571> Case #{caseid} has been voided!",
+                color=discord.Color.green()
+            )
+            
+            
+            await ctx.send(embed=embed)
         
         
         elif not case_info:
-            await ctx.send(f"<:error:1326752911870660704> Case #{caseid} could not be found!")
+            
+            embed = discord.Embed(
+                title="",
+                description=f"<:error:1326752911870660704> Case #{caseid} could not be found!",
+                color=discord.Color.red()
+            )
+            
+            
+            await ctx.send(embed=embed)
             
            
             
