@@ -444,7 +444,6 @@ class ModerationCommandCog(commands.Cog):
     async def view(self, ctx: commands.Context, caseid: int):
         case_info = await cases.find_one({'case_id': caseid, 'guild_id': ctx.guild.id})
         
-        
         if case_info:
             
             embed = discord.Embed(
@@ -453,21 +452,35 @@ class ModerationCommandCog(commands.Cog):
                 color=self.constants.strive_embed_color_setup(),
             )
 
+
+            member_value = f"<@{case_info.get('user_id')}> (`{case_info.get('user_id')}`)"
+            moderator_value = f"<@{case_info.get('moderator_id')}> (`{case_info.get('moderator_id')}`)"
+            reason_value = case_info.get('reason') or "No reason provided."
+
+
+            if case_info.get('status') == "cleared":
+                member_value = f"~~{member_value}~~"
+                moderator_value = f"~~{moderator_value}~~"
+                reason_value = f"~~{reason_value}~~"
+
+
             embed.add_field(
                 name="Member",
-                value=f"<@{case_info.get('user_id')}> (`{case_info.get('user_id')}`)",
+                value=member_value,
                 inline=True
             )
             
+
             embed.add_field(
                 name="Moderator",
-                value=f"<@{case_info.get('moderator_id')}> (`{case_info.get('moderator_id')}`)",
+                value=moderator_value,
                 inline=True
             )
 
+
             embed.add_field(
                 name="Reason",
-                value=case_info.get('reason') or "No reason provided.",
+                value=reason_value,
                 inline=False
             )
 
