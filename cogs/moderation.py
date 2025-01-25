@@ -521,7 +521,7 @@ class ModerationCommandCog(commands.Cog):
             
             embed = discord.Embed(
                 title="",
-                description=f"<:success:1326752811219947571> Case #{caseid} has been voided!",
+                description=f"<:success:1326752811219947571> **Case #{caseid}** has been voided!",
                 color=discord.Color.green()
             )
             
@@ -533,7 +533,7 @@ class ModerationCommandCog(commands.Cog):
             
             embed = discord.Embed(
                 title="",
-                description=f"<:error:1326752911870660704> Case #{caseid} could not be found!",
+                description=f"<:error:1326752911870660704> **Case #{caseid}** could not be found!",
                 color=discord.Color.red()
             )
             
