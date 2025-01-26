@@ -96,21 +96,6 @@ class CommandsCog(commands.Cog):
             
             
             
-    # This will get the version information from GitHub directly. This is so we dont have to change it
-    # each time as that will get anoying fast and I am a lazy developer.
-     
-    def get_git_version(self):
-        try:
-            version = subprocess.check_output(['git', 'describe', '--tags']).decode('utf-8').strip()
-
-            commit = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('utf-8').strip()
-
-            return f"{version} ({commit})"
-        
-        except subprocess.CalledProcessError:
-            return "Unknown Version"       
-            
-            
     # This gets the MongoDB latency using a lightweight command like ping and then mesuring its response time.        
             
     async def get_mongo_latency(self):
