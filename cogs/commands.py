@@ -287,5 +287,19 @@ class CommandsCog(commands.Cog):
             
 
 
+    @commands.hybrid_command(description="Use this command to generate a donation link to donate to Strive.", with_app_command=True, extras={"category": "General"})
+    async def donate(self, ctx):
+        
+        embed = discord.Embed(
+            title="Donate to Strive Systems",
+            description=f"Thank you for wanting to donate! It goes a long way in terms of supporting this project as its completely free, here is your donation link. \n\n https://buy.stripe.com/bIY7uncmy3rW1kk144",
+            color=constants.strive_embed_color_setup()
+        )
+            
+            
+        await ctx.send(embed=embed)
+        
+
+
 async def setup(strive):
     await strive.add_cog(CommandsCog(strive))
