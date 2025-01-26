@@ -280,45 +280,6 @@ class AboutWithButtons:
 
 
         return view
-
-
-# This is a debug command emebed that accepts parameters.    
-    
-class DebugEmbed(discord.Embed):
-    def __init__(self, bot, ctx):
-        
-        
-        # Creates a debug embed with various details for debugging purposes.
-        
-        super().__init__(
-            title="Debug Information",
-            description="Here is the current debug information for the Strive:",
-            color=discord.Color.from_str('#dfa4ff')
-        )
-
-
-        # Define a dictionary with debug information fields
-        
-        fields = {
-            "Latency": f"{round(bot.latency * 1000)} ms",
-            "Server Name": ctx.guild.name,
-            "Server ID": ctx.guild.id,
-            "Channel": ctx.channel.name,
-            "Channel ID": ctx.channel.id,
-            "User": ctx.author.mention,
-            "User ID": ctx.author.id
-        }
-
-
-        # Add all fields to the embed
-        
-        for name, value in fields.items():
-            self.add_field(name=name, value=value, inline=True if "ID" in name else True)
-
-
-        # Set footer with requesting user details
-        
-        self.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar.url)
                
         
 # This is the embed for the bots help center. This embed is the inital embed that shows that
@@ -638,42 +599,6 @@ class UserInformationEmbed:
         except Exception as e:
             print(f"Error generating embed: {e}")
             return None
-
-
-class CheckGuildEmbed(discord.Embed):
-    def create_valid_guild_embed(self, guild: discord.Guild):
-        embed = discord.Embed(
-            title="Valid Guild",
-            description="I have found that guild here is the information on it.",
-            color=self.constants.strive_embed_color_setup()
-        )
-        owner = guild.owner
-        member_count = guild.member_count
-        created_at = guild.created_at.strftime("%B %d, %Y")
-        boosts = guild.premium_subscription_count
-        boost_tier = guild.premium_tier
-        icon_url = guild.icon.url if guild.icon else None
-
-        embed.add_field(
-            name="Information",
-            value=f"> **Name:** {guild.name}\n"
-            f"> **Server Owner:** {owner}"
-            f"> **Member Count:** {member_count}"
-            f"> **Created At:** {created_at}"
-            f"> **Boosts:** {boosts}"
-            f"> **Boost Tier:** {boost_tier}"
-        )
-        embed.set_thumbnail(url=icon_url)
-
-        return embed
-    def create_invalid_guild_embed(id):
-        embed = discord.Embed(
-            title="Invalid Guild",
-            description=f"The guild by the id of ({id})",
-            color=discord.Color.red()
-        )
-
-        return embed
 
     
 # This specifices the afk emebed error, telling use

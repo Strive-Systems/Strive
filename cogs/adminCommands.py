@@ -3,7 +3,7 @@ import uuid
 import time
 from discord.ui import View, Button
 from discord.ext import commands
-from utils.embeds import DebugEmbed, CheckGuildEmbed
+from utils.embeds import CheckGuildEmbed
 from utils.constants import StriveConstants
 from utils.utils import get_next_case_id
 from utils.constants import blacklists, blacklist_bypass, cases
