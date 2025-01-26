@@ -1,4 +1,4 @@
-# **Merx - The Ultimate Discord Moderation Bot**
+# **Strive - The Ultimate Discord Moderation Bot**
 
 Strive is the simplest way to streamline moderation, logging, reaction roles, and more for your community. Strive System empowers you with robust tools, intuitive controls, and seamless integration, making it easier than ever to manage, grow, and engage your community effectively.
 
