@@ -10,7 +10,7 @@ Strive is the simplest way to streamline moderation, logging, reaction roles, an
 - **Ban & Unban**: Easily manage disruptive users using `/ban` and `/unban` commands.
 - **Nickname Management**: Modify or reset user nicknames seamlessly with `/nickname`.
 - **Tickets System**: Effortlessly handle support issues within your server using our advanced ticketing system.
-- **Fully Customizable**: Being open-source, Merx offers the flexibility to adapt and expand its features to suit your server’s unique needs.
+- **Fully Customizable**: Being open-source, Strive offers the flexibility to adapt and expand its features to suit your server’s unique needs.
 
 ## :rocket: **Getting Started**
 
@@ -41,7 +41,7 @@ To run Strive, ensure you have the following installed:
 
 ## :globe_with_meridians: **Contributing**
 
-We welcome contributions from the community! Feel free to fork the project, submit issues, or make pull requests. Help make Merx even better!
+We welcome contributions from the community! Feel free to fork the project, submit issues, or make pull requests. Help make Strive even better!
 
 ## :page_facing_up: **License**
 
