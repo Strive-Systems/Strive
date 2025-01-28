@@ -1,2 +1,5 @@
 .env
 */.env
+*/cogs/linkedroles.py
+/cogs/linkedroles.py
+./cogs/linkedroles.py

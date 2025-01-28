@@ -65,7 +65,7 @@ class CommandsCog(commands.Cog):
             cluster=cluster,
             environment=environment,
             command_run_time=formatted_time,
-            thumbnail_url="https://media.discordapp.net/attachments/1326735526740496444/1330237608420442192/StriveLogoGrey.png"
+            thumbnail_url="https://cdn.discordapp.com/attachments/1326735526740496444/1333643206226739312/StriveLogoGrey.png"
         )
 
 
