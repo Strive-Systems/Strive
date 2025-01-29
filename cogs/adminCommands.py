@@ -213,23 +213,27 @@ class AdminCommandsCog(commands.Cog):
             return await ctx.send(f"<:error:1326752911870660704> {entity} is not blacklisted.")
 
 
-        case_id = await get_next_case_id(ctx.guild.id)
-        
-        case_entry = {
-            "case_id": case_id,
-            "guild_id": entity_id,
-            "user_id": ctx.guild.id,
-            "moderator_id": ctx.author.id,
-            "reason": reason,
-            "timestamp": int(time.time()),
-            "type": "blacklist",
-            "status": "cleared"
-        }
-        
-        
-        await blacklists.delete_one({"discord_id": entity_id, "type": entity_type})
-        await cases.insert_one(case_entry)
-        await ctx.send(f"<:success:1326752811219947571> **Case #{case_id} - {entity}** has been unblacklisted for {reason}.")
+        case_entry = await cases.find_one(
+            {"guild_id": ctx.guild.id, "user_id": entity_id, "type": "blacklist"},
+            sort=[("timestamp", -1)]
+        )
+
+
+        if case_entry:
+            
+            
+            await cases.update_one(
+                {"_id": case_entry["_id"]},
+                {"$set": {"status": "cleared"}}
+            )
+            
+            
+            await blacklists.delete_one({"discord_id": entity_id, "type": entity_type})
+            await ctx.send(f"<:success:1326752811219947571> **{entity}** has been unblacklisted for {reason}.")
+            
+            
+        else:
+            await ctx.send(f"<:error:1326752911870660704> {entity} is not blacklisted.")
         
         
         
