@@ -5,7 +5,7 @@ from discord.ext import commands, tasks
 from datetime import datetime, timedelta
 from utils.utils import get_next_case_id
 from utils.constants import StriveConstants, reminders, afks, notes
-from utils.embeds import UserInformationEmbed, ReminderEmbed, RoleSuccessEmbed, RolesInformationEmbed, SuccessEmbed, ErrorEmbed, AfkEmbed, NicknameSuccessEmbed
+from utils.embeds import UserInformationEmbed, ReminderEmbed, RoleSuccessEmbed, RolesInformationEmbed, SuccessEmbed, ErrorEmbed, NicknameSuccessEmbed
 
 
 constants = StriveConstants()
@@ -345,19 +345,7 @@ class ManagementCommandCog(commands.Cog):
         
         
     @commands.hybrid_group(description="Set your AFK status with an optional reason.")
-    async def afk(self, ctx: commands.Context):
-        return
-    
-    
-    
-    @afk.group(name='mod', description="Group of a group")
-    async def afk_mod(self, ctx: commands.Context):
-        return
-        
-        
-        
-    @afk.command(name='set', description="Set yourself as AFK.", with_app_command=True)
-    async def afk_set(self, ctx: commands.Context, *, message: str = "none"):
+    async def afk(self, ctx: commands.Context, *, message: str = "none"):
         afk_data = await afks.find_one({"user_id": ctx.author.id})
         
         if not afk_data:
@@ -392,64 +380,13 @@ class ManagementCommandCog(commands.Cog):
                 title="",
                 description="<:error:1326752911870660704> You are already AFK."
             ))
-
-
-
-    @afk.command(name="return", description="Return from your AFK")
-    async def afk_return(self, ctx: commands.Context):
-        afk_data = await afks.find_one({"user_id": ctx.author.id})
-        
-        
-        if afk_data:
-            await afks.delete_one({"user_id": ctx.author.id})
-
-
-            for item in self.strive.afk_users:
-                if item['user_id'] == ctx.author.id and item['guild_id'] == ctx.guild.id:
-                    self.strive.afk_users.remove(item)
-                    break
-
-
-            await ctx.send(embed=SuccessEmbed(
-                title="",
-                description="<:success:1326752811219947571> You are now back online!"
-            ))
-            
-            
-        else:
-            await ctx.send(embed=ErrorEmbed(
-                title="",
-                description="<:error:1326752911870660704> You are not AFK."
-            ))
     
     
     
-    @afk_mod.command(name='mod_return', description="Force an AFK return", with_app_command=True)
-    async def afk_return_mod(self, ctx: commands.Context, member: discord.Member, *, reason: str = "None"):
-        afk_data = await afks.find_one_and_delete({"user_id": ctx.author.id})
+    @afk.group(name='mod', description="Group of a group")
+    async def afk_mod(self, ctx: commands.Context):
+        return
         
-        if afk_data:
-            await member.edit(nick=None)
-
-
-            for item in self.strive.afk_users:
-                if item['user_id'] == member.id and item['guild_id'] == ctx.guild.id:
-                    self.strive.afk_users.remove(item)
-                    break
-                
-                
-            await ctx.send(embed=SuccessEmbed(
-                title="",
-                description=f"<:success:1326752811219947571> **{member.name}**'s AFK has been ended!"
-            ))
-            
-            
-            await member.send(f"<:success:1326752811219947571> Your AFK has been ended in **{ctx.guild.name}** by **{ctx.author.mention}** for reason: {reason}")
-        
-        
-        else:
-            await ctx.send("I could not find an AFK for this person!")
-    
     
     
     @afk_mod.command(name='list', description="List all AFK's in this server", with_app_command=True)
@@ -506,7 +443,15 @@ class ManagementCommandCog(commands.Cog):
                 afk_key = {'user_id': user.id, 'guild_id': message.guild.id}
                 if afk_key in afk_data:
                     result = await afks.find_one({'user_id': user.id, 'guild_id': message.guild.id})
-                    await message.channel.send(embed=AfkEmbed(user, result.get('message')))
+                    
+                    afk_timestamp = result.get("timestamp", int(time.time()))
+                    formatted_time = f"<t:{afk_timestamp}:F>"
+
+                    
+                    await message.channel.send(
+                        f"**<:clock:1334022552326111353> {user} is currently AFK because:** {result.get('message')}.\n"
+                        f"-# They have been AFK since {formatted_time}."
+                    )
                     
                     
                     

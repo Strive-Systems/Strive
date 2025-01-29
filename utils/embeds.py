@@ -600,22 +600,6 @@ class UserInformationEmbed:
             print(f"Error generating embed: {e}")
             return None
 
-    
-# This specifices the afk emebed error, telling use
-    
-class AfkEmbed(discord.Embed):
-    
-    
-    def __init__(self, user: discord.User, reason: str):
-        super().__init__(
-            title=f"{user.name} is currently AFK",
-            description=f"> Message: {reason}",
-            color=constants.strive_embed_color_setup()
-        )
-        
-        
-        self.set_footer(text="They will respond when they are back.")
-
 
 class EmojiFindEmbed:
     def __init__(self, emoji):
