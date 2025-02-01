@@ -24,6 +24,7 @@ setup_col = db.setup
 verify_waiting = db.verify_waiting
 cases = db.cases
 guild_counters = db.guild_counters
+timezones = db.timezones
 
 
 class StriveConstants:
