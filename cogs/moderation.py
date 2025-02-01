@@ -441,7 +441,7 @@ class ModerationCommandCog(commands.Cog):
     
     
     @case.command(description="Searches cases by an Case ID.", with_app_command=True)
-    @commands.has_permissions(administrator=True)
+    @commands.has_guild_permissions(ban_members=True)
     async def view(self, ctx: commands.Context, caseid: int):
         case_info = await cases.find_one({'case_id': caseid, 'guild_id': ctx.guild.id})
         
@@ -512,7 +512,7 @@ class ModerationCommandCog(commands.Cog):
     
     
     @case.command(description="Void a case by ID", with_app_command=True)
-    @commands.has_permissions(administrator=True)
+    @commands.has_guild_permissions(ban_members=True)
     async def void(self, ctx: commands.Context, *, caseid: int):
         
         
@@ -552,7 +552,7 @@ class ModerationCommandCog(commands.Cog):
 
 
     @modlogs.command(description="View all modlogs for a certain user")
-    @commands.has_permissions(administrator=True)
+    @commands.has_guild_permissions(ban_members=True)
     async def view(self, ctx, member: discord.Member):
         number = 0
         embed = discord.Embed(
@@ -609,7 +609,7 @@ class ModerationCommandCog(commands.Cog):
 
 
     @modlogs.command(description="Transfer all modlogs to a different user")
-    @commands.has_permissions(administrator=True)
+    @commands.has_guild_permissions(ban_members=True)
     async def transfer(self, ctx, olduser: discord.Member, newuser: discord.Member):
         results = cases.find({'user_id': olduser.id, "guild_id": ctx.guild.id})
         failed_cases = []
@@ -643,6 +643,7 @@ class ModerationCommandCog(commands.Cog):
 
 
     @modlogs.command(description="Clear all modlogs for a certain user")
+    @commands.has_guild_permissions(ban_members=True)
     async def clear(self, ctx, member: discord.Member):
         results = cases.find({'user_id': member.id, "guild_id": ctx.guild.id})
         failed_cases = []
