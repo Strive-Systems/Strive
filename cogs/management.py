@@ -460,6 +460,7 @@ class ManagementCommandCog(commands.Cog):
         return
     
     @note.command(description="Adds a moderator note to a user.", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(administrator=True)
     async def add(self, ctx: commands.Context, member: discord.Member, reason):        
         note_id = await get_next_case_id(ctx.guild.id)
 
@@ -482,6 +483,7 @@ class ManagementCommandCog(commands.Cog):
 
 
     @note.command(description="Delete a note on a user", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(administrator=True)
     async def remove(self, ctx: commands.Context, id):
         await notes.delete_one({"note_id": f"Note #{id}"})
 
@@ -490,6 +492,7 @@ class ManagementCommandCog(commands.Cog):
 
 
     @note.command(description="Search for a note on a user", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(administrator=True)
     async def search(self, ctx: commands.Context, id):
         result = await notes.find_one({"note_id": f"{id}"})
 
