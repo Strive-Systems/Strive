@@ -285,52 +285,9 @@ class CommandsCog(commands.Cog):
             
         await ctx.send(embed=embed)
 
-    @commands.hybrid_group(description="Allows you to set your timezone or view another users")
-    async def timezone(self, ctx):
-        pass
-
-    @timezone.command(name="set", description="Set your timezone", extras={"category": "General"})
-    async def timezone_set(self, ctx, timezone: str):
+    @commands.hybrid_group(description="Allows you to set your timezone or view another users", aliases=["tz"], extras={"category": "General"}, with_app_command=True)
+    async def timezone(self, ctx, user: discord.Member = None):
         try:
-            if timezone not in pytz.all_timezones:
-                embed = discord.Embed(
-                    description="<:error:1326752911870660704> Invalid timezone. Please use a valid timezone like 'US/Pacific' or 'Europe/London'.",
-                    color=constants.strive_embed_color_setup()
-                )
-                await ctx.send(embed=embed)
-                return
-
-
-            await timezones.update_one(
-                {"user_id": str(ctx.author.id)},
-                {"$set": {"timezone": timezone}},
-                upsert=True
-            )
-
-
-            embed = discord.Embed(
-                description=f"<:success:1326752811219947571> Your timezone has been set to `{timezone}`",
-                color=constants.strive_embed_color_setup()
-            )
-
-            await ctx.send(embed=embed)
-
-
-        except Exception as e:
-
-            embed = discord.Embed(
-                title="",
-                description="<:error:1326752911870660704> An error occurred while setting your timezone.",
-                color=constants.strive_embed_color_setup()
-            )
-
-            await ctx.send(embed=embed)
-
-
-    @timezone.command(name="view", description="View a user's timezone", extras={"category": "General"})
-    async def timezone_view(self, ctx, user: discord.Member = None):
-        try:
-
             if user is None:
                 user = ctx.author
 
@@ -364,6 +321,41 @@ class CommandsCog(commands.Cog):
             )
             await ctx.send(embed=embed)
 
+    @timezone.command(name="set", description="Set your timezone", extras={"category": "General"}, with_app_command=True)
+    async def timezone_set(self, ctx, timezone: str):
+        try:
+            timezone = timezone.lower()
+            matching_timezones = [tz for tz in pytz.all_timezones if timezone in tz.lower()]
+            
+            if not matching_timezones:
+                embed = discord.Embed(
+                    description="<:error:1326752911870660704> Invalid timezone. Please use a city name like 'london' or 'tokyo'.",
+                    color=constants.strive_embed_color_setup()
+                )
+                await ctx.send(embed=embed)
+                return
+
+            selected_timezone = matching_timezones[0]
+            await timezones.update_one(
+                {"user_id": str(ctx.author.id)},
+                {"$set": {"timezone": selected_timezone}},
+                upsert=True
+            )
+
+            embed = discord.Embed(
+                description=f"<:success:1326752811219947571> Your timezone has been set to `{selected_timezone}`",
+                color=constants.strive_embed_color_setup()
+            )
+
+            await ctx.send(embed=embed)
+
+        except Exception as e:
+            embed = discord.Embed(
+                title="",
+                description="<:error:1326752911870660704> An error occurred while setting your timezone.",
+                color=constants.strive_embed_color_setup()
+            )
+            await ctx.send(embed=embed)
 
 async def setup(strive):
     await strive.add_cog(CommandsCog(strive))
