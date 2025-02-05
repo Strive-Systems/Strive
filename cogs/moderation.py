@@ -692,8 +692,8 @@ class ModerationCommandCog(commands.Cog):
         )
 
         embed.set_footer(
-            text=f"This dropdown will disable in 30 seconds • Total Bans: {len(bans)}",
-            icon_url=ctx.guild.icon.url
+            text=f"This dropdown will disable in 30 seconds",
+            icon_url=None
         )
 
         class BanSelect(discord.ui.Select):
@@ -741,7 +741,7 @@ class ModerationCommandCog(commands.Cog):
 
                     embed.set_footer(
                         text="This dropdown will disable in 30 seconds",
-                        icon_url=interaction.guild.icon.url
+                        icon_url=None
                     )
                     embed.add_field(name="User", value=f"{ban_entry.user} (`{ban_entry.user.id}`)", inline=False)
                     embed.add_field(name="Reason", value=ban_entry.reason or "No reason provided", inline=False)
