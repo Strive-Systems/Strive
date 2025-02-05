@@ -23,6 +23,10 @@ class Strive(commands.AutoShardedBot):
         self.beta_guilds = [
             1326476818894557217 # Strive Support
         ]
+
+        self.error = "<:error:1326752911870660704>"
+        self.success = "<:success:1326752811219947571>"
+        self.loading = "<a:loading:1336666887760777216>"
         
         
         
