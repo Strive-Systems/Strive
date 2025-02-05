@@ -152,7 +152,7 @@ class CommandsCog(commands.Cog):
 
 
         if emoji.name == None:
-            await ctx.send("{self.bot.error} I couldn't find that emoji.")
+            await ctx.send("{self.strive.error} I couldn't find that emoji.")
             return
         
 
@@ -185,7 +185,7 @@ class CommandsCog(commands.Cog):
         if emoji == None:
             embed = Embed(
                 title="",
-                description=f"{self.bot.error} I could not find that emoji."
+                description=f"{self.strive.error} I could not find that emoji."
             )
             await ctx.reply(embed=embed)
             return
@@ -296,7 +296,7 @@ class CommandsCog(commands.Cog):
             if not timezone_data:
                 embed = discord.Embed(
                     title="",
-                    description=f"{self.bot.error} {'You have' if user == ctx.author else f'{user.name} has'} not set a timezone yet.",
+                    description=f"{self.strive.error} {'You have' if user == ctx.author else f'{user.name} has'} not set a timezone yet.",
                     color=constants.strive_embed_color_setup()
                 )
                 await ctx.send(embed=embed)
@@ -316,7 +316,7 @@ class CommandsCog(commands.Cog):
             print(f"Error viewing timezone: {e}")
             embed = discord.Embed(
                 title="",
-                description=f"{self.bot.error} An error occurred while viewing the timezone.",
+                description=f"{self.strive.error} An error occurred while viewing the timezone.",
                 color=constants.strive_embed_color_setup()
             )
             await ctx.send(embed=embed)
@@ -329,7 +329,7 @@ class CommandsCog(commands.Cog):
             
             if not matching_timezones:
                 embed = discord.Embed(
-                    description=f"{self.bot.error} Invalid timezone. Please use a city name like 'london' or 'tokyo'.",
+                    description=f"{self.strive.error} Invalid timezone. Please use a city name like 'london' or 'tokyo'.",
                     color=constants.strive_embed_color_setup()
                 )
                 await ctx.send(embed=embed)
@@ -343,7 +343,7 @@ class CommandsCog(commands.Cog):
             )
 
             embed = discord.Embed(
-                description=f"{self.bot.success} Your timezone has been set to `{selected_timezone}`",
+                description=f"{self.strive.success} Your timezone has been set to `{selected_timezone}`",
                 color=constants.strive_embed_color_setup()
             )
 
@@ -352,7 +352,7 @@ class CommandsCog(commands.Cog):
         except Exception as e:
             embed = discord.Embed(
                 title="",
-                description=f"{self.bot.error} An error occurred while setting your timezone.",
+                description=f"{self.strive.error} An error occurred while setting your timezone.",
                 color=constants.strive_embed_color_setup()
             )
             await ctx.send(embed=embed)

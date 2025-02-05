@@ -63,7 +63,7 @@ class AutoModCommandCog(commands.Cog):
         guild_id = ctx.guild.id
         await blacklistedwords.insert_one({'guild_id': guild_id, 'word': word})
         await self.fetch_banned_words()
-        await ctx.send(f"{self.bot.success} The word `{word}` has been added to the banned words list.")
+        await ctx.send(f"{self.strive.success} The word `{word}` has been added to the banned words list.")
 
 
 
@@ -73,7 +73,7 @@ class AutoModCommandCog(commands.Cog):
         guild_id = ctx.guild.id
         await blacklistedwords.delete_one({'guild_id': guild_id, 'word': word})
         await self.fetch_banned_words()
-        await ctx.send(f"{self.bot.success} The word `{word}` has been removed from the banned words list.")
+        await ctx.send(f"{self.strive.success} The word `{word}` has been removed from the banned words list.")
 
 
 
@@ -83,7 +83,7 @@ class AutoModCommandCog(commands.Cog):
         banned_words_list = self.strive.blacklistedwords.get(guild_id, [])
 
         if not banned_words_list:
-            await ctx.send(f"{self.bot.error} No banned words found for this server.", ephemeral=True)
+            await ctx.send(f"{self.strive.error} No banned words found for this server.", ephemeral=True)
             return
 
         banned_words_str = ', '.join(banned_words_list)
