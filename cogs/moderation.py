@@ -734,6 +734,10 @@ class ModerationCommandCog(commands.Cog):
                         timestamp=discord.utils.utcnow()
                     )
 
+                    embed.set_footer(
+                        text="This dropdown will disable in 30 seconds",
+                        icon_url=self.strive.user.avatar.url
+                    )
                     embed.add_field(name="User", value=f"{ban_entry.user} (`{ban_entry.user.id}`)", inline=False)
                     embed.add_field(name="Reason", value=ban_entry.reason or "No reason provided", inline=False)
 
@@ -756,13 +760,18 @@ class ModerationCommandCog(commands.Cog):
 
         class BanListView(discord.ui.View):
             def __init__(self, bans, message):
-                super().__init__()
+                super().__init__(timeout=30.0)
                 self.add_item(BanSelect(bans, message))
+
+            async def on_timeout(self):
+                for child in self.children:
+                    child.disabled = True
+                await self.message.edit(view=self)
 
         message = await ctx.send(embed=embed)
         view = BanListView(bans, message)
+        view.message = message
         await message.edit(view=view)
-
         
 async def setup(strive):
     await strive.add_cog(ModerationCommandCog(strive))
