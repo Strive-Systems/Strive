@@ -674,7 +674,7 @@ class ModerationCommandCog(commands.Cog):
     @commands.hybrid_command(description="View a list of banned users", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(ban_members=True)
     async def banlist(self, ctx):
-        bans = [ban_entry async for ban_entry in ctx.guild.bans()]
+        bans = [entry async for entry in ctx.guild.bans()]
         
         if not bans:
             embed = discord.Embed(
@@ -691,27 +691,24 @@ class ModerationCommandCog(commands.Cog):
             color=self.constants.strive_embed_color_setup()
         )
 
-        embed.set_footer(
-            text=f"This dropdown will disable in 30 seconds",
-            icon_url=None
-        )
+        embed.set_footer(text="This dropdown will disable in 30 seconds")
 
-        class BanSelect(discord.ui.Select):
-            def __init__(self, bans, original_message):
-                self.original_message = original_message
-                options = []
-                for ban_entry in bans:
-                    options.append(discord.SelectOption(
-                        label=str(ban_entry.user),
-                        value=str(ban_entry.user.id),
-                        description=f"ID: {ban_entry.user.id}"
-                    ))
+        class BanDropdown(discord.ui.Select):
+            def __init__(self, bans, msg):
+                self.msg = msg
+                options = [
+                    discord.SelectOption(
+                        label=str(ban.user),
+                        value=str(ban.user.id),
+                        description=f"ID: {ban.user.id}"
+                    ) for ban in bans[:25]  # Discord limit of 25 options
+                ]
                 
                 super().__init__(
                     placeholder="Select a banned user...",
                     min_values=1,
                     max_values=1,
-                    options=options[:25]  # Discord limit of 25 options
+                    options=options
                 )
 
             async def callback(self, interaction: discord.Interaction):
@@ -719,14 +716,11 @@ class ModerationCommandCog(commands.Cog):
                     await interaction.response.send_message("You cannot use this menu.", ephemeral=True)
                     return
 
-                ban_entry = None
-                async for entry in interaction.guild.bans():
-                    if str(entry.user.id) == self.values[0]:
-                        ban_entry = entry
-                        break
+                ban = next((ban async for ban in interaction.guild.bans() 
+                          if str(ban.user.id) == self.values[0]), None)
 
-                if ban_entry:
-                    case_info = await cases.find_one({
+                if ban:
+                    case = await cases.find_one({
                         'user_id': int(self.values[0]),
                         'guild_id': interaction.guild.id,
                         'type': 'ban',
@@ -734,49 +728,46 @@ class ModerationCommandCog(commands.Cog):
                     })
 
                     embed = discord.Embed(
-                        title=f"Ban Information for {ban_entry.user}",
+                        title=f"Ban Information for {ban.user}",
                         color=discord.Color.red(),
                         timestamp=discord.utils.utcnow()
                     )
 
-                    embed.set_footer(
-                        text="This dropdown will disable in 30 seconds",
-                        icon_url=None
-                    )
-                    embed.add_field(name="User", value=f"{ban_entry.user} (`{ban_entry.user.id}`)", inline=False)
-                    embed.add_field(name="Reason", value=ban_entry.reason or "No reason provided", inline=False)
+                    embed.set_footer(text="This dropdown will disable in 30 seconds")
+                    embed.add_field(name="User", value=f"{ban.user} (`{ban.user.id}`)", inline=False)
+                    embed.add_field(name="Reason", value=ban.reason or "No reason provided", inline=False)
 
-                    if case_info:
+                    if case:
                         embed.add_field(
                             name="Additional Information",
-                            value=f"**Case ID:** {case_info.get('case_id')}\n"
-                                  f"**Moderator:** <@{case_info.get('moderator_id')}>\n"
-                                  f"**Banned on:** <t:{case_info.get('timestamp')}:F>",
+                            value=f"**Case ID:** {case.get('case_id')}\n"
+                                  f"**Moderator:** <@{case.get('moderator_id')}>\n"
+                                  f"**Banned on:** <t:{case.get('timestamp')}:F>",
                             inline=False
                         )
 
                     try:
-                        embed.set_thumbnail(url=ban_entry.user.avatar.url)
+                        embed.set_thumbnail(url=ban.user.avatar.url)
                     except:
                         pass
 
-                    self.placeholder = str(ban_entry.user)
+                    self.placeholder = str(ban.user)
                     await interaction.response.edit_message(embed=embed, view=self.view)
 
-        class BanListView(discord.ui.View):
+        class BanView(discord.ui.View):
             def __init__(self, bans, message):
                 super().__init__(timeout=30.0)
-                self.add_item(BanSelect(bans, message))
+                self.add_item(BanDropdown(bans, message))
 
             async def on_timeout(self):
-                for child in self.children:
-                    child.disabled = True
+                for item in self.children:
+                    item.disabled = True
                 await self.message.edit(view=self)
 
         message = await ctx.send(embed=embed)
-        view = BanListView(bans, message)
+        view = BanView(bans, message)
         view.message = message
-        await message.edit(view=view)
-        
+        await message.edit(view=view)    
+            
 async def setup(strive):
     await strive.add_cog(ModerationCommandCog(strive))
