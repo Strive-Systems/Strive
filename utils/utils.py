@@ -47,7 +47,7 @@ class StriveContext(commands.Context):
     async def send_success(self, message: str):
         embed = discord.Embed(
             title="",
-            description=f"{self.strive.success} {self.author.mention}**:** {message}",
+            description=f"{self.strive.success} {message}",
             color=self.strive.base_color
         )
         return await super().send(embed=embed, reference=self.message)
