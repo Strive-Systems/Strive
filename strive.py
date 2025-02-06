@@ -27,7 +27,10 @@ class Strive(commands.AutoShardedBot):
         self.error = "<:strivefail:1337077571807875152>"
         self.success = "<:strivesuccess:1337077588840943777>"
         self.loading = "<a:loading:1336666887760777216>"
-        self.context = StriveContext # This is for custom ctx messages
+        self.context = StriveContext
+        
+    async def get_context(self, message, *, cls=StriveContext):
+        return await super().get_context(message, cls=cls)
         
         
         
@@ -144,6 +147,8 @@ strive = Strive(command_prefix=get_prefix,
             allowed_mentions=discord.AllowedMentions(replied_user=True, everyone=True, roles=True),
             cls=StriveContext
             )
+
+
 
 
 
