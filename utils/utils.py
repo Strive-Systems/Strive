@@ -50,7 +50,7 @@ class StriveContext(commands.Context):
             description=f"{self.strive.success} {message}",
             color=0x71ff89
         )
-        return await self.send(embed=embed)
+        return await super().send(embed=embed)
 
     async def send_error(self, message: str):
         embed = discord.Embed(
@@ -58,7 +58,7 @@ class StriveContext(commands.Context):
             description=f"{self.strive.error} {message}", 
             color=0xff6161
         )
-        return await self.send(embed=embed)
+        return await super().send(embed=embed)
 
     
     async def send_loading(self, message: str):
@@ -67,4 +67,4 @@ class StriveContext(commands.Context):
             description=f"{self.strive.loading} {message}",
             color=0x2a2c31
         )
-        return await self.send(embed=embed)
+        return await super().send(embed=embed)

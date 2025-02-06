@@ -295,7 +295,7 @@ class ModerationCommandCog(commands.Cog):
         
     @commands.hybrid_command(description="You can run this command to kick a user in your server.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
+    async def kick(self, ctx: StriveContext, member: discord.Member, *, reason: str = "No reason provided"):
         
         if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             await ctx.send_error(f"You cannot kick {member.mention} because they are an admin or bypassed from moderation.")
@@ -413,7 +413,7 @@ class ModerationCommandCog(commands.Cog):
 
     @modlogs.command(description="View all modlogs for a certain user")
     @commands.has_guild_permissions(ban_members=True)
-    async def view(self, ctx, member: discord.Member):
+    async def view(self, ctx: StriveContext, member: discord.Member):
         number = 0
         embed = discord.Embed(
             title="",
@@ -438,11 +438,7 @@ class ModerationCommandCog(commands.Cog):
                 )
 
         if number == 0:
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} No mod logs could be found for this user!",
-                color=self.constants.strive_embed_color_setup()
-            )
+            await ctx.send_error("This user has no active modlogs.")
             
         else:
             try:
