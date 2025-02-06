@@ -24,9 +24,11 @@ class Strive(commands.AutoShardedBot):
             1326476818894557217 # Strive Support
         ]
 
-        self.error = "<:strivefail:1337077571807875152>"
-        self.success = "<:check:1337197652613533706>"
+        self.error = "<:striveFail:1337205769900130425>"
+        self.success = "<:striveSuccess:1337205815031103645>"
         self.loading = "<a:loading:1336666887760777216>"
+        self.warning = "<:striveWarning:1337206012528295976>"
+        self.base_color = 0x66d8ff
         self.context = StriveContext
         
     async def get_context(self, message, *, cls=StriveContext):

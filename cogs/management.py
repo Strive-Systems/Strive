@@ -453,7 +453,6 @@ class ManagementCommandCog(commands.Cog):
 
         afk_data = self.strive.afk_users
 
-
         afk_key = {'user_id': message.author.id, 'guild_id': message.guild.id}
         if afk_key in afk_data:
             
@@ -463,10 +462,10 @@ class ManagementCommandCog(commands.Cog):
             embed = discord.Embed(
                 title="",
                 description=f"{self.strive.success} Your AFK has ended as you sent a message indicating your return.",
-                color=0xa6eb7b
+                color=self.strive.base_color
             )
                 
-            await message.channel.send(embed=embed)
+            await message.reply(embed=embed)
             
             self.strive.afk_users.remove(afk_key)
             return
