@@ -842,6 +842,69 @@ class ModerationCommandCog(commands.Cog):
             )
             await ctx.send(embed=embed)
 
+    @commands.hybrid_command(description="Remove dangerous roles from a user", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(administrator=True)
+    async def strip(self, ctx, member: discord.Member):
+
+        if member.top_role >= ctx.author.top_role:
+            await ctx.send(embed=discord.Embed(
+                description=f"{self.strive.error} You cannot strip roles from someone with an equal or higher role than you.",
+                color=discord.Color.red()
+            ))
+            return
+
+        dangerous_perms = {
+            "administrator", "manage_guild", "manage_roles", "manage_channels",
+            "manage_webhooks", "manage_nicknames", "manage_emojis",
+            "kick_members", "ban_members", "mention_everyone"
+        }
+
+        dangerous_roles = [
+            role for role in member.roles[1:]
+            if any(getattr(role.permissions, perm) for perm in dangerous_perms)
+        ]
+
+        if not dangerous_roles:
+            await ctx.send(embed=discord.Embed(
+                description=f"{self.strive.error} No dangerous roles found on {member.mention}.",
+                color=discord.Color.red()
+            ))
+            return
+
+        removed_roles = []
+        failed_roles = []
+
+        for role in dangerous_roles:
+            if role >= ctx.guild.me.top_role:
+                failed_roles.append(role.name)
+                continue
+            try:
+                await member.remove_roles(role, reason=f"Role strip command used by {ctx.author}")
+                removed_roles.append(role.name)
+            except discord.Forbidden:
+                failed_roles.append(role.name)
+
+        embed = discord.Embed(
+            title="Role Strip Results",
+            color=self.constants.strive_embed_color_setup()
+        )
+
+        if removed_roles:
+            embed.add_field(
+                name="Removed Roles",
+                value="\n".join(f"• {role}" for role in removed_roles),
+                inline=False
+            )
+
+        if failed_roles:
+            embed.add_field(
+                name="Failed to Remove",
+                value="\n".join(f"• {role}" for role in failed_roles),
+                inline=False
+            )
+
+        await ctx.send(embed=embed)    
+
 
 async def setup(strive):
     await strive.add_cog(ModerationCommandCog(strive))
