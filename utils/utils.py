@@ -40,6 +40,10 @@ async def get_prefix(strive, message):
     return commands.when_mentioned_or(prefix)(strive, message)
 
 class StriveContext(commands.Context):
+    @property
+    def strive(self):
+        return self.bot
+
     async def send_success(self, message: str):
         embed = discord.Embed(
             title="",
@@ -55,6 +59,7 @@ class StriveContext(commands.Context):
             color=0xff6161
         )
         return await self.send(embed=embed)
+
     
     async def send_loading(self, message: str):
         embed = discord.Embed(
