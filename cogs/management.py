@@ -5,7 +5,7 @@ import re
 from typing import List
 from discord.ext import commands, tasks
 from datetime import datetime, timedelta
-from utils.utils import get_next_case_id, get_next_reminder_id
+from utils.utils import get_next_case_id, get_next_reminder_id, StriveContext
 from utils.constants import StriveConstants, reminders, afks, notes
 from utils.embeds import UserInformationEmbed, ReminderEmbed, RoleSuccessEmbed, RolesInformationEmbed, SuccessEmbed, ErrorEmbed, NicknameSuccessEmbed, ReminderListEmbed
 from utils.pagination import ReminderPaginationView
@@ -55,7 +55,7 @@ class ManagementCommandCog(commands.Cog):
 
 
     @commands.hybrid_group(description="Manage reminders.", with_app_command=True, extras={"category": "General"})
-    async def reminder(self, ctx: commands.Context):
+    async def reminder(self, ctx: StriveContext):
 
 
         if ctx.invoked_subcommand is None:
@@ -64,7 +64,7 @@ class ManagementCommandCog(commands.Cog):
 
 
     @reminder.command(name="add", description="Create a reminder.", with_app_command=True)
-    async def add(self, ctx: commands.Context, name: str, time: str, message: str):
+    async def add(self, ctx: StriveContext, name: str, time: str, message: str):
         try:
             minutes = self.time_converter(time)
             newtime = int((datetime.utcnow() + timedelta(minutes=minutes)).timestamp())
@@ -98,7 +98,7 @@ class ManagementCommandCog(commands.Cog):
         
         
     @reminder.command(name="list", description="List your reminders.", with_app_command=True)
-    async def list(self, ctx: commands.Context):
+    async def list(self, ctx: StriveContext):
         user_reminders = reminders.find({"user_id": ctx.author.id})
         reminders_list = await user_reminders.to_list(None)
 
@@ -117,7 +117,7 @@ class ManagementCommandCog(commands.Cog):
 
 
     @reminder.command(name="remove", description="Remove a reminder by ID.", with_app_command=True)
-    async def remove(self, ctx: commands.Context, reminder_id: str):
+    async def remove(self, ctx: StriveContext, reminder_id: str):
 
 
         result = reminders.delete_one({"id": reminder_id, "user_id": ctx.author.id})
@@ -165,14 +165,14 @@ class ManagementCommandCog(commands.Cog):
         
     
     @commands.hybrid_group(description='Allows you to change user roles with Strive.', with_app_command=True)
-    async def role(self, ctx: commands.Context):
+    async def role(self, ctx: StriveContext):
         return
     
     
 
     @role.command(description="Allows server administrators to delete a role.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def delete(self, ctx: commands.Context, role: discord.Role):
+    async def delete(self, ctx: StriveContext, role: discord.Role):
         await role.delete(reason=f"Deleted by {ctx.author}")
         await ctx.send_success(f"Deleted {role.mention}")
 
@@ -180,7 +180,7 @@ class ManagementCommandCog(commands.Cog):
 
     @role.command(description="Allows server administrators to add a role.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def create(self, ctx: commands.Context, *, role_name: str):
+    async def create(self, ctx: StriveContext, *, role_name: str):
         new_role = await ctx.guild.create_role(name=role_name, reason=f"Created by {ctx.author}")
         await ctx.send_success(f"Created {new_role.mention}")
 
@@ -188,7 +188,7 @@ class ManagementCommandCog(commands.Cog):
 
     @role.command(description="Allows server administrators to assign a role.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def add(self, ctx: commands.Context, member: discord.Member, role: discord.Role):
+    async def add(self, ctx: StriveContext, member: discord.Member, role: discord.Role):
         await member.add_roles(role, reason=f"Assigned by {ctx.author}")
         await ctx.send_success(f"Added {role.mention} to {member.mention}")
 
@@ -196,7 +196,7 @@ class ManagementCommandCog(commands.Cog):
 
     @role.command(description="Allows server administrators to unassign a role.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def remove(self, ctx: commands.Context, member: discord.Member, role: discord.Role):
+    async def remove(self, ctx: StriveContext, member: discord.Member, role: discord.Role):
         await member.remove_roles(role, reason=f"Unassigned by {ctx.author}")
         await ctx.send_success(f"Removed {role.mention} from {member.mention}")
         
@@ -337,7 +337,7 @@ class ManagementCommandCog(commands.Cog):
         
         
     @commands.hybrid_command(description="This lists the servers members", with_app_command=True, extras={"category": "General"})
-    async def membercount(self, ctx: commands.Context):
+    async def membercount(self, ctx: StriveContext):
         guild = ctx.guild
 
         if not guild.chunked:
@@ -386,7 +386,7 @@ class ManagementCommandCog(commands.Cog):
         
         
     @commands.hybrid_group(description="Set your AFK status with an optional reason.")
-    async def afk(self, ctx: commands.Context, *, message: str = "none"):
+    async def afk(self, ctx: StriveContext, *, message: str = "none"):
         afk_data = await afks.find_one({"user_id": ctx.author.id})
         
         if not afk_data:
@@ -418,13 +418,13 @@ class ManagementCommandCog(commands.Cog):
     
     
     @afk.group(name='mod', description="Group of a group")
-    async def afk_mod(self, ctx: commands.Context):
+    async def afk_mod(self, ctx: StriveContext):
         return
         
     
     
     @afk_mod.command(name='list', description="List all AFK's in this server", with_app_command=True)
-    async def afk_list(self, ctx: commands.Context):
+    async def afk_list(self, ctx: StriveContext):
         all_afks = afks.find({"guild_id": ctx.guild.id})
         number = 0
         embed = discord.Embed(title="Current AFK's", description="", color=self.constants.strive_embed_color_setup())
@@ -491,12 +491,12 @@ class ManagementCommandCog(commands.Cog):
                     
                     
     @commands.hybrid_group(description='Allows modification of user notes.', with_app_command=True)
-    async def note(self, ctx: commands.Context):
+    async def note(self, ctx: StriveContext):
         return
     
     @note.command(description="Adds a moderator note to a user.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_guild_permissions(ban_members=True)
-    async def add(self, ctx: commands.Context, member: discord.Member, reason):        
+    async def add(self, ctx: StriveContext, member: discord.Member, reason):        
         note_id = await get_next_case_id(ctx.guild.id)
 
         note_entry = {
@@ -519,7 +519,7 @@ class ManagementCommandCog(commands.Cog):
 
     @note.command(description="Delete a note on a user", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_guild_permissions(ban_members=True)
-    async def remove(self, ctx: commands.Context, id):
+    async def remove(self, ctx: StriveContext, id):
         await notes.delete_one({"note_id": f"Note #{id}"})
 
         await ctx.send_success(f"**Note #{id}** has been removed.")
@@ -528,7 +528,7 @@ class ManagementCommandCog(commands.Cog):
 
     @note.command(description="Search for a note on a user", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_guild_permissions(ban_members=True)
-    async def search(self, ctx: commands.Context, id):
+    async def search(self, ctx: StriveContext, id):
         result = await notes.find_one({"note_id": f"{id}"})
 
         if result:

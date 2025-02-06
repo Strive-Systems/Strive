@@ -9,7 +9,7 @@ class OnMessage(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_command(self, ctx: commands.Context):
+    async def on_command(self, ctx: StriveContext):
 
 
         log_channel_id = 1326737938041667628

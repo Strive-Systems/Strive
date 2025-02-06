@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord.ui import Select, View
 from utils.constants import StriveConstants
 from utils.embeds import HelpCenterEmbed
-
+from utils.utils import StriveContext
 
 # Brand new help command that uses a drop down and hidden messages to display content in
 # a cleaner way. This was taken as inspiration from Lukas (notlukasrx)
@@ -35,7 +35,7 @@ class HelpCommandsCog(commands.Cog):
         
 
     @commands.hybrid_command(description="Provides information on the bot's commands and how to use them.", with_app_command=True, extras={"category": "Help"})
-    async def help(self, ctx: commands.Context):
+    async def help(self, ctx: StriveContext):
         
         await ctx.defer(ephemeral=False)
 

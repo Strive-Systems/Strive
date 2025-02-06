@@ -5,7 +5,7 @@ import re
 import time
 from discord.ext import commands
 from utils.constants import StriveConstants, cases, blacklist_bypass
-from utils.utils import get_next_case_id
+from utils.utils import get_next_case_id, StriveContext
 from datetime import timedelta
 from datetime import datetime
 
@@ -51,7 +51,7 @@ class ModerationCommandCog(commands.Cog):
 
     @commands.hybrid_command(description="You can run this command to warn a user in your server.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(administrator=True)
-    async def warn(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
+    async def warn(self, ctx: StriveContext, member: discord.Member, *, reason: str = "No reason provided"):
         
         if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             
@@ -87,13 +87,12 @@ class ModerationCommandCog(commands.Cog):
             await cases.insert_one(warn_entry)
 
 
-            await ctx.send_success(f"**Case #{case_id} - {member}** has been warned for {reason}.")
-        
+            await ctx.send_success(f"**Case #{case_id} - {member}** has been warned for {reason}.")        
         
         
     @commands.hybrid_command(name="ban", description="Ban command to ban members from your server.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_guild_permissions(ban_members=True)
-    async def ban(self, ctx: commands.Context, member: discord.User, *, reason: str = "Nothing was provided"):
+    async def ban(self, ctx: StriveContext, member: discord.User, *, reason: str = "Nothing was provided"):
         
         if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             
@@ -175,7 +174,7 @@ class ModerationCommandCog(commands.Cog):
             
     @commands.hybrid_command(name="unban", description="Unban command to unban members from your server.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_guild_permissions(ban_members=True)
-    async def unban(self, ctx: commands.Context, user: discord.User, *, reason: str = "No reason provided"):
+    async def unban(self, ctx: StriveContext, user: discord.User, *, reason: str = "No reason provided"):
         
         # Defer the response to avoid delay issues.
         
@@ -234,7 +233,7 @@ class ModerationCommandCog(commands.Cog):
     
     @commands.hybrid_command(description="Mute/Timeout a certain user", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(moderate_members=True)
-    async def mute(self, ctx: commands.Context, member: discord.Member, time: str, *, reason: str = "No reason provided"):
+    async def mute(self, ctx: StriveContext, member: discord.Member, time: str, *, reason: str = "No reason provided"):
         
         if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             await ctx.send_error(f"You cannot mute {member.mention} because they are an admin or bypassed from moderation.")
@@ -278,7 +277,7 @@ class ModerationCommandCog(commands.Cog):
 
     @commands.hybrid_command(description="Remove timeout from a certain user", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(moderate_members=True)
-    async def unmute(self, ctx: commands.Context, member: discord.Member, *, reason: str = "No reason provided"):
+    async def unmute(self, ctx: StriveContext, member: discord.Member, *, reason: str = "No reason provided"):
         if member == ctx.author:
             return await ctx.send_error("You cannot unmute yourself!")
     
@@ -347,7 +346,7 @@ class ModerationCommandCog(commands.Cog):
     
     @case.command(description="Searches cases by an Case ID.", with_app_command=True)
     @commands.has_guild_permissions(ban_members=True)
-    async def view(self, ctx: commands.Context, caseid: int):
+    async def view(self, ctx: StriveContext, caseid: int):
         case_info = await cases.find_one({'case_id': caseid, 'guild_id': ctx.guild.id})
         
         if case_info:
@@ -399,7 +398,7 @@ class ModerationCommandCog(commands.Cog):
     
     @case.command(description="Void a case by ID", with_app_command=True)
     @commands.has_guild_permissions(ban_members=True)
-    async def void(self, ctx: commands.Context, *, caseid: int):
+    async def void(self, ctx: StriveContext, *, caseid: int):
         case_info = await cases.find_one_and_update({'case_id': caseid, 'guild_id': ctx.guild.id}, {'$set': {'status': 'cleared'}})
         
         if case_info:
@@ -595,7 +594,7 @@ class ModerationCommandCog(commands.Cog):
 
     @commands.hybrid_command(description="Add slowmode to a channel", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(manage_channels=True)
-    async def slowmode(self, ctx: commands.Context, duration: str = None, channel: discord.TextChannel = None):
+    async def slowmode(self, ctx: StriveContext, duration: str = None, channel: discord.TextChannel = None):
         channel = channel or ctx.channel
 
         if duration is None or duration.lower() == "on":

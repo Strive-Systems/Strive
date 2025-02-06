@@ -4,7 +4,7 @@ import time
 from discord.ui import View, Button
 from discord.ext import commands
 from utils.constants import StriveConstants
-from utils.utils import get_next_case_id
+from utils.utils import get_next_case_id, StriveContext
 from utils.constants import blacklists, blacklist_bypass, cases
 from datetime import timedelta
 from datetime import datetime
@@ -24,7 +24,7 @@ class AdminCommandsCog(commands.Cog):
     
     @commands.command()
     @commands.is_owner()
-    async def checkguild(self, ctx: commands.Context, id: str):
+    async def checkguild(self, ctx: StriveContext, id: str):
         return
         
         
@@ -33,7 +33,7 @@ class AdminCommandsCog(commands.Cog):
     # and blacklist_guild or blacklist_user.
         
     @commands.command()
-    async def addowner(self, ctx: commands.Context, user: discord.User):
+    async def addowner(self, ctx: StriveContext, user: discord.User):
         role = discord.utils.get(ctx.guild.roles, id = 1326485348326314054)
         if ctx.guild.id == 1326476818894557217 and role in ctx.author.roles:
             if user.id in constants.bypassed_users:
@@ -51,7 +51,7 @@ class AdminCommandsCog(commands.Cog):
     # or JSK commands. This is incase the developer or owner leaves or steps down.
     
     @commands.command()
-    async def removeowner(self, ctx: commands.Context, user: discord.User):
+    async def removeowner(self, ctx: StriveContext, user: discord.User):
         role = discord.utils.get(ctx.guild.roles, id = 1326485348326314054)
         if ctx.guild.id == 1326476818894557217 and role in ctx.author.roles:
             if user.id not in constants.bypassed_users:
@@ -67,7 +67,7 @@ class AdminCommandsCog(commands.Cog):
     # need a way to track it.
     
     @commands.command()
-    async def showowners(self, ctx: commands.Context):
+    async def showowners(self, ctx: StriveContext):
         role = discord.utils.get(ctx.guild.roles, id=1326485348326314054)
         if ctx.guild.id != 1326476818894557217 or role not in ctx.author.roles:
             return await ctx.send_error(f"You do not have permission to use this command.")
@@ -167,7 +167,7 @@ class AdminCommandsCog(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def sync(self, ctx: commands.Context, guild_id: int = None):
+    async def sync(self, ctx: StriveContext, guild_id: int = None):
         if guild_id:
             guild = discord.Object(id=guild_id)
             try:
@@ -187,7 +187,7 @@ class AdminCommandsCog(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def unblacklist(self, ctx: commands.Context, entity: int, *, reason: str):
+    async def unblacklist(self, ctx: StriveContext, entity: int, *, reason: str):
         
         
         entity_type = ""
@@ -248,7 +248,7 @@ class AdminCommandsCog(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def blacklist(self, ctx: commands.Context, entity: int, *, reason: str):
+    async def blacklist(self, ctx: StriveContext, entity: int, *, reason: str):
         
         entity_type = ""
 

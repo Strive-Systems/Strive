@@ -9,7 +9,7 @@ class OnCommandError(commands.Cog):
         self.strive = strive
         
     @commands.Cog.listener()
-    async def on_command_error(self, ctx: commands.Context, error):
+    async def on_command_error(self, ctx: StriveContext, error):
         error_id = ZUID(prefix="error_", length=10)
         error_id = error_id()
         

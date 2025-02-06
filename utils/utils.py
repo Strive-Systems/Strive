@@ -40,7 +40,7 @@ async def get_prefix(strive, message):
     return commands.when_mentioned_or(prefix)(strive, message)
 
 class StriveContext(commands.Context):
-    @property
+    @property 
     def strive(self):
         return self.bot
 

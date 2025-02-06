@@ -12,7 +12,7 @@ from discord.ext import commands
 from utils.constants import StriveConstants, db, prefixes, timezones
 from utils.embeds import AboutEmbed, AboutWithButtons, PingCommandEmbed, ServerInformationEmbed, EmojiFindEmbed, PrefixEmbed, PrefixSuccessEmbed, PrefixSuccessEmbedNoneChanged
 from utils.pagination import PingPaginationView
-
+from utils.utils import StriveContext
 
 constants = StriveConstants()
 
@@ -36,7 +36,7 @@ class CommandsCog(commands.Cog):
     # this file for readability purposes.
 
     @commands.hybrid_command(description="Provides important information about Strive.", with_app_command=True, extras={"category": "Other"})
-    async def about(self, ctx: commands.Context):
+    async def about(self, ctx: StriveContext):
         await ctx.defer(ephemeral=True)
         
         
@@ -128,7 +128,7 @@ class CommandsCog(commands.Cog):
     # This is the space for the ping command which will allow users to ping.
     
     @commands.hybrid_command(name="ping", description="Check the bot's latency, uptime, and shard info.", with_app_command=True, extras={"category": "Other"})
-    async def ping(self, ctx: commands.Context):
+    async def ping(self, ctx: StriveContext):
         latency = self.strive.latency
         database_latency = await self.get_mongo_latency()
         uptime = self.strive.start_time
@@ -164,7 +164,7 @@ class CommandsCog(commands.Cog):
 
 
     @commands.hybrid_command(description="Shows all the emojis in the server.", with_app_command=True, extras={"category": "General"})
-    async def emojis(self, ctx: commands.Context):
+    async def emojis(self, ctx: StriveContext):
         emojis = "".join(f"{emoji}" for emoji in ctx.guild.emojis)
 
 

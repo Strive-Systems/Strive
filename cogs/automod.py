@@ -4,6 +4,7 @@ from discord.ext import commands
 from collections import defaultdict
 from utils.embeds import AutoModListWordsEmbed
 from utils.constants import StriveConstants, blacklistedwords, blacklist_bypass
+from utils.utils import StriveContext
 
 constants = StriveConstants()
 
@@ -59,7 +60,7 @@ class AutoModCommandCog(commands.Cog):
 
     @commands.hybrid_command(name="addword", description="Adds a word to the banned words list (Admin only)")
     @commands.has_permissions(administrator=True)
-    async def addword(self, ctx: commands.Context, word: str):
+    async def addword(self, ctx: StriveContext, word: str):
         guild_id = ctx.guild.id
         await blacklistedwords.insert_one({'guild_id': guild_id, 'word': word})
         await self.fetch_banned_words()
@@ -69,7 +70,7 @@ class AutoModCommandCog(commands.Cog):
 
     @commands.hybrid_command(name="removeword", description="Removes a word from the banned words list (Admin only)")
     @commands.has_permissions(administrator=True)
-    async def removeword(self, ctx: commands.Context, word: str):
+    async def removeword(self, ctx: StriveContext, word: str):
         guild_id = ctx.guild.id
         await blacklistedwords.delete_one({'guild_id': guild_id, 'word': word})
         await self.fetch_banned_words()
@@ -78,7 +79,7 @@ class AutoModCommandCog(commands.Cog):
 
 
     @commands.hybrid_command(name="listwords", description="Lists the banned words for this guild")
-    async def listwords(self, ctx: commands.Context):
+    async def listwords(self, ctx: StriveContext):
         guild_id = ctx.guild.id
         banned_words_list = self.strive.blacklistedwords.get(guild_id, [])
 
