@@ -712,8 +712,8 @@ class ModerationCommandCog(commands.Cog):
         if current_perms.send_messages is False:
             return await ctx.send_error(f"{channel.mention} is already locked!")
             
-        overwrite = discord.PermissionOverwrite(send_messages=False, add_reactions=False)
-        await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+        current_perms.send_messages = False
+        await channel.set_permissions(ctx.guild.default_role, overwrite=current_perms)
         await ctx.send_success(f"{channel.mention} has been locked!")
 
 
@@ -730,9 +730,9 @@ class ModerationCommandCog(commands.Cog):
         if current_perms.send_messages is not False:
             return await ctx.send_error(f"{channel.mention} is already unlocked!")
             
-        overwrite = discord.PermissionOverwrite(send_messages=None, add_reactions=None)
-        await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
-        await ctx.send_success(f"{channel.mention} has been unlocked!")    
-
+        current_perms.send_messages = None
+        await channel.set_permissions(ctx.guild.default_role, overwrite=current_perms)
+        await ctx.send_success(f"{channel.mention} has been unlocked!")
+        
 async def setup(strive):
     await strive.add_cog(ModerationCommandCog(strive))
