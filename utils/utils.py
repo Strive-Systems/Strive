@@ -50,14 +50,14 @@ class StriveContext(commands.Context):
             description=f"{self.strive.success} {self.author.mention}**:** {message}",
             color=self.strive.base_color
         )
-        return await super().send(embed=embed)
+        return await super().send(embed=embed, reference=self.message)
     async def send_error(self, message: str):
         embed = discord.Embed(
             title="",
             description=f"{self.strive.error} {message}", 
             color=self.strive.base_color
         )
-        return await super().send(embed=embed)
+        return await super().send(embed=embed, reference=self.message)
 
     
     async def send_loading(self, message: str):
@@ -66,7 +66,7 @@ class StriveContext(commands.Context):
             description=f"{self.strive.loading} {message}",
             color=0x2a2c31
         )
-        return await super().send(embed=embed)
+        return await super().send(embed=embed, reference=self.message)
     
     async def send_warning(self, message: str):
         embed = discord.Embed(
@@ -74,7 +74,7 @@ class StriveContext(commands.Context):
             description=f"{self.strive.warning} {message}",
             color=self.strive.base_color
         )
-        return await super().send(embed=embed)
+        return await super().send(embed=embed, reference=self.message)    
     
     async def send_normal(self, message: str):
         embed = discord.Embed(
