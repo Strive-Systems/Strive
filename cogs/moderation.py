@@ -769,16 +769,33 @@ class ModerationCommandCog(commands.Cog):
         view.message = message
         await message.edit(view=view)         
 
-
     @commands.hybrid_command(description="Add slowmode to a channel", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(manage_channels=True)
-    async def slowmode(self, ctx: commands.Context, seconds: int = None, channel: discord.TextChannel = None):
+    async def slowmode(self, ctx: commands.Context, duration: str = None, channel: discord.TextChannel = None):
         channel = channel or ctx.channel
 
-        if seconds is None:
+        if duration is None:
             embed = discord.Embed(
                 title="",
-                description=f"{self.strive.error} Please specify the number of seconds for slowmode.",
+                description=f"{self.strive.error} Please specify the duration for slowmode (e.g. 10s, 5m, 1h).",
+                color=discord.Color.red()
+            )
+            await ctx.send(embed=embed)
+            return
+
+        time_mapping = {'s': 1, 'm': 60, 'h': 3600}
+        try:
+            amount = int(duration[:-1])
+            unit = duration[-1].lower()
+            
+            if unit not in time_mapping:
+                raise ValueError
+                
+            seconds = amount * time_mapping[unit]
+        except (ValueError, IndexError):
+            embed = discord.Embed(
+                title="",
+                description=f"{self.strive.error} Invalid duration format; use format like: 10s, 5m, 1h",
                 color=discord.Color.red()
             )
             await ctx.send(embed=embed)
@@ -803,18 +820,9 @@ class ModerationCommandCog(commands.Cog):
                     color=discord.Color.green()
                 )
             else:
-                if seconds < 60:
-                    time_format = f"{seconds} seconds"
-                elif seconds < 3600:
-                    minutes = seconds // 60
-                    time_format = f"{minutes} minute{'s' if minutes != 1 else ''}"
-                else:
-                    hours = seconds // 3600
-                    time_format = f"{hours} hour{'s' if hours != 1 else ''}"
-                
                 embed = discord.Embed(
                     title="",
-                    description=f"{self.strive.success} Slowmode set to **{time_format}** in {channel.mention}.",
+                    description=f"{self.strive.success} Slowmode set to **{duration.lower()}** in {channel.mention}.",
                     color=discord.Color.green()
                 )
             
@@ -828,6 +836,6 @@ class ModerationCommandCog(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-            
+
 async def setup(strive):
     await strive.add_cog(ModerationCommandCog(strive))
