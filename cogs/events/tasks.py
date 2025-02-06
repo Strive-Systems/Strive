@@ -1,5 +1,6 @@
 import discord
 from discord.ext import tasks, commands
+from utils.utils import StriveContext
 
 class Tasks(commands.Cog):
     def __init__(self, strive):

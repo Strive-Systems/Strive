@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from zuid import ZUID
 from utils.embeds import MissingArgsEmbed, BadArgumentEmbed, ForbiddenEmbed, MissingPermissionsEmbed, UserErrorEmbed, DeveloperErrorEmbed
+from utils.utils import StriveContext
 
 
 class OnCommandError(commands.Cog):
