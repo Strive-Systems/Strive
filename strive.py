@@ -177,7 +177,7 @@ async def global_blacklist_check(ctx):
         
         em = discord.Embed(
             title="",
-            description="<:warning:1335369524291178506> **Blacklisted** \n\n> This user is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
+            description="<:warning:1335369524291178506> **Blacklisted** \n> This user is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
             color=constants.strive_embed_color_setup(),
         )
         
@@ -192,7 +192,7 @@ async def global_blacklist_check(ctx):
         
         em = discord.Embed(
             title="",
-            description="<:warning:1335369524291178506> **Blacklisted Guild** \n\n> This server is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
+            description="<:warning:1335369524291178506> **Blacklisted Guild** \n> This server is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
             color=constants.strive_embed_color_setup(),
         )
         
