@@ -176,8 +176,8 @@ async def global_blacklist_check(ctx):
     if ctx.author.id in constants.blacklists and ctx.command.name != "unblacklist":
         
         em = discord.Embed(
-            title="Blacklisted",
-            description="This user is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
+            title="<:warning:1335369524291178506> Blacklisted",
+            description="> This user is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
             color=constants.strive_embed_color_setup(),
         )
         
@@ -191,8 +191,8 @@ async def global_blacklist_check(ctx):
     if ctx.guild and ctx.guild.id in constants.blacklists and ctx.command.name != "unblacklist":
         
         em = discord.Embed(
-            title="Blacklisted Guild",
-            description="This server is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
+            title="<:warning:1335369524291178506> Blacklisted Guild",
+            description="> This server is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
             color=constants.strive_embed_color_setup(),
         )
         
