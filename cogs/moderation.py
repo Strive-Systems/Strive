@@ -884,27 +884,16 @@ class ModerationCommandCog(commands.Cog):
             except discord.Forbidden:
                 failed_roles.append(role.name)
 
-        embed = discord.Embed(
-            title="Role Strip Results",
-            color=self.constants.strive_embed_color_setup()
-        )
-
         if removed_roles:
-            embed.add_field(
-                name="Removed Roles",
-                value="\n".join(f"• {role}" for role in removed_roles),
-                inline=False
-            )
-
-        if failed_roles:
-            embed.add_field(
-                name="Failed to Remove",
-                value="\n".join(f"• {role}" for role in failed_roles),
-                inline=False
-            )
-
-        await ctx.send(embed=embed)    
-
+            await ctx.send(embed=discord.Embed(
+                description=f"{self.strive.success} Removed **{len(removed_roles)}** dangerous roles from {member.mention}\n> -# {', '.join(removed_roles)}",
+                color=discord.Color.green()
+            ))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{self.strive.error} Failed to remove any roles from {member.mention}",
+                color=discord.Color.red()
+            ))
 
 async def setup(strive):
     await strive.add_cog(ModerationCommandCog(strive))
