@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
-from utils.embeds import PingCommandEmbed
+from typing import List
+from utils.embeds import PingCommandEmbed, ReminderListEmbed
+
 
 class PingPaginationView(discord.ui.View):
     def __init__(self, strive: commands.Bot, latency, database_latency, uptime, shard_info):
@@ -56,4 +58,55 @@ class PingPaginationView(discord.ui.View):
             self.prev_button.disabled = False
             if self.page == self.max_page:
                 self.next_button.disabled = True
+            await self.update_message(interaction)
+            
+            
+            
+class ReminderPaginationView(discord.ui.View):
+    def __init__(self, strive: commands.Bot, reminders: List[dict], per_page: int = 5):
+        super().__init__()
+        self.strive = strive
+        self.reminders = reminders
+        self.per_page = per_page
+        self.page = 0
+        
+        
+        self.max_page = (len(reminders) // per_page) + (1 if len(reminders) % per_page > 0 else 0)
+
+
+        if self.max_page <= 1:
+            self.prev_button.disabled = True
+            self.next_button.disabled = True
+
+
+    async def update_message(self, interaction: discord.Interaction):
+        start_index = self.page * self.per_page
+        end_index = (self.page + 1) * self.per_page
+        current_page_reminders = self.reminders[start_index:end_index]
+
+        embed = ReminderListEmbed(current_page_reminders, self.page + 1, self.max_page).create_embed()
+        self.update_buttons()
+        await interaction.response.edit_message(embed=embed, view=self)
+
+
+    def update_buttons(self):
+        if self.max_page <= 1:
+            self.prev_button.disabled = True
+            self.next_button.disabled = True
+        else:
+            self.prev_button.disabled = self.page == 0
+            self.next_button.disabled = self.page >= self.max_page - 1
+
+
+    @discord.ui.button(emoji="<:left:1332555046956826646>", style=discord.ButtonStyle.gray, disabled=True)
+    async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.page > 0:
+            self.page -= 1
+            await self.update_message(interaction)
+
+
+    @discord.ui.button(emoji="<:right:1332554985153626113>", style=discord.ButtonStyle.gray)
+    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.page < self.max_page - 1:
+            self.page += 1
             await self.update_message(interaction)

@@ -4,8 +4,8 @@ from datetime import datetime
 from discord import Interaction
 from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
-from typing import List
 from utils.constants import StriveConstants
+from typing import List
 
 
 constants = StriveConstants()
@@ -116,88 +116,72 @@ class BlacklistEmbed(discord.Embed):
             color=discord.Color.red()
         )
         self.add_field(name="Reason", value="Please contact support [here](https://discord.gg/rkRrRfRTwg) for more details.")
-             
+                
         
-# This is an informative embed
+# Setup Commands
 
-class InfoEmbed(discord.Embed):
-    def __init__(self, title: str, description: str, color: discord.Color, **kwargs):
-        super().__init__(
-            title=title, 
-            description=description, 
-            color=color, 
-            **kwargs
-        )
-
-
-# This is for the start of the setup command also known as the disclaimer
-
-class DisclaimerView(discord.ui.View):
+class SetupEmbeds:
     def __init__(self):
-        super().__init__()
-        self.add_item(discord.ui.Button(
-            label="Continue", 
-            style=discord.ButtonStyle.gray, 
-            custom_id="continue")
+        pass
+
+
+    def get_welcome_embed(self):
+        embed = discord.Embed(
+            title="<:Strive:1330583510406267070> Welcome to Strive \n\n",
+            description=(
+                "> This is the setup system for <:Strive:1330583510406267070> **Strive** to configure your server and set up customization. We will walk you through setting up basic settings like prefix, embed color, and bot nickname. Then we will configure the modules and logging. \n\n"
+                "**Current Configuration** \n - **Prefix:** `!` \n - **Disabled Commands:** `None`"
+            ),
+            color=constants.strive_embed_color_setup()
+        )
+
+        return embed
+
+
+    def get_module_selection_embed(self):
+        embed = discord.Embed(
+            title="Module Selection",
+            description="> Select the modules you'd like to enable for your server. Enabling certain modules may require additional configuration. \n\n",
+            color=constants.strive_embed_color_setup()
         )
         
-        
-        self.add_item(discord.ui.Button(
-            label="Exit", 
-            style=discord.ButtonStyle.red, 
-            custom_id="exit")
+        embed.add_field(
+            name="Available Modules",
+            value="- Tickets\n- Management\n- Moderation",
+            inline=False
         )
-
-
-# This is the setup options view and it includes buttons
-
-class SetupOptionsView(discord.ui.View):
-    def __init__(self, show_bot_config: bool, show_plugin_config: bool, show_moderation_config: bool, show_administration_config: bool):
-        super().__init__()
-        if show_bot_config:
-            self.add_item(discord.ui.Button(
-                label="Bot Config", 
-                style=discord.ButtonStyle.gray, 
-                custom_id="bot_config")
-            )
-           
-            
-        if show_plugin_config:
-            self.add_item(discord.ui.Button(
-                label="Plugin Config", 
-                style=discord.ButtonStyle.gray, 
-                custom_id="plugin_config")
-            )
-            
-            
-        if show_moderation_config:
-            self.add_item(discord.ui.Button(
-                label="Moderation Config", 
-                style=discord.ButtonStyle.gray, 
-                custom_id="moderation_config")
-            )
-            
-            
-        if show_administration_config:
-            self.add_item(discord.ui.Button(
-                label="Administration Config", 
-                style=discord.ButtonStyle.gray, 
-                custom_id="administration_config")
-            )
-            
-            
-        self.add_item(discord.ui.Button(label="Exit Setup", style=discord.ButtonStyle.red, custom_id="exit"))
         
+        embed.set_footer(text="You can enable or disable modules later via the settings menu.")
+        return embed
 
-# This is the embed for cancelling setup
 
-class ExitSetupEmbed(discord.Embed):
-    def __init__(self):
-        super().__init__(
-            title="Setup Canceled",
-            description="The setup process has been canceled.",
-            color=discord.Color.red()
+    def get_logging_embed(self, category_name):
+        embed = discord.Embed(
+            title=f"Logging Setup - {category_name}",
+            description=f"Select a channel to log {category_name.lower()} events.",
+            color=constants.strive_embed_color_setup()
         )
+        
+        embed.set_footer(text="This can be updated later in the settings menu.")
+        return embed
+
+
+    def get_completion_embed(self):
+        embed = discord.Embed(
+            title="Setup Complete",
+            description="Your bot setup is now complete! Here are some next steps:",
+            color=discord.Color.green()
+        )
+        
+        embed.add_field(
+            name="Next Steps",
+            value="- Use `/help` to view available commands\n"
+                  "- Customize additional settings via the dashboard or commands",
+            inline=False
+        )
+        
+        embed.set_footer(text="Thank you for using Strive!")
+        return embed
         
         
 # This is for the new about command, edit the info for the command here instead of in the commands file.
@@ -425,8 +409,8 @@ class SearchResultEmbed(discord.Embed):
            
  
 # This contains the emebed and its parameters for the ping command. This shows things like uptime,
-# latency to discors and mongodb.   
- 
+# latency to discors and mongodb.        
+        
 class PingCommandEmbed:
     @staticmethod
     def create_ping_embed(latency: float, database_latency: int, uptime, shard_info: List[dict], page: int = 0):
@@ -464,6 +448,7 @@ class PingCommandEmbed:
                 )
 
             
+
         return embed
       
     
@@ -627,6 +612,7 @@ class EmojiFindEmbed:
         self.emoji = emoji
         self.constants = constants
     
+    
     def create_embed(self):
         emoji_guild = self.emoji.guild
         emoji_name = self.emoji.name
@@ -659,7 +645,7 @@ class AutoModListWordsEmbed(discord.Embed):
         self.set_footer(text=f"Total words: {len(banned_words.split(', '))}")
         
         
-# This is the success embed when the bots prefix is successfully changed by the user.
+# This is the embed that shows the current prefix for the bot.
         
 class PrefixEmbed(discord.Embed):
     def __init__(self, current_prefix: str):
@@ -668,7 +654,9 @@ class PrefixEmbed(discord.Embed):
             description=f"The current prefix for this server is `{current_prefix}`.",
             color=constants.strive_embed_color_setup()
         )
-        
+
+
+# This is the success embed when the bots prefix is successfully changed by the user.
 
 class PrefixSuccessEmbed(discord.Embed):
     def __init__(self, new_prefix: str):
@@ -694,21 +682,50 @@ class ReminderEmbed(discord.Embed):
     def __init__(self, reminder_time: str, **kwargs):
         super().__init__(**kwargs)
 
+
         # Set the embed title and color
+        
         self.title = ""
-        self.description = f"<:success:1326752811219947571> Got it! I have set a reminder. It will go off at **{reminder_time}**."
+        self.description = f"<:success:1326752811219947571> Got it! I have set a reminder. It will go off at <t:{reminder_time}:R>."
         self.color = discord.Color.green()
+        
+
+# This embed lists all the reminders in a guild.
+
+class ReminderListEmbed:
+    def __init__(self, reminders, current_page):
+        self.reminders = reminders
+        self.current_page = current_page
+    
+    
+    def create_embed(self):
+        embed = discord.Embed(title="Your Reminders", color=constants.strive_embed_color_setup())
+
+
+        for reminder in self.reminders:
+            embed.add_field(
+                name=f"Reminder #{reminder['id']}",
+                value=f"**Name:** `{reminder['name']}`\n**Time:** <t:{reminder['time']}:R>\n**Message:** `{reminder['message']}`",
+                inline=False
+            )
+
+
+        return embed
         
         
 # This is the Roles Information Embed that shows information about certain roles.        
         
 class RolesInformationEmbed:
+    
+    
     @staticmethod
     def create(role: discord.Role, target):
         embed = discord.Embed(
             title=f"Role Information: {role.name}",
             color=constants.strive_embed_color_setup()
         )
+        
+        
         embed.add_field(name="Role ID", value=role.id, inline=False)
         embed.add_field(name="Role Color", value=str(role.color), inline=False)
         embed.add_field(name="Members", value=len(role.members), inline=False)
@@ -721,8 +738,9 @@ class RolesInformationEmbed:
             inline=False
         )
 
+
         if isinstance(target, discord.Interaction):
-            return embed  # We'll handle the response in the calling code
+            return embed
         else:
             embed.set_footer(text=f"Requested by {target.author}", icon_url=target.author.avatar.url)
             return embed

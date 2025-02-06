@@ -733,7 +733,7 @@ class ModerationCommandCog(commands.Cog):
                         timestamp=discord.utils.utcnow()
                     )
 
-                    embed.set_footer(text="This dropdown will disable in 30 seconds")
+                    embed.set_footer(text="This dropdown will disable in 1 minute")
                     embed.add_field(name="User", value=f"{ban.user} (`{ban.user.id}`)", inline=False)
                     embed.add_field(name="Reason", value=ban.reason or "No reason provided", inline=False)
 
@@ -756,7 +756,7 @@ class ModerationCommandCog(commands.Cog):
 
         class BanView(discord.ui.View):
             def __init__(self, bans, message):
-                super().__init__(timeout=30.0)
+                super().__init__(timeout=60.0)
                 self.add_item(BanDropdown(bans, message))
 
             async def on_timeout(self):

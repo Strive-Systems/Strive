@@ -1,11 +1,14 @@
 import discord
 import uuid
 import time
+import re
+from typing import List
 from discord.ext import commands, tasks
 from datetime import datetime, timedelta
-from utils.utils import get_next_case_id
+from utils.utils import get_next_case_id, get_next_reminder_id
 from utils.constants import StriveConstants, reminders, afks, notes
-from utils.embeds import UserInformationEmbed, ReminderEmbed, RoleSuccessEmbed, RolesInformationEmbed, SuccessEmbed, ErrorEmbed, NicknameSuccessEmbed
+from utils.embeds import UserInformationEmbed, ReminderEmbed, RoleSuccessEmbed, RolesInformationEmbed, SuccessEmbed, ErrorEmbed, NicknameSuccessEmbed, ReminderListEmbed
+from utils.pagination import ReminderPaginationView
 
 
 constants = StriveConstants()
@@ -24,68 +27,120 @@ class ManagementCommandCog(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def check_for_reminders(self):
-        async for reminder in reminders.find({}):
-            if reminder["time"] == datetime.now().strftime('%Y-%m-%d %H:%M'):
-                print("Reminder went off.")
-                await self.strive.get_user(reminder["user_id"]).send("Your reminder went off :)")
-                reminders.delete_one(reminder)
-        
+        current_time = int(datetime.utcnow().timestamp())
+
+
+        async for reminder in reminders.find({"time": {"$lte": current_time}}):
+            user = self.strive.get_user(reminder["user_id"])
+            guild = self.strive.get_guild(reminder["guild_id"])
+
+
+            if user:
+                guild_name = guild.name if guild else "Unknown Server"
+                reminder_time = f"<t:{reminder['time']}:F>"
+
+
+                message = (
+                    f"<:clock:1334022552326111353> On {reminder_time}, you told me to remind you:\n"
+                    f"> **Message:** {reminder['message']}\n"
+                    f"> **Guild:** {guild_name}"
+                )
+
+
+                await user.send(content=message)
+
+
+            await reminders.delete_one({"_id": reminder["_id"]})
+            
+
+
+    @commands.hybrid_group(description="Manage reminders.", with_app_command=True, extras={"category": "General"})
+    async def reminder(self, ctx: commands.Context):
+
+
+        if ctx.invoked_subcommand is None:
+            await ctx.send("Available subcommands: `add`, `list`, `remove`")
 
 
 
-    @commands.hybrid_command(description="This will create a reminder.", with_app_command=True, extras={"category": "General"})
-    async def addreminder(self, ctx: commands.Context, name:str, time:str, message:str):
+    @reminder.command(name="add", description="Create a reminder.", with_app_command=True)
+    async def add(self, ctx: commands.Context, name: str, time: str, message: str):
         try:
-            newtime = self.time_converter(datetime.now().strftime('%Y-%m-%d %H:%M'),time)
-        except ValueError:
+            minutes = self.time_converter(time)
+            newtime = int((datetime.utcnow() + timedelta(minutes=minutes)).timestamp())
+        except ValueError as e:
             return await ctx.send(embed=discord.Embed(
                 title="Invalid time",
-                description="You provided a invalid time.",
+                description=str(e),
                 color=discord.Color.red()
             ))
 
-        
+
+        case_id = await get_next_reminder_id(ctx.guild.id)
+
+
         data = {
-            "id": str(uuid.uuid4().int)[:4],
+            "id": str(case_id),
             "user_id": ctx.author.id,
+            "guild_id": ctx.guild.id,
             "name": name,
             "message": message,
             "time": newtime
         }
-
-        reminders.insert_one(data)
-
-        reminder_embed = ReminderEmbed(reminder_time=newtime)
-
-        await ctx.send(embed=reminder_embed)
         
-    
 
-    def time_converter(self, current_date: str, parameter: str) -> int:
-        conversions = {
-            ("s", "seconds"): 1,
-            ("m", "minutes"): 60,
-            ("h", "hours"): 60 * 60,
-            ("d", "days"): 24 * 60 * 60,
-            ("w", "weeks"): 7 * 24 * 60 * 60
-        }
+        await reminders.insert_one(data)
 
-        current_date = datetime.strptime(current_date, '%Y-%m-%d %H:%M')
-        parameter = parameter.strip()
+
+        reminder_embed = ReminderListEmbed([data], current_page=0)
+        await ctx.send(embed=reminder_embed.create_embed())
         
-        for aliases, multiplier in conversions.items():
-            for alias in aliases:
-                if parameter.lower().endswith(alias.lower()):
-                    number_part = parameter[:-len(alias)].strip()
-                    
-                    if number_part.isdigit():
-                        time_to_add = int(number_part) * multiplier
-                        new_date = current_date + timedelta(seconds=time_to_add)
-                        return new_date.strftime('%Y-%m-%d %H:%M')
-                    else:
-                        raise ValueError(f"Invalid number: {number_part}")
+        
+        
+    @reminder.command(name="list", description="List your reminders.", with_app_command=True)
+    async def list(self, ctx: commands.Context):
+        user_reminders = reminders.find({"user_id": ctx.author.id})
+        reminders_list = await user_reminders.to_list(None)
 
-        raise ValueError(f"Invalid time format: {parameter}")
+
+        if len(reminders_list) == 0:
+            return await ctx.send("You have no reminders set.")
+
+
+        view = ReminderPaginationView(ctx.bot, reminders_list)
+        embed = ReminderListEmbed(reminders_list[:5], 1).create_embed()
+
+
+        await ctx.send(embed=embed, view=view)
+
+
+
+    @reminder.command(name="remove", description="Remove a reminder by ID.", with_app_command=True)
+    async def remove(self, ctx: commands.Context, reminder_id: str):
+
+
+        result = reminders.delete_one({"id": reminder_id, "user_id": ctx.author.id})
+        if result.deleted_count == 0:
+            return await ctx.send("No reminder found with that ID.")
+
+        await ctx.send(f"Reminder `{reminder_id}` deleted successfully!")
+
+
+
+    @staticmethod
+    def time_converter(parameter: str) -> int:
+
+
+        time_units = {'s': 1/60, 'm': 1, 'h': 60, 'd': 1440, 'w': 10080}
+        match = re.fullmatch(r"(\d+)([smhdw])", parameter.lower())
+
+
+        if not match:
+            raise ValueError("Invalid time format. Use '1m', '2h', '1d', etc.")
+
+
+        value, unit = match.groups()
+        return int(value) * time_units[unit]
 
 
 
