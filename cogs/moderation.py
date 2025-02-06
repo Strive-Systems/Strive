@@ -700,5 +700,39 @@ class ModerationCommandCog(commands.Cog):
         else:
             await ctx.send_error(f"Failed to remove any roles from {member.mention}")
 
+    @commands.hybrid_command(description="Lock a channel", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(manage_channels=True)
+    async def lock(self, ctx: StriveContext, channel: discord.TextChannel = None):
+        channel = channel or ctx.channel
+        
+        if not ctx.guild.me.guild_permissions.manage_channels:
+            return await ctx.send_error("I don't have permission to manage channels!")
+            
+        current_perms = channel.overwrites_for(ctx.guild.default_role)
+        if current_perms.send_messages is False:
+            return await ctx.send_error(f"{channel.mention} is already locked!")
+            
+        overwrite = discord.PermissionOverwrite(send_messages=False, add_reactions=False)
+        await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+        await ctx.send_success(f"{channel.mention} has been locked!")
+
+
+
+    @commands.hybrid_command(description="Unlock a channel", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(manage_channels=True)
+    async def unlock(self, ctx: StriveContext, channel: discord.TextChannel = None):
+        channel = channel or ctx.channel
+        
+        if not ctx.guild.me.guild_permissions.manage_channels:
+            return await ctx.send_error("I don't have permission to manage channels!")
+            
+        current_perms = channel.overwrites_for(ctx.guild.default_role)
+        if current_perms.send_messages is not False:
+            return await ctx.send_error(f"{channel.mention} is already unlocked!")
+            
+        overwrite = discord.PermissionOverwrite(send_messages=None, add_reactions=None)
+        await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+        await ctx.send_success(f"{channel.mention} has been unlocked!")    
+
 async def setup(strive):
     await strive.add_cog(ModerationCommandCog(strive))
