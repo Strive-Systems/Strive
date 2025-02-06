@@ -13,10 +13,15 @@ class OnCommandError(commands.Cog):
     async def on_command_error(self, ctx: StriveContext, error):
         error_id = ZUID(prefix="error_", length=10)
         error_id = error_id()
+        print(f"Error occurred: {error}")
         
         if isinstance(error, commands.MissingRequiredArgument):
             embed = MissingArgsEmbed(error.param.name)
             return await ctx.send(embed=embed)
+        
+        if isinstance(error, AttributeError):
+            print(f"Attribute error details: {error}")
+
 
 
 
