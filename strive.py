@@ -79,7 +79,7 @@ class Strive(commands.AutoShardedBot):
         else:
             
             guild_count = len(strive.guilds)
-            user_count = sum(guild.member_count for guild in strive.guilds)
+            user_count = sum(guild.member_count or 0 for guild in strive.guilds)  # Default to 0 if None
 
 
             await strive.change_presence(activity=discord.Activity(
