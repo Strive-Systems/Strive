@@ -774,14 +774,29 @@ class ModerationCommandCog(commands.Cog):
     async def slowmode(self, ctx: commands.Context, duration: str = None, channel: discord.TextChannel = None):
         channel = channel or ctx.channel
 
-        if duration is None:
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} Please specify the duration for slowmode (e.g. 10s, 5m, 1h).",
-                color=discord.Color.red()
-            )
-            await ctx.send(embed=embed)
-            return
+        if duration is None or duration.lower() == "on":
+            duration = "5s"
+        elif duration.lower() == "off" or duration == "0":
+            duration = "0s"
+
+        if duration == "0s":
+            try:
+                await channel.edit(slowmode_delay=0)
+                embed = discord.Embed(
+                    title="",
+                    description=f"{self.strive.success} Slowmode has been disabled in {channel.mention}.",
+                    color=discord.Color.green()
+                )
+                await ctx.send(embed=embed)
+                return
+            except discord.Forbidden:
+                embed = discord.Embed(
+                    title="",
+                    description=f"{self.strive.error} I don't have permission to modify slowmode in {channel.mention}.",
+                    color=discord.Color.red()
+                )
+                await ctx.send(embed=embed)
+                return
 
         time_mapping = {'s': 1, 'm': 60, 'h': 3600}
         try:
@@ -812,20 +827,11 @@ class ModerationCommandCog(commands.Cog):
 
         try:
             await channel.edit(slowmode_delay=seconds)
-            
-            if seconds == 0:
-                embed = discord.Embed(
-                    title="",
-                    description=f"{self.strive.success} Slowmode has been disabled in {channel.mention}.",
-                    color=discord.Color.green()
-                )
-            else:
-                embed = discord.Embed(
-                    title="",
-                    description=f"{self.strive.success} Slowmode set to **{duration.lower()}** in {channel.mention}.",
-                    color=discord.Color.green()
-                )
-            
+            embed = discord.Embed(
+                title="",
+                description=f"{self.strive.success} Slowmode set to **{duration.lower()}** in {channel.mention}.",
+                color=discord.Color.green()
+            )
             await ctx.send(embed=embed)
 
         except discord.Forbidden:
