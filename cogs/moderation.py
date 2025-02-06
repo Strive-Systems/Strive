@@ -716,8 +716,8 @@ class ModerationCommandCog(commands.Cog):
                     await interaction.response.send_message("You cannot use this menu.", ephemeral=True)
                     return
 
-                ban = next((ban async for ban in interaction.guild.bans() 
-                          if str(ban.user.id) == self.values[0]), None)
+                ban_list = [ban async for ban in interaction.guild.bans()]
+                ban = next((ban for ban in ban_list if str(ban.user.id) == self.values[0]), None)
 
                 if ban:
                     case = await cases.find_one({
@@ -767,7 +767,6 @@ class ModerationCommandCog(commands.Cog):
         message = await ctx.send(embed=embed)
         view = BanView(bans, message)
         view.message = message
-        await message.edit(view=view)    
-            
+        await message.edit(view=view)            
 async def setup(strive):
     await strive.add_cog(ModerationCommandCog(strive))
