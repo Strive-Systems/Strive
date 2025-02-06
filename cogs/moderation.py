@@ -886,7 +886,7 @@ class ModerationCommandCog(commands.Cog):
 
         if removed_roles:
             await ctx.send(embed=discord.Embed(
-                description=f"{self.strive.success} Removed **{len(removed_roles)}** dangerous roles from {member.mention}\n> -# {', '.join(removed_roles)}",
+                description=f"{self.strive.success} Removed **{len(removed_roles)}** dangerous roles from {member.mention}\n=# <:right:1332554985153626113>  {', '.join(removed_roles)}",
                 color=discord.Color.green()
             ))
         else:
