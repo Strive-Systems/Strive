@@ -4,6 +4,7 @@ from datetime import datetime
 from discord import Interaction
 from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
+from typing import List
 from utils.constants import StriveConstants
 
 
@@ -424,25 +425,45 @@ class SearchResultEmbed(discord.Embed):
            
  
 # This contains the emebed and its parameters for the ping command. This shows things like uptime,
-# latency to discors and mongodb.        
-        
-class PingCommandEmbed(discord.Embed):
-    def create_ping_embed(latency, database_latency, uptime):
+# latency to discors and mongodb.   
+ 
+class PingCommandEmbed:
+    @staticmethod
+    def create_ping_embed(latency: float, database_latency: int, uptime, shard_info: List[dict], page: int = 0):
         embed = discord.Embed(
-            title="",
-            color=discord.Color.green()
-        )
-
-        
-        embed.add_field(
-            name="**🏓 Pong!**", 
-            value=f"> **Latency:** {round(latency * 1000)}ms\n"
-                  f"> **Database Latency:** {database_latency}ms\n"
-                  f"> **Uptime:** <t:{int((uptime.timestamp()))}:R>\n",
-            inline=False
+            title="<:Strive:1330583510406267070> Strive",
+            color=constants.strive_embed_color_setup(),
         )
         
+        
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1326735526740496444/1333643206226739312/StriveLogoGrey.png")
+        
 
+        if page == 0:
+            embed.add_field(
+                name="<:settings:1327195042602942508> **Network Information**",
+                value=(
+                    f"**Latency:** `{round(latency * 1000)}ms` \n"
+                    f"**Database:** `{'Connected' if database_latency else 'Disconnected'}\n` "
+                    f"**Uptime:** <t:{int(uptime.timestamp())}:R>"
+                ),
+                inline=False
+            )
+        else:
+            embed.add_field(name="**Sharding Information**", value="", inline=False)
+
+            start_index = (page - 1) * 5
+            end_index = start_index + 5
+            shards_to_display = shard_info[start_index:end_index]
+
+            for shard in shards_to_display:
+                embed.add_field(
+                    name=f"<:clock:1334022552326111353> **Shard {shard['id']}**",
+                    value=f"> **Latency:** `{shard['latency']}ms` \n> **Guilds:** `{shard['guilds']}`",
+                    inline=False
+                )
+
+            
         return embed
       
     

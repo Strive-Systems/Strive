@@ -11,6 +11,7 @@ from discord import Interaction, Embed
 from discord.ext import commands
 from utils.constants import StriveConstants, db, prefixes, timezones
 from utils.embeds import AboutEmbed, AboutWithButtons, PingCommandEmbed, ServerInformationEmbed, EmojiFindEmbed, PrefixEmbed, PrefixSuccessEmbed, PrefixSuccessEmbedNoneChanged
+from utils.pagination import PingPaginationView
 
 
 constants = StriveConstants()
@@ -119,31 +120,27 @@ class CommandsCog(commands.Cog):
     
     # This is the space for the ping command which will allow users to ping.
     
-    @commands.hybrid_command(name="ping", description="Check the bot's latency and uptime.", with_app_command=True, extras={"category": "Other"})
+    @commands.hybrid_command(name="ping", description="Check the bot's latency, uptime, and shard info.", with_app_command=True, extras={"category": "Other"})
     async def ping(self, ctx: commands.Context):
-        
-        
         latency = self.strive.latency
-        
         database_latency = await self.get_mongo_latency()
+        uptime = self.strive.start_time
 
 
-        # Calculate uptime
-        
-        uptime_seconds = getattr(self.strive, 'uptime', 0)
-        uptime_formatted = f"<t:{int((self.strive.start_time.timestamp()))}:R>"
-        
+        shard_info = []
+        for shard_id, shard in self.strive.shards.items():
+            shard_info.append({
+                "id": shard_id,
+                "latency": round(shard.latency * 1000),
+                "guilds": len([g for g in self.strive.guilds if g.shard_id == shard_id])
+            })
 
-        # Use the embed creation function from embeds.py
-        
-        embed = PingCommandEmbed.create_ping_embed(
-            latency=latency,
-            database_latency=database_latency,
-            uptime=self.strive.start_time
-        )
-        
 
-        await ctx.send(embed=embed)
+        embed = PingCommandEmbed.create_ping_embed(latency, database_latency, uptime, shard_info, page=0)
+        view = PingPaginationView(self.strive, latency, database_latency, uptime, shard_info)
+
+
+        await ctx.send(embed=embed, view=view)
 
 
 
