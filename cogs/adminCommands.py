@@ -37,13 +37,13 @@ class AdminCommandsCog(commands.Cog):
         role = discord.utils.get(ctx.guild.roles, id = 1326485348326314054)
         if ctx.guild.id == 1326476818894557217 and role in ctx.author.roles:
             if user.id in constants.bypassed_users:
-                return await ctx.send(f"{self.strive.error} {user.mention} is already in the bypass list.")
+                return await ctx.send_error(f"{user.mention} is already in the bypass list.")
 
             # Add the user to the MongoDB collection
             
             await blacklist_bypass.insert_one({"discord_id": user.id})
             
-            await ctx.send(f"{self.strive.success} {user.mention} has been added to the bypass list.")
+            await ctx.send_success(f"{user.mention} has been added to the bypass list.")
 
 
 
@@ -55,11 +55,11 @@ class AdminCommandsCog(commands.Cog):
         role = discord.utils.get(ctx.guild.roles, id = 1326485348326314054)
         if ctx.guild.id == 1326476818894557217 and role in ctx.author.roles:
             if user.id not in constants.bypassed_users:
-                return await ctx.send(f"{self.strive.error} {user.mention} is not in the bypass list.")
+                return await ctx.send_error(f"{user.mention} is not in the bypass list.")
             
             await blacklist_bypass.delete_one({"discord_id": user.id})
             
-            await ctx.send(f"{self.strive.success} {user.mention} has been removed from the bypass list.")
+            await ctx.send_success(f"{user.mention} has been removed from the bypass list.")
             
             
             
@@ -70,7 +70,7 @@ class AdminCommandsCog(commands.Cog):
     async def showowners(self, ctx: commands.Context):
         role = discord.utils.get(ctx.guild.roles, id=1326485348326314054)
         if ctx.guild.id != 1326476818894557217 or role not in ctx.author.roles:
-            return await ctx.send(f"{self.strive.error} You do not have permission to use this command.")
+            return await ctx.send_error(f"You do not have permission to use this command.")
 
 
         owners_cursor = blacklist_bypass.find({})
@@ -172,14 +172,15 @@ class AdminCommandsCog(commands.Cog):
             guild = discord.Object(id=guild_id)
             try:
                 guild_name = self.strive.get_guild(guild_id).name
-                loading_msg = await ctx.send(f"{self.strive.loading} Syncing for ***{guild_name}**...")
+                loading_msg = await ctx.send_loading(f"Syncing for ***{guild_name}**...")
             except AttributeError:
-                loading_msg = await ctx.send(f"{self.strive.loading} Syncing for guild ID **{guild_id}**..")
+                loading_msg = await ctx.send_loading(f"Syncing for guild ID **{guild_id}**..")
             synced = await self.strive.tree.sync(guild=guild)
         else:
-            loading_msg = await ctx.send(f"{self.strive.loading} Syncing commands globally...")
+            loading_msg = await ctx.send_loading(f"Syncing commands globally...")
             synced = await self.strive.tree.sync()
-        await loading_msg.edit(content=f"{self.strive.success} Synced **{len(synced)}** commands.")
+        await loading_msg.delete()
+        await ctx.send_success(f"Synced **{len(synced)}** commands.")
 
     # This is the set of commands to unblacklist a user from the bot. This follows the same set of logic as
     # blacklisting the user but in the opposit order.
@@ -214,7 +215,7 @@ class AdminCommandsCog(commands.Cog):
         # Checks to see if its in the db
         
         if not await blacklists.find_one({"discord_id": entity_id, "type": entity_type}):
-            return await ctx.send(f"{self.strive.error} {entity} is not blacklisted.")
+            return await ctx.send_error(f"{entity} is not blacklisted.")
 
 
         case_entry = await cases.find_one(
@@ -233,11 +234,11 @@ class AdminCommandsCog(commands.Cog):
             
             
             await blacklists.delete_one({"discord_id": entity_id, "type": entity_type})
-            await ctx.send(f"{self.strive.success} **{entity}** has been unblacklisted for {reason}.")
+            await ctx.send_success(f"**{entity}** has been unblacklisted for {reason}.")
             
             
         else:
-            await ctx.send(f"{self.strive.error} {entity} is not blacklisted.")
+            await ctx.send_error(f"{entity} is not blacklisted.")
         
         
         
@@ -273,7 +274,7 @@ class AdminCommandsCog(commands.Cog):
         # Checks to see if its in the db
         
         if await blacklists.find_one({"discord_id": entity_id, "type": entity_type}):
-            return await ctx.send(f"{self.strive.error} {entity} is already blacklisted.")
+            return await ctx.send_error(f"{entity} is already blacklisted.")
         
         
         case_id = await get_next_case_id(ctx.guild.id)
@@ -300,7 +301,7 @@ class AdminCommandsCog(commands.Cog):
 
         await blacklists.insert_one(blacklist_entry)
         await cases.insert_one(case_entry)
-        await ctx.send(f"{self.strive.success} **Case #{case_id} - {entity}** has been blacklisted for {reason}.")
+        await ctx.send_success(f"**Case #{case_id} - {entity}** has been blacklisted for {reason}.")
         
         
 

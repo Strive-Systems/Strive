@@ -56,14 +56,7 @@ class ModerationCommandCog(commands.Cog):
         if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             
             
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} You cannot warn {member.mention} because they are an admin or bypassed from moderation.",
-                color=discord.Color.green()
-            )
-            
-            
-            await ctx.send(embed=embed)
+            await ctx.send_error(f"You cannot warn {member.mention} because they are an admin or bypassed from moderation.")
             
             
         else:
@@ -73,10 +66,10 @@ class ModerationCommandCog(commands.Cog):
 
 
             try:
-                dm_message = f"{self.strive.success} **Case #{case_id} - You have been warned in {ctx.guild.name}** for {reason}."
+                dm_message = f"**Case #{case_id} - You have been warned in {ctx.guild.name}** for {reason}."
                 await member.send(dm_message)
             except discord.Forbidden:
-                await ctx.send(f"{self.strive.error} Unable to send a DM to {member.mention}; warning the user in the server.")
+                await ctx.send_error(f"Unable to send a DM to {member.mention}; warning the user in the server.")
             
             
             warn_entry = {
@@ -94,14 +87,7 @@ class ModerationCommandCog(commands.Cog):
             await cases.insert_one(warn_entry)
 
 
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.success} **Case #{case_id} - {member}** has been warned for {reason}.",
-                color=discord.Color.green()
-            )
-            
-            
-            await ctx.send(embed=embed)
+            await ctx.send_success(f"**Case #{case_id} - {member}** has been warned for {reason}.")
         
         
         
@@ -112,14 +98,7 @@ class ModerationCommandCog(commands.Cog):
         if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
             
             
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} You cannot ban {member.mention} because they are an admin or bypassed from moderation.",
-                color=discord.Color.green()
-            )
-            
-            
-            await ctx.send(embed=embed)
+            await ctx.send_error(f"You cannot ban {member.mention} because they are an admin or bypassed from moderation.")
             
             
         else:
@@ -144,20 +123,20 @@ class ModerationCommandCog(commands.Cog):
             # Moved the error checking to the top to prevent as many nested if statements.
 
             if user_to_unban:
-                return await ctx.send(f"{self.strive.error} User {fetched_member} is already banned.", ephemeral=True)
+                return await ctx.send_error(f"{fetched_member} is already banned.")
             
             
             elif fetched_member == ctx.author:
-                return await ctx.send(f"{self.strive.error} You cannot ban yourself!")
+                return await ctx.send_error(f"You cannot ban yourself!")
         
         
             elif fetched_member == ctx.guild.me:
-                return await ctx.send(f"{self.strive.error} I cannot ban myself!")
+                return await ctx.send_error(f"I cannot ban myself!")
             
             
             try:
                 if fetched_member.top_role >= ctx.author.top_role:
-                    return await ctx.send("You cannot ban a member with an equal or higher role!")
+                    return await ctx.send_error(f"You cannot ban a member with an equal or higher role!")
                 
                 
             except AttributeError:
@@ -190,7 +169,7 @@ class ModerationCommandCog(commands.Cog):
 
             # Send the success message
             
-            await ctx.send(f"{self.strive.success} **Case #{case_id} - {member}** has been banned for {reason}.")
+            await ctx.send_success(f"**Case #{case_id} - {fetched_member}** has been banned for {reason}.")
                 
             
             
@@ -221,17 +200,17 @@ class ModerationCommandCog(commands.Cog):
 
 
             if user_to_unban is None:
-                await ctx.send(f"{self.strive.error} User {user} is not banned.", ephemeral=True)
+                await ctx.send_error(f"{user.mention} is not banned.")
                 return
 
 
             await ctx.guild.unban(user_to_unban, reason=reason)
             case_id = await get_next_case_id(ctx.guild.id)
-            await ctx.send(f"{self.strive.success} **Case #{case_id} - Successfully unbanned {user_to_unban.mention}** for {reason}.", ephemeral=True)
+            await ctx.send_success(f"**Case #{case_id} - {user_to_unban}** has been unbanned for {reason}.")
 
 
         except discord.Forbidden:
-            await ctx.send(f"{self.strive.error} I do not have permissions to unban this user.", ephemeral=True)
+            await ctx.send_error(f"I do not have permission to unban {user.mention}.")
             
         
         
@@ -243,25 +222,14 @@ class ModerationCommandCog(commands.Cog):
     async def softban(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         
         if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
-            
-            
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} You cannot softban {member.mention} because they are an admin or bypassed from moderation.",
-                color=discord.Color.green()
-            )
-            
-            
-            await ctx.send(embed=embed)
+            await ctx.send_error(f"You cannot softban {member.mention} because they are an admin or bypassed from moderation.")
             
         else:
-
             await ctx.guild.ban(member, reason=reason, delete_message_days=1)
             case_number = f"Case #{str(uuid.uuid4().int)[:4]}"  # Generate a short unique case number
-            await ctx.send(f"{self.strive.success} **Case #{case_number} - Successfully softbanned {member.mention}** for: {reason}")
+            await ctx.send_success(f"**Case #{case_number} - Successfully softbanned {member.mention}** for: {reason}")
             await asyncio.sleep(2)
-            await ctx.guild.unban(member)
-        
+            await ctx.guild.unban(member)        
     
     
     @commands.hybrid_command(description="Mute/Timeout a certain user", with_app_command=True, extras={"category": "Moderation"})
@@ -269,44 +237,27 @@ class ModerationCommandCog(commands.Cog):
     async def mute(self, ctx: commands.Context, member: discord.Member, time: str, *, reason: str = "No reason provided"):
         
         if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
-            
-            
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} You cannot mute {member.mention} because they are an admin or bypassed from moderation.",
-                color=discord.Color.green()
-            )
-            
-            
-            await ctx.send(embed=embed)
-            
+            await ctx.send_error(f"You cannot mute {member.mention} because they are an admin or bypassed from moderation.")
 
         else:
-    
-    
             if member == ctx.author:
-                return await ctx.send(f"{self.strive.error} You cannot mute yourself!")
-            
+                return await ctx.send_error("You cannot mute yourself!")
             
             elif member == ctx.guild.me:
-                return await ctx.send(f"{self.strive.error} I cannot mute myself!")
-            
+                return await ctx.send_error("I cannot mute myself!")
             
             try:
                 if member.top_role >= ctx.author.top_role:
-                    return await ctx.send(f"{self.strive.error} You cannot mute a member with an equal or higher role!")
+                    return await ctx.send_error("You cannot mute a member with an equal or higher role!")
             except AttributeError:
                 pass
 
-
             time_match = re.match(r"(\d+)([mshd])", time)
             if not time_match:
-                return await ctx.send("Invalid time format. Use `1m`, `1h`, etc.")
-
+                return await ctx.send_error("Invalid time format. Use `1m`, `1h`, etc.")
 
             amount, unit = time_match.groups()
             amount = int(amount)
-
 
             if unit == "m":
                 delta = timedelta(minutes=amount)
@@ -317,105 +268,64 @@ class ModerationCommandCog(commands.Cog):
             elif unit == "d":
                 delta = timedelta(days=amount)
             else:
-                return await ctx.send("Invalid time unit. Use `m`, `h`, `s`, or `d`.")
-
+                return await ctx.send_error("Invalid time unit. Use `m`, `h`, `s`, or `d`.")
 
             until = discord.utils.utcnow() + delta
             await member.timeout(until, reason=reason)
             formatted_time = discord.utils.format_dt(until, style="f")
             
-            
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.success} **{member.name}** has been muted until {formatted_time}!",
-                color=discord.Color.green()
-            )
-            
-            
-            await ctx.send(embed=embed)
-
-
+            await ctx.send_success(f"**{member.name}** has been muted until {formatted_time}!")
 
     @commands.hybrid_command(description="Remove timeout from a certain user", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(moderate_members=True)
     async def unmute(self, ctx: commands.Context, member: discord.Member, *, reason: str = "No reason provided"):
         if member == ctx.author:
-            return await ctx.send(f"{self.strive.error} You cannot unmute yourself!")
+            return await ctx.send_error("You cannot unmute yourself!")
     
         elif member == ctx.guild.me:
-            return await ctx.send(f"{self.strive.error} I cannot unmute myself!")
+            return await ctx.send_error("I cannot unmute myself!")
         
         try:
             if member.top_role >= ctx.author.top_role:
-                return await ctx.send(f"{self.strive.error} You cannot unmute a member with an equal or higher role!")
+                return await ctx.send_error("You cannot unmute a member with an equal or higher role!")
         except AttributeError:
             pass
 
-
         await member.timeout(None, reason=reason)
-        
-        
-        embed = discord.Embed(
-            title="",
-            description=f"{self.strive.success} **{member.name}** has been unmuted!",
-            color=discord.Color.green()
-        )
-        
-        
-        await ctx.send(embed=embed)
-        
-        
+        await ctx.send_success(f"**{member.name}** has been unmuted!")
         
     @commands.hybrid_command(description="You can run this command to kick a user in your server.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         
-        
         if await ModerationCommandCog.is_blacklisted_or_admin(ctx, member):
-            
-            
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} You cannot kick {member.mention} because they are an admin or bypassed from moderation.",
-                color=discord.Color.green()
-            )
-            
-            
-            await ctx.send(embed=embed)
-            
+            await ctx.send_error(f"You cannot kick {member.mention} because they are an admin or bypassed from moderation.")
             
         else:
-        
-        
             if not ctx.guild.me.guild_permissions.manage_messages:
-                await ctx.send(f"{self.strive.error} I do not have permission to manage messages.")
+                await ctx.send_error("I do not have permission to manage messages.")
                 return
-            
             
             if not ctx.guild.me.guild_permissions.kick_members:
-                await ctx.send(f"{self.strive.error} I do not have permission to kick members.")
+                await ctx.send_error("I do not have permission to kick members.")
                 return
-
 
             try:
                 await member.kick(reason=reason)
             except discord.Forbidden:
-                await ctx.send(f"{self.strive.error} I do not have permission to kick that user.")
+                await ctx.send_error("I do not have permission to kick that user.")
                 return
             except discord.HTTPException:
-                await ctx.send(f"{self.strive.error} I couldn't kick this user.")
+                await ctx.send_error("I couldn't kick this user.")
                 return
 
-
             case_id = await get_next_case_id(ctx.guild.id)
-
 
             try:
                 dm_message = f"{self.strive.success} **Case #{case_id} - You have been kicked from **{ctx.guild.name}** for {reason}"
                 await member.send(dm_message)
             except discord.Forbidden:
-                await ctx.send(f"{self.strive.error} Unable to send a DM to {member.mention}; kicking the user in the server.")
-
+                await ctx.send_error(f"Unable to send a DM to {member.mention}; kicking the user in the server.")
 
             kick_entry = {
                 "case_id": case_id,
@@ -429,16 +339,11 @@ class ModerationCommandCog(commands.Cog):
             }
             await cases.insert_one(kick_entry)
             
-
-            await ctx.send(f"{self.strive.success} **Case #{case_id} - {member}** has been kicked for {reason}.")
-            
-        
+            await ctx.send_success(f"**Case #{case_id} - {member}** has been kicked for {reason}.")
         
     @commands.hybrid_group(description="This is the command for case management.")
     async def case(self, ctx):
         return
-    
-    
     
     @case.command(description="Searches cases by an Case ID.", with_app_command=True)
     @commands.has_guild_permissions(ban_members=True)
@@ -446,24 +351,20 @@ class ModerationCommandCog(commands.Cog):
         case_info = await cases.find_one({'case_id': caseid, 'guild_id': ctx.guild.id})
         
         if case_info:
-            
             embed = discord.Embed(
                 title=f"{case_info.get('type').title()} | Case #{case_info.get('case_id')}",
                 description=f"Action took place on <t:{case_info.get('timestamp')}:F>.",
                 color=self.constants.strive_embed_color_setup(),
             )
 
-
             member_value = f"<@{case_info.get('user_id')}> (`{case_info.get('user_id')}`)"
             moderator_value = f"<@{case_info.get('moderator_id')}> (`{case_info.get('moderator_id')}`)"
             reason_value = case_info.get('reason') or "No reason provided."
-
 
             if case_info.get('status') == "cleared":
                 member_value = f"~~{member_value}~~"
                 moderator_value = f"~~{moderator_value}~~"
                 reason_value = f"~~{reason_value}~~"
-
 
             embed.add_field(
                 name="Member",
@@ -471,13 +372,11 @@ class ModerationCommandCog(commands.Cog):
                 inline=True
             )
             
-
             embed.add_field(
                 name="Moderator",
                 value=moderator_value,
                 inline=True
             )
-
 
             embed.add_field(
                 name="Reason",
@@ -485,71 +384,33 @@ class ModerationCommandCog(commands.Cog):
                 inline=False
             )
 
-
             try:
                 member: discord.Member = await self.strive.fetch_user(case_info.get('user_id'))
                 embed.set_author(name=f"@{member.name}", icon_url=member.avatar.url)
                 
-                
             except:
                 embed.set_author(name="Unknown User")
 
-
             await ctx.send(embed=embed)
-            
             
         else:
-            
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} Case #{caseid} could not be found!",
-                color=discord.Color.red()
-            )
-            
-            
-            await ctx.send(embed=embed)
-    
+            await ctx.send_error(f"Case #{caseid} could not be found!")    
     
     
     @case.command(description="Void a case by ID", with_app_command=True)
     @commands.has_guild_permissions(ban_members=True)
     async def void(self, ctx: commands.Context, *, caseid: int):
-        
-        
         case_info = await cases.find_one_and_update({'case_id': caseid, 'guild_id': ctx.guild.id}, {'$set': {'status': 'cleared'}})
         
-        
         if case_info:
-            
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.success} **Case #{caseid}** has been voided!",
-                color=discord.Color.green()
-            )
-            
-            
-            await ctx.send(embed=embed)
-        
-        
+            await ctx.send_success(f"**Case #{caseid}** has been voided!")
         elif not case_info:
-            
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} **Case #{caseid}** could not be found!",
-                color=discord.Color.red()
-            )
-            
-            
-            await ctx.send(embed=embed)
-            
-           
+            await ctx.send_error(f"**Case #{caseid}** could not be found!")
             
     @commands.hybrid_group(description="Allows the lookup, transferring and modification of modlogs.")
     async def modlogs(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send("Please specify a valid subcommand (view, transfer, clear).")
-
-
 
     @modlogs.command(description="View all modlogs for a certain user")
     @commands.has_guild_permissions(ban_members=True)
@@ -564,7 +425,6 @@ class ModerationCommandCog(commands.Cog):
 
         results = cases.find({'user_id': member.id, "guild_id": ctx.guild.id})
         
-        
         async for result in results:
             if result.get('status') == "active":
                 number += 1
@@ -578,14 +438,12 @@ class ModerationCommandCog(commands.Cog):
                     inline=False
                 )
 
-
         if number == 0:
             embed = discord.Embed(
                 title="",
                 description=f"{self.strive.error} No mod logs could be found for this user!",
                 color=self.constants.strive_embed_color_setup()
             )
-            
             
         else:
             try:
@@ -600,20 +458,15 @@ class ModerationCommandCog(commands.Cog):
                     icon_url=member.default_avatar.url
                 )
                 
-                
             embed.set_footer(text=f"ID: {member.id} • Total Modlogs: {number}")
 
-
         await ctx.send(embed=embed)
-
-
 
     @modlogs.command(description="Transfer all modlogs to a different user")
     @commands.has_guild_permissions(ban_members=True)
     async def transfer(self, ctx, olduser: discord.Member, newuser: discord.Member):
         results = cases.find({'user_id': olduser.id, "guild_id": ctx.guild.id})
         failed_cases = []
-
 
         async for result in results:
             updated_case = await cases.find_one_and_update(
@@ -623,31 +476,16 @@ class ModerationCommandCog(commands.Cog):
             if not updated_case:
                 failed_cases.append(result.get('case_id'))
 
-
         if failed_cases:
-            await ctx.send(f"{self.strive.error} The following cases could not be updated: {', '.join(map(str, failed_cases))}")
+            await ctx.send_error(f"The following cases could not be updated: {', '.join(map(str, failed_cases))}")
 
-
-        embed = discord.Embed(
-            title="",
-            description=(
-                f"{self.strive.success} All moderation logs for **{olduser.name}** "
-                f"have been transferred to **{newuser.name}**."
-            ),
-            color=discord.Color.green()
-        )
-        
-        
-        await ctx.send(embed=embed)
-
-
+        await ctx.send_success(f"All moderation logs for **{olduser.name}** have been transferred to **{newuser.name}**.")
 
     @modlogs.command(description="Clear all modlogs for a certain user")
     @commands.has_guild_permissions(ban_members=True)
     async def clear(self, ctx, member: discord.Member):
         results = cases.find({'user_id': member.id, "guild_id": ctx.guild.id})
         failed_cases = []
-
 
         async for result in results:
             updated_case = await cases.find_one_and_update(
@@ -657,19 +495,10 @@ class ModerationCommandCog(commands.Cog):
             if not updated_case:
                 failed_cases.append(result.get('case_id'))
 
-
         if failed_cases:
-            await ctx.send(f"{self.strive.error} The following cases could not be cleared: {', '.join(map(str, failed_cases))}")
+            await ctx.send_error(f"The following cases could not be cleared: {', '.join(map(str, failed_cases))}")
 
-
-        embed = discord.Embed(
-            title="",
-            description=f"{self.strive.success} All moderation logs have been cleared for **{member.name}**.",
-            color=discord.Color.green()
-        )
-        
-        
-        await ctx.send(embed=embed)
+        await ctx.send_success(f"All moderation logs have been cleared for **{member.name}**.")
 
     @commands.hybrid_command(description="View a list of banned users", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(ban_members=True)
@@ -677,12 +506,7 @@ class ModerationCommandCog(commands.Cog):
         bans = [entry async for entry in ctx.guild.bans()]
         
         if not bans:
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} There are no banned users in this server.",
-                color=discord.Color.red()
-            )
-            await ctx.send(embed=embed)
+            await ctx.send_error("There are no banned users in this server.")
             return
 
         embed = discord.Embed(
@@ -782,20 +606,10 @@ class ModerationCommandCog(commands.Cog):
         if duration == "0s":
             try:
                 await channel.edit(slowmode_delay=0)
-                embed = discord.Embed(
-                    title="",
-                    description=f"{self.strive.success} Slowmode has been disabled in {channel.mention}.",
-                    color=discord.Color.green()
-                )
-                await ctx.send(embed=embed)
+                await ctx.send_success(f"Slowmode has been disabled in {channel.mention}.")
                 return
             except discord.Forbidden:
-                embed = discord.Embed(
-                    title="",
-                    description=f"{self.strive.error} I don't have permission to modify slowmode in {channel.mention}.",
-                    color=discord.Color.red()
-                )
-                await ctx.send(embed=embed)
+                await ctx.send_error(f"I don't have permission to modify slowmode in {channel.mention}.")
                 return
 
         time_mapping = {'s': 1, 'm': 60, 'h': 3600}
@@ -808,49 +622,54 @@ class ModerationCommandCog(commands.Cog):
                 
             seconds = amount * time_mapping[unit]
         except (ValueError, IndexError):
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} Invalid duration format; use format like: 10s, 5m, 1h",
-                color=discord.Color.red()
-            )
-            await ctx.send(embed=embed)
+            await ctx.send_error("Invalid duration format; use format like: 10s, 5m, 1h")
             return
 
         if seconds > 21600:  # discord's max slowmode is 6 hours
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} Slowmode cannot be longer than 6 hours (21600 seconds).",
-                color=discord.Color.red()
-            )
-            await ctx.send(embed=embed)
+            await ctx.send_error("Slowmode cannot be longer than 6 hours (21600 seconds).")
             return
 
         try:
             await channel.edit(slowmode_delay=seconds)
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.success} Slowmode set to **{duration.lower()}** in {channel.mention}.",
-                color=discord.Color.green()
-            )
-            await ctx.send(embed=embed)
+            await ctx.send_success(f"Slowmode set to **{duration.lower()}** in {channel.mention}.")
 
         except discord.Forbidden:
-            embed = discord.Embed(
-                title="",
-                description=f"{self.strive.error} I don't have permission to modify slowmode in {channel.mention}.",
-                color=discord.Color.red()
-            )
-            await ctx.send(embed=embed)
+            await ctx.send_error(f"I don't have permission to modify slowmode in {channel.mention}.")
+
+    @commands.hybrid_command(description="Remove member's attach files & embed links permission", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(moderate_members=True)
+    async def imute(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
+        overwrite = discord.PermissionOverwrite(attach_files=False, embed_links=False)
+        await ctx.channel.set_permissions(member, overwrite=overwrite)
+        await ctx.send_success(f"Removed file/embed permissions from {member.mention}")
+
+    @commands.hybrid_command(description="Restore member's attach files & embed links permission", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(moderate_members=True)
+    async def iunmute(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
+        overwrite = discord.PermissionOverwrite(attach_files=None, embed_links=None)
+        await ctx.channel.set_permissions(member, overwrite=overwrite)
+        await ctx.send_success(f"Restored file/embed permissions for {member.mention}")
+
+    @commands.hybrid_command(description="Remove member's reaction & external emotes permission", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(moderate_members=True)
+    async def rmute(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
+        overwrite = discord.PermissionOverwrite(add_reactions=False, use_external_emojis=False)
+        await ctx.channel.set_permissions(member, overwrite=overwrite)
+        await ctx.send_success(f"Removed reaction/emoji permissions from {member.mention}")
+
+    @commands.hybrid_command(description="Restore member's reaction & external emotes permission", with_app_command=True, extras={"category": "Moderation"})
+    @commands.has_permissions(moderate_members=True)
+    async def runmute(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
+        overwrite = discord.PermissionOverwrite(add_reactions=None, use_external_emojis=None)
+        await ctx.channel.set_permissions(member, overwrite=overwrite)
+        await ctx.send_success(f"Restored reaction/emoji permissions for {member.mention}")    
 
     @commands.hybrid_command(description="Remove dangerous roles from a user", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_permissions(administrator=True)
     async def strip(self, ctx, member: discord.Member):
 
         if member.top_role >= ctx.author.top_role:
-            await ctx.send(embed=discord.Embed(
-                description=f"{self.strive.error} You cannot strip roles from someone with an equal or higher role than you.",
-                color=discord.Color.red()
-            ))
+            await ctx.send_error("You cannot strip roles from someone with an equal or higher role than you.")
             return
 
         dangerous_perms = {
@@ -865,10 +684,7 @@ class ModerationCommandCog(commands.Cog):
         ]
 
         if not dangerous_roles:
-            await ctx.send(embed=discord.Embed(
-                description=f"{self.strive.error} No dangerous roles found on {member.mention}.",
-                color=discord.Color.red()
-            ))
+            await ctx.send_error(f"No dangerous roles found on {member.mention}.")
             return
 
         removed_roles = []
@@ -885,15 +701,9 @@ class ModerationCommandCog(commands.Cog):
                 failed_roles.append(role.name)
 
         if removed_roles:
-            await ctx.send(embed=discord.Embed(
-                description=f"{self.strive.success} Removed **{len(removed_roles)}** dangerous roles from {member.mention}\n-# <:right:1332554985153626113>  {', '.join(removed_roles)}",
-                color=discord.Color.green()
-            ))
+            await ctx.send_success(f"Removed **{len(removed_roles)}** dangerous roles from {member.mention}\n-# <:right:1332554985153626113>  {', '.join(removed_roles)}")
         else:
-            await ctx.send(embed=discord.Embed(
-                description=f"{self.strive.error} Failed to remove any roles from {member.mention}",
-                color=discord.Color.red()
-            ))
+            await ctx.send_error(f"Failed to remove any roles from {member.mention}")
 
 async def setup(strive):
     await strive.add_cog(ModerationCommandCog(strive))

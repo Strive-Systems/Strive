@@ -38,3 +38,28 @@ async def get_prefix(strive, message):
         prefix = str(os.getenv('PREFIX'))
     
     return commands.when_mentioned_or(prefix)(strive, message)
+
+class StriveContext(commands.Context):
+    async def send_success(self, message: str):
+        embed = discord.Embed(
+            title="",
+            description=f"{self.strive.success} {message}",
+            color=0x71ff89
+        )
+        return await self.send(embed=embed)
+
+    async def send_error(self, message: str):
+        embed = discord.Embed(
+            title="",
+            description=f"{self.strive.error} {message}", 
+            color=0xff6161
+        )
+        return await self.send(embed=embed)
+    
+    async def send_loading(self, message: str):
+        embed = discord.Embed(
+            title="",
+            description=f"{self.strive.loading} {message}",
+            color=0x2a2c31
+        )
+        return await self.send(embed=embed)

@@ -156,8 +156,7 @@ class CommandsCog(commands.Cog):
 
 
         if emoji.name == None:
-            await ctx.send("{self.strive.error} I couldn't find that emoji.")
-            return
+            await ctx.send_error("Unable to find that emoji")
         
 
         await ctx.send(embed=EmojiFindEmbed(emoji).create_embed())
@@ -187,11 +186,7 @@ class CommandsCog(commands.Cog):
 
 
         if emoji == None:
-            embed = Embed(
-                title="",
-                description=f"{self.strive.error} I could not find that emoji."
-            )
-            await ctx.reply(embed=embed)
+            await ctx.send_error("Unable to find that emoji")
             return
         
 
@@ -339,11 +334,7 @@ class CommandsCog(commands.Cog):
             matching_timezones = [tz for tz in pytz.all_timezones if timezone in tz.lower()]
             
             if not matching_timezones:
-                embed = discord.Embed(
-                    description=f"{self.strive.error} Invalid timezone. Please use a city name like 'london' or 'tokyo'.",
-                    color=constants.strive_embed_color_setup()
-                )
-                await ctx.send(embed=embed)
+                await ctx.send_error(f"No matching timezone found for `{timezone}`, try a city name or abbreviation")
                 return
 
             selected_timezone = matching_timezones[0]
@@ -353,12 +344,7 @@ class CommandsCog(commands.Cog):
                 upsert=True
             )
 
-            embed = discord.Embed(
-                description=f"{self.strive.success} Your timezone has been set to `{selected_timezone}`",
-                color=constants.strive_embed_color_setup()
-            )
-
-            await ctx.send(embed=embed)
+            await ctx.send_success(f"Your timezone has been set to `{selected_timezone}`.")
 
         except Exception as e:
             embed = discord.Embed(

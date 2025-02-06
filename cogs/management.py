@@ -105,12 +105,7 @@ class ManagementCommandCog(commands.Cog):
 
         if len(reminders_list) == 0:
             
-            embed = ErrorEmbed(
-                title="",
-                description=f"<:error:1326752911870660704> You have no reminders set."
-            )
-
-            return await ctx.send(embed=embed)
+            await ctx.send_warning("You have no reminders.")
 
 
         view = ReminderPaginationView(ctx.bot, reminders_list)
@@ -128,20 +123,10 @@ class ManagementCommandCog(commands.Cog):
         result = reminders.delete_one({"id": reminder_id, "user_id": ctx.author.id})
         if result.deleted_count == 0:
             
-            embed = ErrorEmbed(
-                title="",
-                description=f"<:error:1326752911870660704> There are no reminders with that ID."
-            )
-
-            await ctx.send(embed=embed)
+            await ctx.send_warning("Reminder not found.")
         
 
-        embed = SuccessEmbed(
-            title="",
-            description=f"<:success:1326752811219947571> Reminder #**{reminder_id}** deleted successfully!"
-        )
-
-        await ctx.send(embed=embed)
+        await ctx.send_success(f"Reminder with ID `{reminder_id}` has been removed.")
 
 
 
@@ -189,8 +174,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def delete(self, ctx: commands.Context, role: discord.Role):
         await role.delete(reason=f"Deleted by {ctx.author}")
-        embed = RoleSuccessEmbed(title="", description=f"{self.strive.success} Role {role.mention} has been deleted.")
-        await ctx.send(embed=embed)
+        await ctx.send_success(f"Deleted {role.mention}")
 
 
 
@@ -198,8 +182,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def create(self, ctx: commands.Context, *, role_name: str):
         new_role = await ctx.guild.create_role(name=role_name, reason=f"Created by {ctx.author}")
-        embed = RoleSuccessEmbed(title="", description=f"{self.strive.success} Role {new_role.name} has been created.")
-        await ctx.send(embed=embed)
+        await ctx.send_success(f"Created {new_role.mention}")
 
 
 
@@ -207,8 +190,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def add(self, ctx: commands.Context, member: discord.Member, role: discord.Role):
         await member.add_roles(role, reason=f"Assigned by {ctx.author}")
-        embed = RoleSuccessEmbed(title="", description=f"{self.strive.success} Role {role.mention} has been assigned to {member.mention}.")
-        await ctx.send(embed=embed)
+        await ctx.send_success(f"Added {role.mention} to {member.mention}")
 
 
 
@@ -216,8 +198,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def remove(self, ctx: commands.Context, member: discord.Member, role: discord.Role):
         await member.remove_roles(role, reason=f"Unassigned by {ctx.author}")
-        embed = RoleSuccessEmbed(title="", description=f"{self.strive.success} Role {role.mention} has been removed from {member.mention}.")
-        await ctx.send(embed=embed)
+        await ctx.send_success(f"Removed {role.mention} from {member.mention}")
         
         
         
@@ -254,7 +235,7 @@ class ManagementCommandCog(commands.Cog):
 
 
         if limit is None or limit < 1:
-            await ctx.send("Please specify a valid number of messages to delete (greater than 0).")
+            await ctx.send_error("Please specify a valid number of messages to delete (greater than 0).")
             return
 
 
@@ -279,7 +260,7 @@ class ManagementCommandCog(commands.Cog):
 
         elif option == "user":
             if user is None:
-                await ctx.send("Please specify a user to purge messages from.")
+                await ctx.send_error("Please specify a user to purge messages from.")
                 return
             deleted = await ctx.channel.purge(limit=limit, check=lambda m: m.author.id == user.id)
             embed = SuccessEmbed(
@@ -297,7 +278,7 @@ class ManagementCommandCog(commands.Cog):
 
 
         else:
-            await ctx.send("Please specify a valid option: any, bots, user, or strive.")
+            await ctx.send_error("Please specify a valid option: any, bots, user, or strive.")
             return
 
 
@@ -310,13 +291,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            embed = discord.Embed(
-                title="Cooldown",
-                description=f"You are running the command too fast! Please wait {self.cooldown} seconds before using this command again.",
-                color=discord.Color.red()
-            )
-            await ctx.send(embed=embed)
-        
+            await ctx.send_error(f"This command is on cooldown; please try again <t:{int(discord.utils.utcnow().timestamp() + error.retry_after)}:R>")        
         
         
     @commands.hybrid_group(name="members", description="Lists the amount of members a role is assigned to. You can pass specific_role to run the command.", with_app_command=True, extras={"category": "General"})
@@ -329,11 +304,7 @@ class ManagementCommandCog(commands.Cog):
     async def specific_role(self, ctx, *, role: discord.Role):
         
         if not role:
-            await ctx.send(embed=ErrorEmbed(
-                title="",
-                description=f"{self.strive.error} Role not found."
-            ))
-            return
+            await ctx.send_error("Please specify a role to check.")
 
 
         await ctx.guild.chunk()
@@ -341,11 +312,7 @@ class ManagementCommandCog(commands.Cog):
 
 
         if not members_with_role:
-            await ctx.send(embed=ErrorEmbed(
-                title="",
-                description=f"{self.strive.error} No members have the role {role.name}."
-            ))
-            return
+            await ctx.send_error(f"No members have the role `{role.name}`.")
 
 
         embed = discord.Embed(
@@ -443,18 +410,11 @@ class ManagementCommandCog(commands.Cog):
             self.strive.afk_users.append(afk_doc_2)
             
             
-            await ctx.send(embed=SuccessEmbed(
-                title="",
-                description=f"{self.strive.success} I set your AFK: `{message}`!"
-            ))
+            await ctx.send_success(f"You are now AFK: {message}")
 
 
         elif afk_data:
-            await ctx.send(embed=ErrorEmbed(
-                title="",
-                description=f"{self.strive.error} You are already AFK."
-            ))
-    
+            await ctx.send_error(f"You are already AFK!")
     
     
     @afk.group(name='mod', description="Group of a group")
@@ -502,7 +462,8 @@ class ManagementCommandCog(commands.Cog):
             
             embed = SuccessEmbed(
                 title="",
-                description=f"{self.strive.success} Your AFK has ended as you sent a message indicating your return."
+                description=f"{self.strive.success} Your AFK has ended as you sent a message indicating your return.",
+                color=0x71ff89
             )
                 
             await message.channel.send(embed=embed)
@@ -552,7 +513,7 @@ class ManagementCommandCog(commands.Cog):
 
         await notes.insert_one(note_entry)
 
-        await ctx.send(f"{self.strive.success} **{note_id}** has been logged for {member}.")
+        await ctx.send_success(f"**{note_id}** has been logged for {member}.")
 
 
 
@@ -561,7 +522,7 @@ class ManagementCommandCog(commands.Cog):
     async def remove(self, ctx: commands.Context, id):
         await notes.delete_one({"note_id": f"Note #{id}"})
 
-        await ctx.send(f"{self.strive.success} **Note #{id}** has been removed.")
+        await ctx.send_success(f"**Note #{id}** has been removed.")
 
 
 
@@ -589,7 +550,7 @@ class ManagementCommandCog(commands.Cog):
 
             await ctx.send(embed=embed)
         else:
-            await ctx.send(f"{self.strive.error} No note found with the ID {id}.")
+            await ctx.send_error(f"No note found with the ID {id}.")
         
         
         

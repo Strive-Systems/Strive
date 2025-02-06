@@ -6,7 +6,7 @@ import sentry_sdk
 from datetime import datetime
 from discord.ext import commands
 from utils.constants import StriveConstants, afks, prefixes
-from utils.utils import get_prefix
+from utils.utils import get_prefix, StriveContext
 from cogwatch import watch
 
 # We use constants.py to specify things like the mongo db connnection, prefix
@@ -24,9 +24,10 @@ class Strive(commands.AutoShardedBot):
             1326476818894557217 # Strive Support
         ]
 
-        self.error = "<:error:1326752911870660704>"
-        self.success = "<:success:1326752811219947571>"
+        self.error = "<:strivefail:1337077571807875152>"
+        self.success = "<:strivesuccess:1337077588840943777>"
         self.loading = "<a:loading:1336666887760777216>"
+        self.ctx_class = StriveContext # This is for custom ctx messages
         
         
         
