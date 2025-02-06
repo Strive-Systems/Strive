@@ -27,7 +27,7 @@ class Strive(commands.AutoShardedBot):
         self.error = "<:strivefail:1337077571807875152>"
         self.success = "<:strivesuccess:1337077588840943777>"
         self.loading = "<a:loading:1336666887760777216>"
-        self.ctx_class = StriveContext # This is for custom ctx messages
+        self.context = StriveContext # This is for custom ctx messages
         
         
         
