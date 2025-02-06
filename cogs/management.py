@@ -446,7 +446,7 @@ class ManagementCommandCog(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_message(self, ctx: StriveContext, *, message: discord.Message):
+    async def on_message(self, message: discord.Message):
         if message.author.bot:
             return
 
@@ -459,11 +459,12 @@ class ManagementCommandCog(commands.Cog):
             
             await afks.delete_one({"user_id": message.author.id, 'guild_id': message.guild.id})
 
+            ctx = await self.strive.get_context(message)
             await ctx.send_success("Your AFK has ended as you sent a message indicating your return.")
             
             self.strive.afk_users.remove(afk_key)
             return
-
+        
         if message.mentions:
             for user in message.mentions:
                 afk_key = {'user_id': user.id, 'guild_id': message.guild.id}
