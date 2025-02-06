@@ -141,7 +141,9 @@ strive = Strive(command_prefix=get_prefix,
             intents=intents,
             chunk_guilds_at_startup=False,
             help_command=None,
-            allowed_mentions=discord.AllowedMentions(replied_user=True, everyone=True, roles=True))
+            allowed_mentions=discord.AllowedMentions(replied_user=True, everyone=True, roles=True),
+            cls=StriveContext
+            )
 
 
 
