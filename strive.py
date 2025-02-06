@@ -188,7 +188,7 @@ async def global_blacklist_check(ctx):
 
     # Check if the guild is blacklisted
     
-    if ctx.guild and ctx.guild.id in constants.server_blacklists and ctx.command.name != "guild_unblacklist":
+    if ctx.guild and ctx.guild.id in constants.blacklists and ctx.command.name != "unblacklist":
         
         em = discord.Embed(
             title="Blacklisted Guild",

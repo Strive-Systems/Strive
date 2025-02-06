@@ -17,6 +17,13 @@ from utils.pagination import PingPaginationView
 constants = StriveConstants()
 
 
+class DonateButton(discord.ui.View):
+        def __init__(self, donate_url: str):
+            super().__init__()
+            self.add_item(discord.ui.Button(label="Donate", emoji="<:developer:1336896473518047333>", url=donate_url, style=discord.ButtonStyle.gray))
+
+
+
 # The main commands Cog.
 
 class CommandsCog(commands.Cog):
@@ -274,13 +281,20 @@ class CommandsCog(commands.Cog):
     async def donate(self, ctx):
         
         embed = discord.Embed(
-            title="Donate to Strive Systems",
-            description=f"Thank you for wanting to donate! It goes a long way in terms of supporting this project as its completely free, here is your donation link. \n\n https://buy.stripe.com/bIY7uncmy3rW1kk144",
+            title="",
+            description=f"**<:Donation:1336885507455582248> Donate to Strive Systems** \n\n> Thank you for wanting to donate! It goes a long way in terms of supporting this project as its completely free, here is your donation link.",
             color=constants.strive_embed_color_setup()
         )
             
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1326735526740496444/1333643206226739312/StriveLogoGrey.png")
             
-        await ctx.send(embed=embed)
+        
+        donate_url = "https://buy.stripe.com/bIY7uncmy3rW1kk144"
+        view = DonateButton(donate_url)
+
+        await ctx.send(embed=embed, view=view)
+        
+        
 
     @commands.hybrid_group(description="Allows you to set your timezone or view another users", aliases=["tz"], extras={"category": "General"}, with_app_command=True)
     async def timezone(self, ctx, user: discord.Member = None):

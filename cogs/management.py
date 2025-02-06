@@ -104,7 +104,13 @@ class ManagementCommandCog(commands.Cog):
 
 
         if len(reminders_list) == 0:
-            return await ctx.send("You have no reminders set.")
+            
+            embed = ErrorEmbed(
+                title="",
+                description=f"<:error:1326752911870660704> You have no reminders set."
+            )
+
+            return await ctx.send(embed=embed)
 
 
         view = ReminderPaginationView(ctx.bot, reminders_list)
@@ -121,9 +127,21 @@ class ManagementCommandCog(commands.Cog):
 
         result = reminders.delete_one({"id": reminder_id, "user_id": ctx.author.id})
         if result.deleted_count == 0:
-            return await ctx.send("No reminder found with that ID.")
+            
+            embed = ErrorEmbed(
+                title="",
+                description=f"<:error:1326752911870660704> There are no reminders with that ID."
+            )
 
-        await ctx.send(f"Reminder `{reminder_id}` deleted successfully!")
+            await ctx.send(embed=embed)
+        
+
+        embed = SuccessEmbed(
+            title="",
+            description=f"<:success:1326752811219947571> Reminder #**{reminder_id}** deleted successfully!"
+        )
+
+        await ctx.send(embed=embed)
 
 
 
