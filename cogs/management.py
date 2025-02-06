@@ -18,6 +18,7 @@ class ManagementCommandCog(commands.Cog):
         self.mongo_db = None
         self.check_for_reminders.start()
         self.cooldown = 2
+        self.bot = strive
 
 
 
@@ -115,7 +116,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def delete(self, ctx: commands.Context, role: discord.Role):
         await role.delete(reason=f"Deleted by {ctx.author}")
-        embed = RoleSuccessEmbed(title="", description=f"<:success:1326752811219947571> Role {role.mention} has been deleted.")
+        embed = RoleSuccessEmbed(title="", description=f"{self.strive.success} Role {role.mention} has been deleted.")
         await ctx.send(embed=embed)
 
 
@@ -124,7 +125,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def create(self, ctx: commands.Context, *, role_name: str):
         new_role = await ctx.guild.create_role(name=role_name, reason=f"Created by {ctx.author}")
-        embed = RoleSuccessEmbed(title="", description=f"<:success:1326752811219947571> Role {new_role.name} has been created.")
+        embed = RoleSuccessEmbed(title="", description=f"{self.strive.success} Role {new_role.name} has been created.")
         await ctx.send(embed=embed)
 
 
@@ -133,7 +134,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def add(self, ctx: commands.Context, member: discord.Member, role: discord.Role):
         await member.add_roles(role, reason=f"Assigned by {ctx.author}")
-        embed = RoleSuccessEmbed(title="", description=f"<:success:1326752811219947571> Role {role.mention} has been assigned to {member.mention}.")
+        embed = RoleSuccessEmbed(title="", description=f"{self.strive.success} Role {role.mention} has been assigned to {member.mention}.")
         await ctx.send(embed=embed)
 
 
@@ -142,7 +143,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def remove(self, ctx: commands.Context, member: discord.Member, role: discord.Role):
         await member.remove_roles(role, reason=f"Unassigned by {ctx.author}")
-        embed = RoleSuccessEmbed(title="", description=f"<:success:1326752811219947571> Role {role.mention} has been removed from {member.mention}.")
+        embed = RoleSuccessEmbed(title="", description=f"{self.strive.success} Role {role.mention} has been removed from {member.mention}.")
         await ctx.send(embed=embed)
         
         
@@ -191,7 +192,7 @@ class ManagementCommandCog(commands.Cog):
             deleted = await ctx.channel.purge(limit=limit)
             embed = SuccessEmbed(
                 title="Messages Cleared",
-                description=f"<:success:1326752811219947571> Cleared {len(deleted)} messages from this channel."
+                description=f"{self.strive.success} Cleared {len(deleted)} messages from this channel."
             )
 
 
@@ -199,7 +200,7 @@ class ManagementCommandCog(commands.Cog):
             deleted = await ctx.channel.purge(limit=limit, check=lambda m: m.author.bot)
             embed = SuccessEmbed(
                 title="Bot Messages Cleared",
-                description=f"<:success:1326752811219947571> Cleared {len(deleted)} bot messages from this channel."
+                description=f"{self.strive.success} Cleared {len(deleted)} bot messages from this channel."
             )
 
 
@@ -210,7 +211,7 @@ class ManagementCommandCog(commands.Cog):
             deleted = await ctx.channel.purge(limit=limit, check=lambda m: m.author.id == user.id)
             embed = SuccessEmbed(
                 title="User Messages Cleared",
-                description=f"<:success:1326752811219947571> Cleared {len(deleted)} messages from {user.mention}."
+                description=f"{self.strive.success} Cleared {len(deleted)} messages from {user.mention}."
             )
 
 
@@ -218,7 +219,7 @@ class ManagementCommandCog(commands.Cog):
             deleted = await ctx.channel.purge(limit=limit, check=lambda m: m.author.id == self.strive.user.id)
             embed = SuccessEmbed(
                 title="Strive Messages Cleared",
-                description=f"<:success:1326752811219947571> Cleared {len(deleted)} messages from Strive."
+                description=f"{self.strive.success} Cleared {len(deleted)} messages from Strive."
             )
 
 
@@ -257,7 +258,7 @@ class ManagementCommandCog(commands.Cog):
         if not role:
             await ctx.send(embed=ErrorEmbed(
                 title="",
-                description=f"<:error:1326752911870660704> Role not found."
+                description=f"{self.strive.error} Role not found."
             ))
             return
 
@@ -269,7 +270,7 @@ class ManagementCommandCog(commands.Cog):
         if not members_with_role:
             await ctx.send(embed=ErrorEmbed(
                 title="",
-                description=f"<:error:1326752911870660704> No members have the role {role.name}."
+                description=f"{self.strive.error} No members have the role {role.name}."
             ))
             return
 
@@ -371,14 +372,14 @@ class ManagementCommandCog(commands.Cog):
             
             await ctx.send(embed=SuccessEmbed(
                 title="",
-                description=f"<:success:1326752811219947571> I set your AFK: `{message}`!"
+                description=f"{self.strive.success} I set your AFK: `{message}`!"
             ))
 
 
         elif afk_data:
             await ctx.send(embed=ErrorEmbed(
                 title="",
-                description="<:error:1326752911870660704> You are already AFK."
+                description=f"{self.strive.error} You are already AFK."
             ))
     
     
@@ -402,7 +403,7 @@ class ManagementCommandCog(commands.Cog):
         
         
         if number == 0:
-            embed = discord.Embed(title="Not Found", description="No AFK logs could be found for this server!", color=self.constants.strive_embed_color_setup())
+            embed = discord.Embed(description=f"{self.strive.error} No AFK logs could be found for this server!", color=self.constants.strive_embed_color_setup())
         else:
             embed.set_footer(text=f"Moderator ID: {ctx.author.id} • Total AFK's: {number}")
         
@@ -428,7 +429,7 @@ class ManagementCommandCog(commands.Cog):
             
             embed = SuccessEmbed(
                 title="",
-                description="<:success:1326752811219947571> Your AFK has ended as you sent a message indicating your return."
+                description=f"{self.strive.success} Your AFK has ended as you sent a message indicating your return."
             )
                 
             await message.channel.send(embed=embed)
@@ -478,7 +479,7 @@ class ManagementCommandCog(commands.Cog):
 
         await notes.insert_one(note_entry)
 
-        await ctx.send(f"<:success:1326752811219947571> **{note_id}** has been logged for {member}.")
+        await ctx.send(f"{self.strive.success} **{note_id}** has been logged for {member}.")
 
 
 
@@ -487,7 +488,7 @@ class ManagementCommandCog(commands.Cog):
     async def remove(self, ctx: commands.Context, id):
         await notes.delete_one({"note_id": f"Note #{id}"})
 
-        await ctx.send(f"<:success:1326752811219947571> **Note #{id}** has been removed.")
+        await ctx.send(f"{self.strive.success} **Note #{id}** has been removed.")
 
 
 
@@ -515,7 +516,7 @@ class ManagementCommandCog(commands.Cog):
 
             await ctx.send(embed=embed)
         else:
-            await ctx.send(f"<:error:1326752911870660704> No note found with the ID {id}.")
+            await ctx.send(f"{self.strive.error} No note found with the ID {id}.")
         
         
         
