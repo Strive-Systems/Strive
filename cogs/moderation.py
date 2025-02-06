@@ -691,7 +691,7 @@ class ModerationCommandCog(commands.Cog):
             color=self.constants.strive_embed_color_setup()
         )
 
-        embed.set_footer(text="This dropdown will disable in 30 seconds")
+        embed.set_footer(text="This dropdown will disable in 60 seconds")
 
         class BanDropdown(discord.ui.Select):
             def __init__(self, bans, msg):
