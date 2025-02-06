@@ -48,7 +48,7 @@ class StriveContext(commands.Context):
         embed = discord.Embed(
             title="",
             description=f"{self.strive.success} {message}",
-            color=0x71ff89
+            color=0xa6eb7b
         )
         return await super().send(embed=embed)
 

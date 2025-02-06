@@ -25,7 +25,7 @@ class Strive(commands.AutoShardedBot):
         ]
 
         self.error = "<:strivefail:1337077571807875152>"
-        self.success = "<:strivesuccess:1337077588840943777>"
+        self.success = "<:check:1337197652613533706>"
         self.loading = "<a:loading:1336666887760777216>"
         self.context = StriveContext
         
