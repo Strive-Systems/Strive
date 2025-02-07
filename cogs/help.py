@@ -113,7 +113,7 @@ class HelpCommandsCog(commands.Cog):
         # View with dropdown, This prepares and displays the main embed. This gets the embed from
         # embeds.py file and fills in the information.
         
-        dropdown = HelpDropdown(self.categories, self.strive, self.category_emojis)
+        dropdown = HelpDropdown(self.categories, self.strive)
         view = View()
         view.add_item(dropdown)
 
