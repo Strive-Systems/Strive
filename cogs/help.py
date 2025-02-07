@@ -38,7 +38,7 @@ class HelpCommandsCog(commands.Cog):
                     discord.SelectOption(
                         label=cat,
                         description=f"View {cat} commands",
-                        emoji="📚"
+                        emoji=None
                     )
                     for cat in categories
                 ]
@@ -54,11 +54,10 @@ class HelpCommandsCog(commands.Cog):
                 command_list = self.get_commands_in_category(selected_category)
 
                 embed = discord.Embed(
-                    title=f"📖 {selected_category} Commands",
+                    title=f"{selected_category} Commands",
                     description=command_list or "No commands available in this category.",
                     color=constants.strive_embed_color_setup()
                 )
-                embed.set_footer(text="Tip: Click on a command to use it!")
                 
                 await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -79,9 +78,9 @@ class HelpCommandsCog(commands.Cog):
                     slash_command = slash_commands.get(command_name)
                     
                     if slash_command and hasattr(slash_command, 'id') and slash_command.id:
-                        command_entries.append(f"</{command_name}:{slash_command.id}> • {command_description}")
+                        command_entries.append(f"</{command_name}:{slash_command.id}> - {command_description}")
                     else:
-                        command_entries.append(f"`/{command_name}` • {command_description}")
+                        command_entries.append(f"`/{command_name}` - {command_description}")
 
                 return "\n".join(command_entries) if command_entries else "No commands available."
         
