@@ -33,13 +33,27 @@ class LastFMCommandCog(commands.Cog):
             if not user_info:
                 return await ctx.send_error("That Last.fm account doesn't exist.")
 
+            user_stats = await self.lastfmhandler.get_user_stats(username)
+            total_scrobbles = user_stats.get('playcount', 0)
+            registered_timestamp = user_stats.get('registered', {}).get('unixtime', int(time.time()))
+
             await lastfm.insert_one({
                 "discord_id": ctx.author.id,
                 "username": username,
-                "connected_at": int(time.time())
+                "connected_at": int(time.time()),
+                "total_scrobbles": total_scrobbles,
+                "registered_at": registered_timestamp
             })
 
-            await ctx.send_success(f"Successfully connected your Last.fm account: **{username}**")
+            embed = discord.Embed(
+                title="Last.fm Account Connected",
+                description=f"Successfully connected your Last.fm account: **{username}**",
+                color=constants.strive_embed_color_setup()
+            )
+            embed.add_field(name="Total Scrobbles", value=f"{total_scrobbles:,}", inline=True)
+            embed.add_field(name="Account Created", value=f"<t:{registered_timestamp}:R>", inline=True)
+            
+            await ctx.send(embed=embed)
         except Exception as e:
             await ctx.send_error(f"An error occurred: {str(e)}")
 
