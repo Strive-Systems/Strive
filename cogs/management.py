@@ -13,6 +13,41 @@ from utils.pagination import ReminderPaginationView
 
 constants = StriveConstants()
 
+class SocialLinksButton(discord.ui.Button):
+    def __init__(self, user_id: int):
+        super().__init__(
+            label="Social Links",
+            style=discord.ButtonStyle.gray,
+            custom_id=f"social_links_{user_id}",
+            emoji="<:striveLink:1337227857621155860>"
+        )
+        self.user_id = user_id
+
+
+
+    async def callback(self, interaction: discord.Interaction):
+        social_links = await interaction.client.db.socials.find_one({"user_id": self.user_id})
+        if not social_links or not social_links.get("platforms"):
+            await interaction.response.send_message("This user has no social links.", ephemeral=True)
+            return
+
+        embed = discord.Embed(
+            title="Social Links",
+            description="",
+            color=interaction.client.base_color
+        )
+        
+        for platform, link in social_links["platforms"].items():
+            embed.add_field(name=platform.title(), value=link, inline=False)
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+
+class SocialPlatform(discord.app_commands.Choice):
+    Twitter = "twitter"
+    Instagram = "instagram"
+    Snapchat = "snapchat"
 
 class ManagementCommandCog(commands.Cog):
     def __init__(self, strive):
@@ -146,10 +181,8 @@ class ManagementCommandCog(commands.Cog):
         return int(value) * time_units[unit]
 
 
-
     @commands.hybrid_command(description="Show all information about a certain user.", aliases=["w", "ui"], with_app_command=True, extras={"category": "General"})
     async def whois(self, ctx, member: discord.User = None):
-
         if member is None:
             member = ctx.author
         
@@ -160,15 +193,68 @@ class ManagementCommandCog(commands.Cog):
 
         embed = await UserInformationEmbed(fetched_member, self.constants, self.strive).create_embed()
 
+        social_links = await self.strive.db.socials.find_one({"user_id": fetched_member.id})
+        view = None
+        if social_links and social_links.get("platforms"):
+            view = discord.ui.View()
+            view.add_item(SocialLinksButton(fetched_member.id))
+
+        await ctx.send(embed=embed, view=view)
+
+
+
+    @commands.hybrid_group(name="social", description="Manage your social media links")
+    async def social(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send_error("Please specify a subcommand: add, remove, list")
+
+    @social.command(name="add", description="Add a social media link")
+    async def social_add(self, ctx: StriveContext, platform: SocialPlatform, link: str):
+        if not link.startswith(("http://", "https://")):
+            await ctx.send_error("Please provide a valid URL starting with http:// or https://")
+            return
+
+        result = await self.strive.db.socials.update_one(
+            {"user_id": ctx.author.id},
+            {"$set": {f"platforms.{platform}": link}},
+            upsert=True
+        )
+
+        await ctx.send_success(f"Added your [**{platform}**]({link}) link successfully!")
+
+    @social.command(name="remove", description="Remove a social media link")
+    async def social_remove(self, ctx: StriveContext, platform: SocialPlatform):
+        result = await self.strive.db.socials.update_one(
+            {"user_id": ctx.author.id},
+            {"$unset": {f"platforms.{platform}": ""}}
+        )
+
+        if result.modified_count > 0:
+            await ctx.send_success(f"Removed your {platform} link successfully!")
+        else:
+            await ctx.send_error(f"You don't have a {platform} link saved.")
+
+    @social.command(name="list", description="List your social media links")
+    async def social_list(self, ctx: StriveContext):
+        social_links = await self.strive.db.socials.find_one({"user_id": ctx.author.id})
+        
+        if not social_links or not social_links.get("platforms"):
+            await ctx.send_warning("You have no social links saved.")
+            return
+
+        embed = discord.Embed(
+            title="Your Social Links",
+            color=ctx.strive.base_color
+        )
+
+        for platform, link in social_links["platforms"].items():
+            embed.add_field(name=platform.title(), value=link, inline=False)
+
         await ctx.send(embed=embed)
-        
-        
-    
+
     @commands.hybrid_group(description='Allows you to change user roles with Strive.', with_app_command=True)
     async def role(self, ctx: StriveContext):
-        return
-    
-    
+        return    
 
     @role.command(description="Allows server administrators to delete a role.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)

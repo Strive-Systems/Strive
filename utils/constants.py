@@ -26,6 +26,7 @@ cases = db.cases
 guild_counters = db.guild_counters
 reminder_counters = db.reminder_counters
 timezones = db.timezones
+socials = db.socials
 
 
 class StriveConstants:
