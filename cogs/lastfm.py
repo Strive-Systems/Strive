@@ -33,9 +33,8 @@ class LastFMCommandCog(commands.Cog):
             if not user_info:
                 return await ctx.send_error("That Last.fm account doesn't exist.")
 
-            user_stats = await self.lastfmhandler.get_user_stats(username)
-            total_scrobbles = user_stats.get('playcount', 0)
-            registered_timestamp = user_stats.get('registered', {}).get('unixtime', int(time.time()))
+            total_scrobbles = user_info['user']['playcount']
+            registered_timestamp = int(user_info['user']['registered']['unixtime'])
 
             await lastfm.insert_one({
                 "discord_id": ctx.author.id,
