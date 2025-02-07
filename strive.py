@@ -172,7 +172,7 @@ async def before_invoke(ctx):
 
 
     
-async def global_blacklist_check(self, ctx):
+async def global_blacklist_check(ctx):
     
 
     # Fetch blacklist if not already fetched or periodically
@@ -187,7 +187,7 @@ async def global_blacklist_check(self, ctx):
         
         em = discord.Embed(
             title="",
-            description=f"{self.strive.warning} **Blacklisted User** \n\n> You are blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
+            description=f"{strive.warning} **Blacklisted User** \n\n> You are blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
             color=constants.strive_embed_color_setup(),
         )
         
@@ -202,7 +202,7 @@ async def global_blacklist_check(self, ctx):
         
         em = discord.Embed(
             title="",
-            description=f"{self.strive.warning} **Blacklisted Guild** \n\n> This server is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
+            description=f"{strive.warning} **Blacklisted Guild** \n\n> This server is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
             color=constants.strive_embed_color_setup(),
         )
         
