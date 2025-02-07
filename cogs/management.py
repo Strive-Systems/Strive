@@ -305,13 +305,9 @@ class ManagementCommandCog(commands.Cog):
         
         
     @role.command(description="Shows information about a specific role.", with_app_command=True, extras={"category": "Setup"})
-    async def info(self, target, role: discord.Role):
-        embed = RolesInformationEmbed.create(role, target)
-
-        if isinstance(target, discord.Interaction):
-            await target.response.send_message(embed=embed)
-        else:
-            await target.send(embed=embed)
+    async def info(self, ctx: commands.Context, role: discord.Role):
+        embed = RolesInformationEmbed(role, constants).create()
+        await ctx.send(embed=embed)
             
             
             
@@ -394,6 +390,7 @@ class ManagementCommandCog(commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send_error(f"This command is on cooldown; please try again <t:{int(discord.utils.utcnow().timestamp() + error.retry_after)}:R>")        
+        
         
         
     @commands.hybrid_group(name="members", description="Lists the amount of members a role is assigned to. You can pass specific_role to run the command.", with_app_command=True, extras={"category": "General"})
@@ -592,6 +589,7 @@ class ManagementCommandCog(commands.Cog):
     @commands.hybrid_group(description='Allows modification of user notes.', with_app_command=True)
     async def note(self, ctx: StriveContext):
         return
+    
     
     @note.command(description="Adds a moderator note to a user.", with_app_command=True, extras={"category": "Moderation"})
     @commands.has_guild_permissions(ban_members=True)

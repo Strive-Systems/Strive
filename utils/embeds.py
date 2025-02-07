@@ -714,31 +714,58 @@ class ReminderListEmbed:
 # This is the Roles Information Embed that shows information about certain roles.        
         
 class RolesInformationEmbed:
-    
-    
-    @staticmethod
-    def create(role: discord.Role, target):
+    def __init__(self, role: discord.Role, constants):
+        self.role = role
+        self.constants = constants
+
+
+    def create(self):
+        
+        # Basic role information
+        
+        created_at = f"<t:{int(self.role.created_at.timestamp())}:F>"
+        mentionable = "Yes" if self.role.mentionable else "No"
+        hoisted = "Yes" if self.role.hoist else "No"
+        managed = "Yes" if self.role.managed else "No"
+        member_count = len(self.role.members)
+        position = self.role.position
+
+
+        # Fetch permissions
+        
+        permissions = [perm[0].replace("_", " ").title() for perm in self.role.permissions]
+        half_permissions = permissions[:len(permissions) // 2]
+        permissions_str = ", ".join(half_permissions) if half_permissions else "None"
+
+        
         embed = discord.Embed(
-            title=f"Role Information: {role.name}",
-            color=constants.strive_embed_color_setup()
+            title=f"Role Information - {self.role.name}",
+            color=self.role.color if self.role.color != discord.Color.default() else self.constants.strive_embed_color_setup(),
+            timestamp=datetime.utcnow()
         )
-        
-        
-        embed.add_field(name="Role ID", value=role.id, inline=False)
-        embed.add_field(name="Role Color", value=str(role.color), inline=False)
-        embed.add_field(name="Members", value=len(role.members), inline=False)
-        embed.add_field(name="Mentionable", value=role.mentionable, inline=False)
-        embed.add_field(name="Hoisted", value=role.hoist, inline=False)
-        embed.add_field(name="Position", value=role.position, inline=False)
+
+
         embed.add_field(
-            name="Permissions",
-            value=', '.join(perm[0] for perm in role.permissions if perm[1]),
+            name="**General Information**",
+            value=f"- **Role ID:** `{self.role.id}`\n"
+                  f"- **Created:** {created_at}\n"
+                  f"- **Position:** `{position}`\n"
+                  f"- **Color:** `{str(self.role.color)}`\n"
+                  f"- **Mentionable:** `{mentionable}`\n"
+                  f"- **Hoisted:** `{hoisted}`\n"
+                  f"- **Managed by Integration:** `{managed}`",
             inline=False
         )
 
 
-        if isinstance(target, discord.Interaction):
-            return embed
-        else:
-            embed.set_footer(text=f"Requested by {target.author}", icon_url=target.author.avatar.url)
-            return embed
+        embed.add_field(
+            name="**Permissions**",
+            value=f"{permissions_str}",
+            inline=False
+        )
+
+        
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1326735526740496444/1333643206226739312/StriveLogoGrey.png")
+
+
+        return embed

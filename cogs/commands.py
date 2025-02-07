@@ -298,7 +298,9 @@ class CommandsCog(commands.Cog):
             if user is None:
                 user = ctx.author
 
+
             timezone_data = await timezones.find_one({"user_id": str(user.id)})
+         
             
             if not timezone_data:
                 embed = discord.Embed(
@@ -309,8 +311,10 @@ class CommandsCog(commands.Cog):
                 await ctx.send(embed=embed)
                 return
 
+
             timezone = pytz.timezone(timezone_data["timezone"])
             current_time = datetime.now(timezone)
+
 
             embed = discord.Embed(
                 title=f"Timezone - {user.name}",
@@ -318,6 +322,7 @@ class CommandsCog(commands.Cog):
                 color=constants.strive_embed_color_setup()
             )
             await ctx.send(embed=embed)
+
 
         except Exception as e:
             print(f"Error viewing timezone: {e}")
@@ -328,15 +333,18 @@ class CommandsCog(commands.Cog):
             )
             await ctx.send(embed=embed)
 
+
     @timezone.command(name="set", description="Set your timezone", extras={"category": "General"}, with_app_command=True)
     async def timezone_set(self, ctx, timezone: str):
         try:
             timezone = timezone.lower()
             matching_timezones = [tz for tz in pytz.all_timezones if timezone in tz.lower()]
             
+            
             if not matching_timezones:
                 await ctx.send_error(f"No matching timezone found for `{timezone}`, try a city name or abbreviation")
                 return
+
 
             selected_timezone = matching_timezones[0]
             await timezones.update_one(
@@ -347,6 +355,7 @@ class CommandsCog(commands.Cog):
 
             await ctx.send_success(f"Your timezone has been set to `{selected_timezone}`.")
 
+
         except Exception as e:
             embed = discord.Embed(
                 title="",
@@ -354,6 +363,8 @@ class CommandsCog(commands.Cog):
                 color=constants.strive_embed_color_setup()
             )
             await ctx.send(embed=embed)
+
+
 
     class QuestionView(discord.ui.View):
         def __init__(self, answers, correct):
@@ -364,6 +375,7 @@ class CommandsCog(commands.Cog):
             for answer in answers:
                 self.add_item(discord.ui.Button(label=answer, style=discord.ButtonStyle.grey, custom_id=answer))
 
+
         async def interaction_check(self, interaction: discord.Interaction) -> bool:
             if interaction.user.id in self.answered_users:
                 await interaction.response.send_message("You've already attempted this question!", ephemeral=True)
@@ -372,6 +384,7 @@ class CommandsCog(commands.Cog):
             self.answered_users.add(interaction.user.id)
             chosen = interaction.data["custom_id"]
             embed = interaction.message.embeds[0]
+            
             
             if chosen == self.correct:
                 for item in self.children:
@@ -384,6 +397,7 @@ class CommandsCog(commands.Cog):
                 await interaction.response.send_message("That's incorrect! Try again.", ephemeral=True)
             return True
 
+
         async def on_timeout(self):
             embed = self.message.embeds[0]
             for item in self.children:
@@ -392,6 +406,8 @@ class CommandsCog(commands.Cog):
                     item.style = discord.ButtonStyle.green
             embed.description += f"\n\nTime's up! The correct answer was **{self.correct}**"
             await self.message.edit(view=self, embed=embed)
+
+
 
     @commands.hybrid_command(description="Play a trivia game!", extras={"category": "Other"})
     async def question(self, ctx):
@@ -411,6 +427,8 @@ class CommandsCog(commands.Cog):
         
         view = self.QuestionView(answers, data["correctAnswer"])
         view.message = await ctx.send(embed=embed, view=view)    
+
+
 
 async def setup(strive):
     await strive.add_cog(CommandsCog(strive))
