@@ -5,6 +5,7 @@ import datetime
 import subprocess
 import shortuuid
 import pytz
+import random
 from dotenv import load_dotenv
 from datetime import datetime
 from discord import Interaction, Embed
@@ -359,6 +360,7 @@ class CommandsCog(commands.Cog):
             super().__init__()
             self.correct = correct
             self.answered_users = set()
+            random.shuffle(answers)
             for answer in answers:
                 self.add_item(discord.ui.Button(label=answer, style=discord.ButtonStyle.grey, custom_id=answer))
 
@@ -390,9 +392,8 @@ class CommandsCog(commands.Cog):
                 data = (await resp.json())[0]
             
         answers = data["incorrectAnswers"] + [data["correctAnswer"]]
-        import random
         random.shuffle(answers)
-
+        
         embed = discord.Embed(
             title="Trivia Question",
             description=data["question"]["text"],
@@ -400,7 +401,7 @@ class CommandsCog(commands.Cog):
         )
         
         view = self.QuestionView(answers, data["correctAnswer"])
-        await ctx.send(embed=embed, view=view)        
-              
+        await ctx.send(embed=embed, view=view)
+        
 async def setup(strive):
     await strive.add_cog(CommandsCog(strive))
