@@ -72,7 +72,7 @@ class LastFMCommandCog(commands.Cog):
             return await ctx.send_error("You don't have a Last.fm account connected.")
 
         try:
-            top_artists = await self.lastfmhandler.get_top_artists(check["username"])
+            top_artists = await self.lastfmhandler.get_top_artists(check["username"], 10)
             description = "\n".join(f"`{i+1}` **{artist['name']}** - {str(artist['playcount'])} plays" 
                                   for i, artist in enumerate(top_artists[:10]))
 
@@ -92,7 +92,7 @@ class LastFMCommandCog(commands.Cog):
             return await ctx.send_error("You don't have a Last.fm account connected.")
 
         try:
-            top_tracks = await self.lastfmhandler.get_top_tracks(check["username"])
+            top_tracks = await self.lastfmhandler.get_top_tracks(check["username"], 10)
             description = "\n".join(f"`{i+1}` **{track['name']}** by {track['artist']['name']} - {str(track['playcount'])} plays" 
                                   for i, track in enumerate(top_tracks[:10]))
 
@@ -112,9 +112,9 @@ class LastFMCommandCog(commands.Cog):
             return await ctx.send_error("You don't have a Last.fm account connected.")
 
         try:
-            top_albums = await self.lastfmhandler.get_top_albums(check["username"])
+            top_albums = await self.lastfmhandler.get_top_albums(check["username"], 10)
             description = "\n".join(f"`{i+1}` **{album['name']}** by {album['artist']['name']} - {str(album['playcount'])} plays" 
-                                  for i, track in enumerate(top_albums[:10]))
+                                  for i, album in enumerate(top_albums[:10]))
 
             embed = discord.Embed(
                 title=f"{check['username']}'s Top Albums",
