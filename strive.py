@@ -172,7 +172,7 @@ async def before_invoke(ctx):
 
 
     
-async def global_blacklist_check(ctx):
+async def global_blacklist_check(self, ctx):
     
 
     # Fetch blacklist if not already fetched or periodically
