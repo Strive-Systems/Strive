@@ -73,12 +73,13 @@ class LastFMCommandCog(commands.Cog):
 
         try:
             top_artists = await self.lastfmhandler.get_top_artists(check["username"], 10)
-            description = "\n".join(f"`{i+1}` **{artist['name']}** - {str(artist['playcount'])} plays" 
-                                  for i, artist in enumerate(top_artists[:10]))
+            description = []
+            for i, artist in enumerate(top_artists['topartists']['artist']):
+                description.append(f"`{i+1}` **{artist['name']}** - {artist['playcount']} plays")
 
             embed = discord.Embed(
                 title=f"{check['username']}'s Top Artists",
-                description=description,
+                description="\n".join(description),
                 color=constants.strive_embed_color_setup()
             )
             await ctx.send(embed=embed)
@@ -93,12 +94,13 @@ class LastFMCommandCog(commands.Cog):
 
         try:
             top_tracks = await self.lastfmhandler.get_top_tracks(check["username"], 10)
-            description = "\n".join(f"`{i+1}` **{track['name']}** by {track['artist']['name']} - {str(track['playcount'])} plays" 
-                                  for i, track in enumerate(top_tracks[:10]))
+            description = []
+            for i, track in enumerate(top_tracks['toptracks']['track']):
+                description.append(f"`{i+1}` **{track['name']}** by {track['artist']['name']} - {track['playcount']} plays")
 
             embed = discord.Embed(
                 title=f"{check['username']}'s Top Songs",
-                description=description,
+                description="\n".join(description),
                 color=constants.strive_embed_color_setup()
             )
             await ctx.send(embed=embed)
@@ -113,12 +115,13 @@ class LastFMCommandCog(commands.Cog):
 
         try:
             top_albums = await self.lastfmhandler.get_top_albums(check["username"], 10)
-            description = "\n".join(f"`{i+1}` **{album['name']}** by {album['artist']['name']} - {str(album['playcount'])} plays" 
-                                  for i, album in enumerate(top_albums[:10]))
+            description = []
+            for i, album in enumerate(top_albums['topalbums']['album']):
+                description.append(f"`{i+1}` **{album['name']}** by {album['artist']['name']} - {album['playcount']} plays")
 
             embed = discord.Embed(
                 title=f"{check['username']}'s Top Albums",
-                description=description,
+                description="\n".join(description),
                 color=constants.strive_embed_color_setup()
             )
             await ctx.send(embed=embed)
@@ -147,12 +150,13 @@ class LastFMCommandCog(commands.Cog):
             return await ctx.send_error(f"Nobody in this server has listened to **{artist}**")
 
         listeners.sort(key=lambda x: x[1], reverse=True)
-        description = "\n".join(f"{'🎵' if i == 0 else f'`{i+1}`'} {member.mention} - **{str(plays)}** plays" 
-                              for i, (member, plays) in enumerate(listeners[:10]))
+        description = []
+        for i, (member, plays) in enumerate(listeners[:10]):
+            description.append(f"{'🎵' if i == 0 else f'`{i+1}`'} {member.mention} - **{plays}** plays")
 
         embed = discord.Embed(
             title=f"Who knows {artist}?",
-            description=description,
+            description="\n".join(description),
             color=constants.strive_embed_color_setup()
         )
         embed.set_footer(text=f"Total Listeners: {len(listeners)}")
