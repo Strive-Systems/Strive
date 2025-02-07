@@ -483,7 +483,7 @@ class UserInformationEmbed:
 
             # Check for Early Supporter role third
             if discord.utils.get(guild_member.roles, id=early_supporter_role_id):
-                badges.append("> <:Strive:1330583510406267070> Early Supporter")
+                badges.append("> <:Strive:1330583510406267070> Contributor")
                 
         except (discord.NotFound, discord.Forbidden):
             pass
