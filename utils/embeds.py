@@ -475,15 +475,15 @@ class UserInformationEmbed:
 
             # Check for Strive Team role first
             if any(discord.utils.get(guild_member.roles, id=role_id) for role_id in [1326485348326314054]):
-                badges.append("> <:Strive:1330583510406267070> Strive Team")
+                badges.append("> <:striveVerified:1337235198085042196> Strive Team")
 
             # Check for staff roles second
             if any(discord.utils.get(guild_member.roles, id=role_id) for role_id in staff_roles):
-                badges.append("> <:Strive:1330583510406267070> Strive Staff")
+                badges.append("> <:striveStaff:1337235592760655872> Strive Staff")
 
             # Check for Early Supporter role third
             if discord.utils.get(guild_member.roles, id=early_supporter_role_id):
-                badges.append("> <:purple_heart:1329494247090421812> Early Supporter")
+                badges.append("> <:Strive:1330583510406267070> Early Supporter")
                 
         except (discord.NotFound, discord.Forbidden):
             pass
