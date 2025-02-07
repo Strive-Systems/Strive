@@ -57,6 +57,75 @@ class LastFMCommandCog(commands.Cog):
         except Exception as e:
             await ctx.send_error(f"An error occurred: {str(e)}")
 
+    @lastfm.command(name="unset", description="Disconnect your Last.fm account")
+    async def lastfm_unset(self, ctx: StriveContext):
+        check = await lastfm.find_one({"discord_id": ctx.author.id})
+        if not check:
+            return await ctx.send_error("You don't have a Last.fm account connected.")
+
+        await lastfm.delete_one({"discord_id": ctx.author.id})
+        await ctx.send_success("Successfully disconnected your Last.fm account.")
+
+    @lastfm.command(name="topartists", description="View your top artists")
+    async def lastfm_topartists(self, ctx: StriveContext):
+        check = await lastfm.find_one({"discord_id": ctx.author.id})
+        if not check:
+            return await ctx.send_error("You don't have a Last.fm account connected.")
+
+        try:
+            top_artists = await self.lastfmhandler.get_top_artists(check["username"])
+            description = "\n".join(f"`{i+1}` **{artist['name']}** - {artist['playcount']:,} plays" 
+                                  for i, artist in enumerate(top_artists[:10]))
+
+            embed = discord.Embed(
+                title=f"{check['username']}'s Top Artists",
+                description=description,
+                color=constants.strive_embed_color_setup()
+            )
+            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send_error(f"An error occurred: {str(e)}")
+
+    @lastfm.command(name="topsongs", description="View your top songs")
+    async def lastfm_topsongs(self, ctx: StriveContext):
+        check = await lastfm.find_one({"discord_id": ctx.author.id})
+        if not check:
+            return await ctx.send_error("You don't have a Last.fm account connected.")
+
+        try:
+            top_tracks = await self.lastfmhandler.get_top_tracks(check["username"])
+            description = "\n".join(f"`{i+1}` **{track['name']}** by {track['artist']['name']} - {track['playcount']:,} plays" 
+                                  for i, track in enumerate(top_tracks[:10]))
+
+            embed = discord.Embed(
+                title=f"{check['username']}'s Top Songs",
+                description=description,
+                color=constants.strive_embed_color_setup()
+            )
+            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send_error(f"An error occurred: {str(e)}")
+
+    @lastfm.command(name="topalbums", description="View your top albums")
+    async def lastfm_topalbums(self, ctx: StriveContext):
+        check = await lastfm.find_one({"discord_id": ctx.author.id})
+        if not check:
+            return await ctx.send_error("You don't have a Last.fm account connected.")
+
+        try:
+            top_albums = await self.lastfmhandler.get_top_albums(check["username"])
+            description = "\n".join(f"`{i+1}` **{album['name']}** by {album['artist']['name']} - {album['playcount']:,} plays" 
+                                  for i, album in enumerate(top_albums[:10]))
+
+            embed = discord.Embed(
+                title=f"{check['username']}'s Top Albums",
+                description=description,
+                color=constants.strive_embed_color_setup()
+            )
+            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send_error(f"An error occurred: {str(e)}")
+
     @lastfm.command(name="whoknows", aliases=['wk'], description="View who knows an artist")
     async def lastfm_whoknows(self, ctx: StriveContext, *, artist: str = None):
         check = await lastfm.find_one({"discord_id": ctx.author.id})
