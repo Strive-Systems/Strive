@@ -4,67 +4,73 @@ from discord.ui import Select, View
 from utils.constants import StriveConstants
 from utils.embeds import HelpCenterEmbed
 from utils.utils import StriveContext
-
-# Brand new help command that uses a drop down and hidden messages to display content in
-# a cleaner way. This was taken as inspiration from Lukas (notlukasrx)
+from typing import List, Set
 
 constants = StriveConstants()
 
-EXCLUDED_COMMANDS = ['jishaku', 
-                     'debug', 
-                     'addowner', 
-                     'removeowner', 
-                     'sync', 
-                     'checkguild', 
-                     'showowners', 
-                     'blacklist', 
-                     'unblacklist']
-
+EXCLUDED_COMMANDS = [
+    'jishaku', 'debug', 'addowner', 'removeowner', 
+    'sync', 'checkguild', 'showowners', 'blacklist', 
+    'unblacklist'
+]
 
 class HelpCommandsCog(commands.Cog):
+    """A cog that handles the help command functionality with an interactive dropdown menu."""
+    
     def __init__(self, strive):
         self.strive = strive
         self.categories = self.get_command_categories()
-        
 
-    @commands.hybrid_command(description="Provides information on the bot's commands and how to use them.", with_app_command=True, extras={"category": "Help"})
-    async def help(self, ctx: StriveContext):
+    @commands.hybrid_command(
+        name="help",
+        description="Provides information on the bot's commands and how to use them.",
+        with_app_command=True,
+        extras={"category": "Help"}
+    )
+    async def help(self, ctx: StriveContext) -> None:
+        """Display an interactive help menu with categorized commands."""
         await ctx.defer(ephemeral=False)
         
         class HelpDropdown(Select):
-            def __init__(self, categories, strive):
+            def __init__(self, categories: List[str], strive):
                 self.strive = strive
-                
                 options = [
                     discord.SelectOption(
                         label=cat,
-                        description=f"Commands for {cat}"
+                        description=f"View {cat} commands",
+                        emoji="📚"
                     )
                     for cat in categories
                 ]
-                
-                super().__init__(placeholder="Select a help topic", options=options)
+                super().__init__(
+                    placeholder="Choose a command category...",
+                    options=options,
+                    min_values=1,
+                    max_values=1
+                )
 
-            async def callback(self, interaction: discord.Interaction):
+            async def callback(self, interaction: discord.Interaction) -> None:
                 selected_category = self.values[0]
                 command_list = self.get_commands_in_category(selected_category)
 
                 embed = discord.Embed(
-                    title=f"Commands for {selected_category}",
-                    description=command_list or "No commands available.",
+                    title=f"📖 {selected_category} Commands",
+                    description=command_list or "No commands available in this category.",
                     color=constants.strive_embed_color_setup()
                 )
+                embed.set_footer(text="Tip: Click on a command to use it!")
                 
                 await interaction.response.send_message(embed=embed, ephemeral=True)
-                await interaction.message.edit()
 
             def get_commands_in_category(self, category: str) -> str:
-                command_list = ""
-                commands_in_category = [cmd for cmd in self.strive.commands 
-                                        if cmd.extras.get('category', 'General') == category
-                                        and cmd.qualified_name not in EXCLUDED_COMMANDS]
+                commands_in_category = [
+                    cmd for cmd in self.strive.commands 
+                    if cmd.extras.get('category', 'General') == category
+                    and cmd.qualified_name not in EXCLUDED_COMMANDS
+                ]
                 
-                slash_commands = {command.name: command for command in self.strive.tree.get_commands()}
+                slash_commands = {cmd.name: cmd for cmd in self.strive.tree.get_commands()}
+                command_entries = []
 
                 for command in commands_in_category:
                     command_name = command.qualified_name
@@ -73,30 +79,36 @@ class HelpCommandsCog(commands.Cog):
                     slash_command = slash_commands.get(command_name)
                     
                     if slash_command and hasattr(slash_command, 'id') and slash_command.id:
-                        command_list += f"</{command_name}:{slash_command.id}> - {command_description}\n"
+                        command_entries.append(f"</{command_name}:{slash_command.id}> • {command_description}")
                     else:
-                        command_list += f"`/{command_name}` - {command_description}\n"
+                        command_entries.append(f"`/{command_name}` • {command_description}")
 
-                return command_list.strip()
+                return "\n".join(command_entries) if command_entries else "No commands available."
         
-        dropdown = HelpDropdown(self.categories, self.strive)
-        view = View()
-        view.add_item(dropdown)
+        view = View(timeout=180)
+        view.add_item(HelpDropdown(self.categories, self.strive))
 
         embed = HelpCenterEmbed(
-            description="Welcome to Strive, select a help topic from the dropdown to view the commands. Once you find the command you want simply run it. \n\n Use the select menu below to browse categories or search for commands.",
+            title="🤖 Strive Help Center",
+            description=(
+                "Welcome to Strive's interactive help menu! Here's how to get started:\n\n"
+                "1️⃣ Select a category from the dropdown menu below\n"
+                "2️⃣ Browse through the available commands\n"
+                "3️⃣ Click on any command to use it directly\n\n"
+                "Need more help? Join our support server or contact our team!"
+            ),
             color=constants.strive_embed_color_setup()
         )
         
         await ctx.send(embed=embed, view=view)
 
-    def get_command_categories(self) -> list:
-        categories = set()
-        for command in self.strive.commands:
-            if isinstance(command, commands.HybridCommand) or isinstance(command, commands.Command):
-                category = command.extras.get('category', 'General')
-                categories.add(category)
-        return sorted(categories)
+    def get_command_categories(self) -> Set[str]:
+        """Get all unique command categories."""
+        return sorted({
+            command.extras.get('category', 'General')
+            for command in self.strive.commands
+            if isinstance(command, (commands.HybridCommand, commands.Command))
+        })
 
 async def setup(strive):
     await strive.add_cog(HelpCommandsCog(strive))

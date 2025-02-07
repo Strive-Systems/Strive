@@ -393,7 +393,7 @@ class CommandsCog(commands.Cog):
             embed.description += f"\n\nTime's up! The correct answer was **{self.correct}**"
             await self.message.edit(view=self, embed=embed)
 
-    @commands.hybrid_command(description="Play a trivia game!", extras={"category": "Games"})
+    @commands.hybrid_command(description="Play a trivia game!", extras={"category": "Other"})
     async def question(self, ctx):
         import aiohttp
         async with aiohttp.ClientSession() as session:
@@ -411,6 +411,6 @@ class CommandsCog(commands.Cog):
         
         view = self.QuestionView(answers, data["correctAnswer"])
         view.message = await ctx.send(embed=embed, view=view)    
-            
+
 async def setup(strive):
     await strive.add_cog(CommandsCog(strive))
