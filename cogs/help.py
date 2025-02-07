@@ -28,9 +28,9 @@ class HelpCommandsCog(commands.Cog):
         self.strive = strive
         self.categories = self.get_command_categories()
         self.category_emojis = {
-            "General": "<:Development:1327195371771789324>",
-            "Moderation": "<:banned:1326788110305988659>",
-            "Other": "<:settings:1327195042602942508>",
+            "General": "🌐",
+            "Moderation": "🛡️",
+            "Other": "⚙️",
         }
         
 
