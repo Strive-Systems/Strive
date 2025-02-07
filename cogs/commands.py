@@ -354,5 +354,45 @@ class CommandsCog(commands.Cog):
             )
             await ctx.send(embed=embed)
 
+    class QuestionView(discord.ui.View):
+        def __init__(self, answers, correct):
+            super().__init__()
+            self.correct = correct
+            for answer in answers:
+                self.add_item(discord.ui.Button(label=answer, style=discord.ButtonStyle.grey, custom_id=answer))
+
+        async def interaction_check(self, interaction: discord.Interaction) -> bool:
+            chosen = interaction.data["custom_id"]
+            for item in self.children:
+                item.disabled = True
+                if item.custom_id == self.correct:
+                    item.style = discord.ButtonStyle.green
+
+            if chosen == self.correct:
+                embed = interaction.message.embeds[0]
+                embed.description += f"\n\n{interaction.user.mention} won! The answer was **{self.correct}**"
+            await interaction.response.edit_message(view=self, embed=embed)
+            return True
+
+    @commands.hybrid_command(description="Play a trivia game!", extras={"category": "Games"})
+    async def question(self, ctx):
+        import aiohttp
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://the-trivia-api.com/v2/questions") as resp:
+                data = (await resp.json())[0]
+            
+        answers = data["incorrectAnswers"] + [data["correctAnswer"]]
+        import random
+        random.shuffle(answers)
+
+        embed = discord.Embed(
+            title="Trivia Question",
+            description=data["question"]["text"],
+            color=constants.strive_embed_color_setup()
+        )
+        
+        view = self.QuestionView(answers, data["correctAnswer"])
+        await ctx.send(embed=embed, view=view)
+        
 async def setup(strive):
     await strive.add_cog(CommandsCog(strive))
