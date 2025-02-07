@@ -358,20 +358,28 @@ class CommandsCog(commands.Cog):
         def __init__(self, answers, correct):
             super().__init__()
             self.correct = correct
+            self.answered_users = set()
             for answer in answers:
                 self.add_item(discord.ui.Button(label=answer, style=discord.ButtonStyle.grey, custom_id=answer))
 
         async def interaction_check(self, interaction: discord.Interaction) -> bool:
+            if interaction.user.id in self.answered_users:
+                await interaction.response.send_message("You've already attempted this question!", ephemeral=True)
+                return False
+                
+            self.answered_users.add(interaction.user.id)
             chosen = interaction.data["custom_id"]
-            for item in self.children:
-                item.disabled = True
-                if item.custom_id == self.correct:
-                    item.style = discord.ButtonStyle.green
-
+            embed = interaction.message.embeds[0]
+            
             if chosen == self.correct:
-                embed = interaction.message.embeds[0]
+                for item in self.children:
+                    item.disabled = True
+                    if item.custom_id == self.correct:
+                        item.style = discord.ButtonStyle.green
                 embed.description += f"\n\n{interaction.user.mention} won! The answer was **{self.correct}**"
-            await interaction.response.edit_message(view=self, embed=embed)
+                await interaction.response.edit_message(view=self, embed=embed)
+            else:
+                await interaction.response.send_message("That's incorrect! Try again.", ephemeral=True)
             return True
 
     @commands.hybrid_command(description="Play a trivia game!", extras={"category": "Games"})
@@ -392,7 +400,7 @@ class CommandsCog(commands.Cog):
         )
         
         view = self.QuestionView(answers, data["correctAnswer"])
-        await ctx.send(embed=embed, view=view)
-        
+        await ctx.send(embed=embed, view=view)        
+              
 async def setup(strive):
     await strive.add_cog(CommandsCog(strive))
