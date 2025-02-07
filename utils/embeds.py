@@ -473,18 +473,17 @@ class UserInformationEmbed:
             staff_roles = [1326488657959583745]  # Staff Role
             early_supporter_role_id = 1326781391861710899
 
+            # Check for Strive Team role first
+            if any(discord.utils.get(guild_member.roles, id=role_id) for role_id in [1326485348326314054]):
+                badges.append("> <:Strive:1330583510406267070> Strive Team")
 
-            # Check for staff roles
-            
+            # Check for staff roles second
             if any(discord.utils.get(guild_member.roles, id=role_id) for role_id in staff_roles):
                 badges.append("> <:Strive:1330583510406267070> Strive Staff")
 
-
-            # Check for Early Supporter role
-            
+            # Check for Early Supporter role third
             if discord.utils.get(guild_member.roles, id=early_supporter_role_id):
                 badges.append("> <:purple_heart:1329494247090421812> Early Supporter")
-                
                 
         except (discord.NotFound, discord.Forbidden):
             pass
@@ -551,9 +550,9 @@ class UserInformationEmbed:
 
 
             # Fetch badges and permissions
-            
-            badges = self.get_user_badges()
-            badges.extend(await self.fetch_guild_specific_badges())
+            guild_badges = await self.fetch_guild_specific_badges()
+            discord_badges = self.get_user_badges()
+            badges = guild_badges + discord_badges
             permissions_display = self.get_permissions()
 
 
@@ -632,8 +631,7 @@ class EmojiFindEmbed:
         embed.set_author(name=f"{emoji_guild} emoji.", icon_url=emoji_guild.icon.url)
         embed.set_thumbnail(url=emoji_url)
 
-        return embed
-    
+        return embed    
 
 # This is the embed for the Auto Moderation feature that gets the list of banned words from
 # Mongo Db then lists it in a nice way.

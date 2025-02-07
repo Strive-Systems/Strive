@@ -210,12 +210,13 @@ class ManagementCommandCog(commands.Cog):
 
 
 
-    @commands.hybrid_group(name="social", description="Manage your social media links")
+    @commands.hybrid_group(name="social", description="Manage your social media links", extras={"category": "General"})
     async def social(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send_error("Please specify a subcommand: add, remove, list")
 
-    @social.command(name="add", description="Add a social media link")
+    @social.command(name="add", description="Add a social media link", extras={"category": "General"})
+    @commands.describe(platform="The platform you want to add a link to", username="The username of the social media account")
     async def social_add(self, ctx: StriveContext, platform: SocialPlatformType, username: str):
         result = await socials.update_one(
             {"user_id": ctx.author.id},
@@ -232,7 +233,7 @@ class ManagementCommandCog(commands.Cog):
 
         await ctx.send_success(f"Added your [**{platform}**]({link}) link successfully!")
 
-    @social.command(name="remove", description="Remove a social media link")
+    @social.command(name="remove", description="Remove a social media link", extras={"category": "General"})
     async def social_remove(self, ctx: StriveContext, platform: SocialPlatformType):
         result = await socials.update_one(
             {"user_id": ctx.author.id},
@@ -244,7 +245,7 @@ class ManagementCommandCog(commands.Cog):
         else:
             await ctx.send_error(f"You don't have a {platform} link saved.")
 
-    @social.command(name="list", description="List your social media links")
+    @social.command(name="list", description="List your social media links", extras={"category": "General"})
     async def social_list(self, ctx: StriveContext):
         social_links = await socials.find_one({"user_id": ctx.author.id})
         
