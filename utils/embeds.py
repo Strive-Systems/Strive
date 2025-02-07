@@ -271,7 +271,7 @@ class AboutWithButtons:
 # tells the user how to use the help center.
 
 class HelpCenterEmbed(discord.Embed):
-    def __init__(self, description: str, color: discord.Color = discord.Color.from_str('#dfa4ff')):
+    def __init__(self, description: str, color: discord.Color = 0x66d8ff):
         super().__init__(
             title="Strive Help Center",
             description=description,
