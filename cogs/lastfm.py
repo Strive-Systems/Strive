@@ -17,8 +17,15 @@ class LastFMCommandCog(commands.Cog):
         self.lastfm_crowns = {}
         self.globalwhoknows_cache = {}
 
-    @commands.hybrid_command(description="Connect your Last.fm account", with_app_command=True, extras={"category": "LastFM"})
-    async def lastfm(self, ctx: StriveContext, username: str):
+    lastfm_group = discord.app_commands.Group(name="lastfm", description="Last.fm commands", guild_only=True)
+
+    @commands.hybrid_group(name="lastfm", aliases=['lf'], description="Last.fm commands", fallback="help")
+    async def lastfm(self, ctx: StriveContext):
+        if ctx.invoked_subcommand is None:
+            await ctx.send_help(ctx.command)
+
+    @lastfm.command(name="set", description="Connect your Last.fm account")
+    async def lastfm_set(self, ctx: StriveContext, username: str):
         check = await lastfm.find_one({"discord_id": ctx.author.id})
         if check:
             return await ctx.send_error("You already have a Last.fm account connected.")
@@ -38,38 +45,8 @@ class LastFMCommandCog(commands.Cog):
         except Exception as e:
             await ctx.send_error(f"An error occurred: {str(e)}")
 
-    @commands.hybrid_command(aliases=['np', 'fm'], description="View your currently playing track", with_app_command=True, extras={"category": "LastFM"})
-    async def nowplaying(self, ctx: StriveContext, member: discord.Member = None):
-        member = member or ctx.author
-        check = await lastfm.find_one({"discord_id": member.id})
-        
-        if not check:
-            return await ctx.send_error(f"{'You don' if member == ctx.author else f'**{member}** doesn'}'t have a Last.fm account connected.")
-
-        try:
-            user = check['username']
-            a = await self.lastfmhandler.get_tracks_recent(user, 1)
-            artist = a['recenttracks']['track'][0]['artist']['#text'].replace(" ", "+")
-            album = a['recenttracks']['track'][0]['album']['#text'] or "N/A"
-            
-            embed = discord.Embed(colour=constants.strive_embed_color_setup())
-            embed.add_field(name="**Track:**", value = f"\n{a['recenttracks']['track'][0]['name']}", inline = True)
-            embed.add_field(name="**Artist:**", value = f"\n{a['recenttracks']['track'][0]['artist']['#text']}", inline = True)
-            embed.set_author(name = user, icon_url = member.display_avatar, url = f"https://last.fm/user/{user}")                               
-            embed.set_thumbnail(url=(a['recenttracks']['track'][0])['image'][3]['#text'])
-            embed.set_footer(text = f"Track Playcount: {await self.lastfmhandler.get_track_playcount(user, a['recenttracks']['track'][0])} ・Album: {album}", icon_url = (a['recenttracks']['track'][0])['image'][3]['#text'])
-            
-            view = discord.ui.View()
-            view.add_item(discord.ui.Button(label="Track Link", url=a['recenttracks']['track'][0]['url']))
-            view.add_item(discord.ui.Button(label="Artist Link", url=f"https://last.fm/music/{artist}"))
-            
-            await ctx.send(embed=embed, view=view)
-
-        except Exception as e:
-            await ctx.send_error(f"An error occurred: {str(e)}")
-
-    @commands.hybrid_command(description="View who knows an artist", with_app_command=True, extras={"category": "LastFM"})
-    async def whoknows(self, ctx: StriveContext, *, artist: str = None):
+    @lastfm.command(name="whoknows", aliases=['wk'], description="View who knows an artist")
+    async def lastfm_whoknows(self, ctx: StriveContext, *, artist: str = None):
         check = await lastfm.find_one({"discord_id": ctx.author.id})
         if not check:
             return await ctx.send_error("You don't have a Last.fm account connected.")
@@ -101,6 +78,36 @@ class LastFMCommandCog(commands.Cog):
         embed.set_footer(text=f"Total Listeners: {len(listeners)}")
 
         await ctx.send(embed=embed)
+
+    @commands.hybrid_command(aliases=['np', 'fm'], description="View your currently playing track", with_app_command=True, extras={"category": "LastFM"})
+    async def nowplaying(self, ctx: StriveContext, member: discord.Member = None):
+        member = member or ctx.author
+        check = await lastfm.find_one({"discord_id": member.id})
+        
+        if not check:
+            return await ctx.send_error(f"{'You don' if member == ctx.author else f'**{member}** doesn'}'t have a Last.fm account connected.")
+
+        try:
+            user = check['username']
+            a = await self.lastfmhandler.get_tracks_recent(user, 1)
+            artist = a['recenttracks']['track'][0]['artist']['#text'].replace(" ", "+")
+            album = a['recenttracks']['track'][0]['album']['#text'] or "N/A"
+            
+            embed = discord.Embed(colour=constants.strive_embed_color_setup())
+            embed.add_field(name="**Track:**", value = f"\n{a['recenttracks']['track'][0]['name']}", inline = True)
+            embed.add_field(name="**Artist:**", value = f"\n{a['recenttracks']['track'][0]['artist']['#text']}", inline = True)
+            embed.set_author(name = user, icon_url = member.display_avatar, url = f"https://last.fm/user/{user}")                               
+            embed.set_thumbnail(url=(a['recenttracks']['track'][0])['image'][3]['#text'])
+            embed.set_footer(text = f"Track Playcount: {await self.lastfmhandler.get_track_playcount(user, a['recenttracks']['track'][0])} ・Album: {album}", icon_url = (a['recenttracks']['track'][0])['image'][3]['#text'])
+            
+            view = discord.ui.View()
+            view.add_item(discord.ui.Button(label="Track Link", url=a['recenttracks']['track'][0]['url']))
+            view.add_item(discord.ui.Button(label="Artist Link", url=f"https://last.fm/music/{artist}"))
+            
+            await ctx.send(embed=embed, view=view)
+
+        except Exception as e:
+            await ctx.send_error(f"An error occurred: {str(e)}")
 
 async def setup(strive):
     await strive.add_cog(LastFMCommandCog(strive))
