@@ -39,7 +39,13 @@ class SocialLinksButton(discord.ui.Button):
             )
             
             if social_links and "platforms" in social_links:
-                for platform, link in social_links["platforms"].items():
+                for platform, username in social_links["platforms"].items():
+                    if platform == "instagram":
+                        link = f"https://instagram.com/{username}"
+                    elif platform == "snapchat":
+                        link = f"https://snapchat.com/add/{username}"
+                    elif platform == "twitter":
+                        link = f"https://x.com/{username}"
                     embed.add_field(name=platform.title(), value=link, inline=False)
 
             await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -210,16 +216,19 @@ class ManagementCommandCog(commands.Cog):
             await ctx.send_error("Please specify a subcommand: add, remove, list")
 
     @social.command(name="add", description="Add a social media link")
-    async def social_add(self, ctx: StriveContext, platform: SocialPlatformType, link: str):
-        if not link.startswith(("http://", "https://")):
-            await ctx.send_error("Please provide a valid URL starting with http:// or https://")
-            return
-
+    async def social_add(self, ctx: StriveContext, platform: SocialPlatformType, username: str):
         result = await socials.update_one(
             {"user_id": ctx.author.id},
-            {"$set": {f"platforms.{platform}": link}},
+            {"$set": {f"platforms.{platform}": username}},
             upsert=True
         )
+
+        if platform == "instagram":
+            link = f"https://instagram.com/{username}"
+        elif platform == "snapchat":
+            link = f"https://snapchat.com/add/{username}"
+        elif platform == "twitter":
+            link = f"https://x.com/{username}"
 
         await ctx.send_success(f"Added your [**{platform}**]({link}) link successfully!")
 
@@ -248,10 +257,17 @@ class ManagementCommandCog(commands.Cog):
             color=ctx.strive.base_color
         )
 
-        for platform, link in social_links["platforms"].items():
+        for platform, username in social_links["platforms"].items():
+            if platform == "instagram":
+                link = f"https://instagram.com/{username}"
+            elif platform == "snapchat":
+                link = f"https://snapchat.com/add/{username}"
+            elif platform == "twitter":
+                link = f"https://x.com/{username}"
             embed.add_field(name=platform.title(), value=link, inline=False)
 
-        await ctx.send(embed=embed)        
+        await ctx.send(embed=embed)
+        
     @commands.hybrid_group(description='Allows you to change user roles with Strive.', with_app_command=True)
     async def role(self, ctx: StriveContext):
         return    
