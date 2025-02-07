@@ -216,7 +216,6 @@ class ManagementCommandCog(commands.Cog):
             await ctx.send_error("Please specify a subcommand: add, remove, list")
 
     @social.command(name="add", description="Add a social media link", extras={"category": "General"})
-    @commands.describe(platform="The platform you want to add a link to", username="The username of the social media account")
     async def social_add(self, ctx: StriveContext, platform: SocialPlatformType, username: str):
         result = await socials.update_one(
             {"user_id": ctx.author.id},
