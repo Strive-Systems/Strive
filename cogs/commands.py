@@ -357,7 +357,7 @@ class CommandsCog(commands.Cog):
 
     class QuestionView(discord.ui.View):
         def __init__(self, answers, correct):
-            super().__init__()
+            super().__init__(timeout=60.0)
             self.correct = correct
             self.answered_users = set()
             random.shuffle(answers)
@@ -384,6 +384,15 @@ class CommandsCog(commands.Cog):
                 await interaction.response.send_message("That's incorrect! Try again.", ephemeral=True)
             return True
 
+        async def on_timeout(self):
+            embed = self.message.embeds[0]
+            for item in self.children:
+                item.disabled = True
+                if item.custom_id == self.correct:
+                    item.style = discord.ButtonStyle.green
+            embed.description += f"\n\nTime's up! The correct answer was **{self.correct}**"
+            await self.message.edit(view=self, embed=embed)
+
     @commands.hybrid_command(description="Play a trivia game!", extras={"category": "Games"})
     async def question(self, ctx):
         import aiohttp
@@ -401,7 +410,7 @@ class CommandsCog(commands.Cog):
         )
         
         view = self.QuestionView(answers, data["correctAnswer"])
-        await ctx.send(embed=embed, view=view)
-        
+        view.message = await ctx.send(embed=embed, view=view)    
+            
 async def setup(strive):
     await strive.add_cog(CommandsCog(strive))
