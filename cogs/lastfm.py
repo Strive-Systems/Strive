@@ -17,8 +17,6 @@ class LastFMCommandCog(commands.Cog):
         self.lastfm_crowns = {}
         self.globalwhoknows_cache = {}
 
-    lastfm_group = discord.app_commands.Group(name="lastfm", description="Last.fm commands", guild_only=True)
-
     @commands.hybrid_group(name="lastfm", aliases=['lf'], description="Last.fm commands", fallback="help")
     async def lastfm(self, ctx: StriveContext):
         if ctx.invoked_subcommand is None:
