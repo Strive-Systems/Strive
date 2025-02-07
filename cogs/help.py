@@ -89,15 +89,13 @@ class HelpCommandsCog(commands.Cog):
         view.add_item(HelpDropdown(self.categories, self.strive))
 
         embed = HelpCenterEmbed(
-            title="🤖 Strive Help Center",
             description=(
                 "Welcome to Strive's interactive help menu! Here's how to get started:\n\n"
                 "1️⃣ Select a category from the dropdown menu below\n"
                 "2️⃣ Browse through the available commands\n"
                 "3️⃣ Click on any command to use it directly\n\n"
                 "Need more help? Join our support server or contact our team!"
-            ),
-            color=constants.strive_embed_color_setup()
+            )
         )
         
         await ctx.send(embed=embed, view=view)
