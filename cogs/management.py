@@ -26,22 +26,28 @@ class SocialLinksButton(discord.ui.Button):
 
 
     async def callback(self, interaction: discord.Interaction):
-        social_links = await interaction.client.db.socials.find_one({"user_id": self.user_id})
-        if not social_links or not social_links.get("platforms"):
-            await interaction.response.send_message("This user has no social links.", ephemeral=True)
-            return
+        try:
+            social_links = await interaction.client.db.socials.find_one({"user_id": self.user_id})
+            if not social_links or not social_links.get("platforms"):
+                await interaction.response.send_message("This user has no social links.", ephemeral=True)
+                return
 
-        embed = discord.Embed(
-            title="Social Links",
-            description="",
-            color=interaction.client.base_color
-        )
-        
-        for platform, link in social_links["platforms"].items():
-            embed.add_field(name=platform.title(), value=link, inline=False)
+            embed = discord.Embed(
+                title="Social Links", 
+                description="",
+                color=interaction.client.base_color
+            )
+            
+            platforms = await interaction.client.db.socials.find_one({"user_id": self.user_id})
+            if platforms and "platforms" in platforms:
+                for platform, link in platforms["platforms"].items():
+                    embed.add_field(name=platform.title(), value=link, inline=False)
 
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            
+        except Exception as e:
+            await interaction.response.send_message(f"An error occurred: {str(e)}", ephemeral=True)
+            print(f"Error in social links callback: {str(e)}")
 
 SocialPlatformType = Literal["twitter", "instagram", "snapchat"]
 
@@ -247,6 +253,7 @@ class ManagementCommandCog(commands.Cog):
             embed.add_field(name=platform.title(), value=link, inline=False)
 
         await ctx.send(embed=embed)
+        
     @commands.hybrid_group(description='Allows you to change user roles with Strive.', with_app_command=True)
     async def role(self, ctx: StriveContext):
         return    
