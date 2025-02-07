@@ -2,7 +2,7 @@ import discord
 import uuid
 import time
 import re
-from typing import List
+from typing import List, Literal
 from discord.ext import commands, tasks
 from datetime import datetime, timedelta
 from utils.utils import get_next_case_id, get_next_reminder_id, StriveContext
@@ -43,11 +43,7 @@ class SocialLinksButton(discord.ui.Button):
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
-
-class SocialPlatform(discord.app_commands.Choice):
-    Twitter = "twitter"
-    Instagram = "instagram"
-    Snapchat = "snapchat"
+SocialPlatformType = Literal["twitter", "instagram", "snapchat"]
 
 class ManagementCommandCog(commands.Cog):
     def __init__(self, strive):
@@ -209,7 +205,7 @@ class ManagementCommandCog(commands.Cog):
             await ctx.send_error("Please specify a subcommand: add, remove, list")
 
     @social.command(name="add", description="Add a social media link")
-    async def social_add(self, ctx: StriveContext, platform: SocialPlatform, link: str):
+    async def social_add(self, ctx: StriveContext, platform: SocialPlatformType, link: str):
         if not link.startswith(("http://", "https://")):
             await ctx.send_error("Please provide a valid URL starting with http:// or https://")
             return
@@ -223,7 +219,7 @@ class ManagementCommandCog(commands.Cog):
         await ctx.send_success(f"Added your [**{platform}**]({link}) link successfully!")
 
     @social.command(name="remove", description="Remove a social media link")
-    async def social_remove(self, ctx: StriveContext, platform: SocialPlatform):
+    async def social_remove(self, ctx: StriveContext, platform: SocialPlatformType):
         result = await self.strive.db.socials.update_one(
             {"user_id": ctx.author.id},
             {"$unset": {f"platforms.{platform}": ""}}
@@ -251,7 +247,6 @@ class ManagementCommandCog(commands.Cog):
             embed.add_field(name=platform.title(), value=link, inline=False)
 
         await ctx.send(embed=embed)
-
     @commands.hybrid_group(description='Allows you to change user roles with Strive.', with_app_command=True)
     async def role(self, ctx: StriveContext):
         return    
