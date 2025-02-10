@@ -6,6 +6,7 @@ from discord.ext import commands
 from utils.constants import StriveConstants
 from utils.utils import get_next_case_id, StriveContext
 from utils.constants import blacklists, blacklist_bypass, cases
+from utils.pagination import GuildPaginator
 from datetime import timedelta
 from datetime import datetime
  
@@ -28,6 +29,18 @@ class AdminCommandsCog(commands.Cog):
         return
         
         
+    
+    @commands.command()
+    async def guild_list(ctx):
+        role = discord.utils.get(ctx.guild.roles, id=1326485348326314054)
+        if ctx.guild.id == 1326476818894557217 and role in ctx.author.roles:
+            guilds = sorted(ctx.bot.guilds, key=lambda g: -g.member_count)
+            view = GuildPaginator(ctx, guilds)
+            await view.send()
+        else:
+            await ctx.send_error("You do not have permission to use this command.")
+        
+    
         
     # This command will add users into blacklist_bypass collection so they can run commands like JSK
     # and blacklist_guild or blacklist_user.
@@ -181,6 +194,8 @@ class AdminCommandsCog(commands.Cog):
             synced = await self.strive.tree.sync()
         await loading_msg.delete()
         await ctx.send_success(f"Synced **{len(synced)}** commands.")
+
+
 
     # This is the set of commands to unblacklist a user from the bot. This follows the same set of logic as
     # blacklisting the user but in the opposit order.

@@ -110,3 +110,57 @@ class ReminderPaginationView(discord.ui.View):
         if self.page < self.max_page - 1:
             self.page += 1
             await self.update_message(interaction)
+            
+            
+
+class GuildPaginator(discord.ui.View):
+    def __init__(self, ctx, guilds, per_page=5):
+        super().__init__()
+        self.ctx = ctx
+        self.guilds = guilds
+        self.per_page = per_page
+        self.page = 0
+        self.max_pages = (len(guilds) - 1) // per_page + 1
+        self.message = None
+
+
+    def get_embed(self):
+        start = self.page * self.per_page
+        end = start + self.per_page
+        guild_list = "\n".join(
+            [f"> {g.name}\n> Users {g.member_count}\n> Id {g.id}" for g in self.guilds[start:end]]
+        )
+
+        embed = discord.Embed(title="Guilds by Member Count", description=guild_list or "No guilds available", color=discord.Color.blue())
+        embed.set_footer(text=f"Page {self.page + 1}/{self.max_pages}")
+        return embed
+
+
+    async def update_message(self):
+        if self.message:
+            await self.message.edit(embed=self.get_embed(), view=self)
+
+
+    @discord.ui.button(emoji="<:left:1332555046956826646>", style=discord.ButtonStyle.primary, disabled=True)
+    async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.page -= 1
+        self.next_page.disabled = False
+        if self.page == 0:
+            button.disabled = True
+        await self.update_message()
+        await interaction.response.defer()
+
+
+    @discord.ui.button(emoji="<:right:1332554985153626113>", style=discord.ButtonStyle.primary)
+    async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.page += 1
+        self.previous_page.disabled = False
+        if self.page >= self.max_pages - 1:
+            button.disabled = True
+        await self.update_message()
+        await interaction.response.defer()
+
+
+    async def send(self):
+        self.message = await self.ctx.send(embed=self.get_embed(), view=self)
+        await self.ctx.message.delete()
