@@ -29,6 +29,7 @@ class HelpCommandsCog(commands.Cog):
         self.categories = self.get_command_categories()
         self.category_emojis = {
             "General": "<:Development:1327195371771789324>",
+            "LastFM": "<:shouts:1338375688520077404>",
             "Moderation": "<:banned:1326788110305988659>",
             "Other": "<:settings:1327195042602942508>",
         }
@@ -50,27 +51,15 @@ class HelpCommandsCog(commands.Cog):
                 self.category_emojis = category_emojis
                 
                 
-                options = []
-                for cat in categories:
-                    emoji = self.category_emojis.get(cat, "")
-                    
-
-                    if isinstance(emoji, str) and not emoji.startswith("<:"):
-                        options.append(
-                            discord.SelectOption(
-                                label=cat,
-                                description=f"Commands for {cat}",
-                                emoji=emoji
-                            )
-                        )
-                    else:
-                        options.append(
-                            discord.SelectOption(
-                                label=cat,
-                                description=f"Commands for {cat}"
-                            )
-                        )
-
+                options = [
+                    discord.SelectOption(
+                        label=cat,
+                        description=f"Commands for {cat}",
+                        emoji=self.category_emojis.get(cat, "")
+                    )
+                    for cat in categories
+                ]
+                
                 
                 super().__init__(placeholder="Select a help topic", options=options)
 
