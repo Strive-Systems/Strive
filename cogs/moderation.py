@@ -4,6 +4,7 @@ import uuid
 import re
 import time
 from discord.ext import commands
+from discord import Embed, Member, User
 from utils.constants import StriveConstants, cases, blacklist_bypass
 from utils.utils import get_next_case_id, StriveContext
 from datetime import timedelta
@@ -443,21 +444,20 @@ class ModerationCommandCog(commands.Cog):
     @modlogs.command(description="View all modlogs for a certain user")
     @commands.has_guild_permissions(ban_members=True)
     async def view(self, ctx: StriveContext, user: discord.User):
+        
+        
         user_obj = None
-        
-        
-        if user.isdigit():
-            try:
-                user_obj = await ctx.bot.fetch_user(int(user))
-            except commands.BadArgument:
-                return await ctx.send_error("Invalid user ID provided.")
+
+
+        if isinstance(user, (Member, User)):  
+            user_obj = user
             
             
-        else:
+        elif isinstance(user, discord.Object):  
             try:
-                user_obj = await commands.MemberConverter().convert(ctx, user)
-            except commands.BadArgument:
-                return await ctx.send_error("User not found in the server or invalid input.")
+                user_obj = await ctx.bot.fetch_user(user.id)
+            except Exception:
+                return await ctx.send_error("Failed to fetch user by ID.")
 
 
         if not user_obj:
@@ -465,13 +465,15 @@ class ModerationCommandCog(commands.Cog):
 
 
         number = 0
-        embed = discord.Embed(
+        
+        
+        embed = Embed(
             title="",
             description="",
             color=self.constants.strive_embed_color_setup(),
             timestamp=datetime.utcnow()
         )
-        
+
 
         results = cases.find({'user_id': user_obj.id, "guild_id": ctx.guild.id})
         
