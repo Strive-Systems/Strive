@@ -128,7 +128,7 @@ class GuildPaginator(discord.ui.View):
         start = self.page * self.per_page
         end = start + self.per_page
         guild_list = "\n".join(
-            [f"> {g.name} - Users {g.member_count} - ID `({g.id})`" for g in self.guilds[start:end]]
+            [f"> **Guild Name:** {g.name}\n> **Member Count:** {g.member_count}\n> **Guild ID:** `({g.id})`" for g in self.guilds[start:end]]
         )
 
         embed = discord.Embed(title="Guilds by Member Count", description=guild_list or "No guilds available", color=discord.Color.blue())
