@@ -443,17 +443,27 @@ class ModerationCommandCog(commands.Cog):
     @modlogs.command(description="View all modlogs for a certain user")
     @commands.has_guild_permissions(ban_members=True)
     async def view(self, ctx: StriveContext, user: discord.User):
+        user_obj = None
+        try:
+            user_obj = await commands.MemberConverter().convert(ctx, user)  # Try to get a Member
+        except commands.BadArgument:
+            try:
+                user_obj = await ctx.bot.fetch_user(user)  # Fallback to fetching a User
+            except commands.NotFound:
+                return await ctx.send_error("User not found.")
+
+        if not user_obj:
+            return await ctx.send_error("Invalid user provided.")
+
         number = 0
-        embed = discord.Embed(
+        embed = Embed(
             title="",
             description="",
             color=self.constants.strive_embed_color_setup(),
             timestamp=datetime.utcnow()
         )
-        
-        
-        results = cases.find({'user_id': user.id, "guild_id": ctx.guild.id})
-        
+
+        results = cases.find({'user_id': user_obj.id, "guild_id": ctx.guild.id})
         
         async for result in results:
             if result.get('status') == "active":
@@ -468,24 +478,16 @@ class ModerationCommandCog(commands.Cog):
                     inline=False
                 )
 
-
         if number == 0:
             await ctx.send_error("This user has no active modlogs.")
             return
 
-
-        try:
-            embed.set_author(
-                name=f"{user.name}'s Modlogs",
-                icon_url=user.avatar.url if user.avatar else user.default_avatar.url
-            )
-        except AttributeError:
-            embed.set_author(
-                name=f"{user.name}'s Modlogs"
-            )
-            
-            
-        embed.set_footer(text=f"ID: {user.id} • Total Modlogs: {number}")
+        embed.set_author(
+            name=f"{user_obj.name}'s Modlogs",
+            icon_url=user_obj.avatar.url if user_obj.avatar else user_obj.default_avatar.url
+        )
+        
+        embed.set_footer(text=f"ID: {user_obj.id} • Total Modlogs: {number}")
         await ctx.send(embed=embed)
 
 
