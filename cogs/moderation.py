@@ -439,9 +439,10 @@ class ModerationCommandCog(commands.Cog):
             await ctx.send("Please specify a valid subcommand (view, transfer, clear).")
 
 
+
     @modlogs.command(description="View all modlogs for a certain user")
     @commands.has_guild_permissions(ban_members=True)
-    async def view(self, ctx: StriveContext, member: discord.Member):
+    async def view(self, ctx: StriveContext, user: discord.User):
         number = 0
         embed = discord.Embed(
             title="",
@@ -449,8 +450,10 @@ class ModerationCommandCog(commands.Cog):
             color=self.constants.strive_embed_color_setup(),
             timestamp=datetime.utcnow()
         )
-
-        results = cases.find({'user_id': member.id, "guild_id": ctx.guild.id})
+        
+        
+        results = cases.find({'user_id': user.id, "guild_id": ctx.guild.id})
+        
         
         async for result in results:
             if result.get('status') == "active":
@@ -465,25 +468,36 @@ class ModerationCommandCog(commands.Cog):
                     inline=False
                 )
 
+
         if number == 0:
             await ctx.send_error("This user has no active modlogs.")
-            
-        else:
-            try:
-                embed.set_author(
-                    name=f"{member.name}'s Modlogs",
-                    icon_url=member.avatar.url
-                )
-                
-            except AttributeError:
-                embed.set_author(
-                    name=f"{member.name}'s Modlogs",
-                    icon_url=member.default_avatar.url
-                )
-                
-            embed.set_footer(text=f"ID: {member.id} • Total Modlogs: {number}")
+            return
 
+
+        try:
+            embed.set_author(
+                name=f"{user.name}'s Modlogs",
+                icon_url=user.avatar.url if user.avatar else user.default_avatar.url
+            )
+        except AttributeError:
+            embed.set_author(
+                name=f"{user.name}'s Modlogs"
+            )
+            
+            
+        embed.set_footer(text=f"ID: {user.id} • Total Modlogs: {number}")
         await ctx.send(embed=embed)
+
+
+
+    @view.before_invoke
+    async def get_user(self, ctx: StriveContext, argument: str):
+        try:
+            user = await commands.UserConverter().convert(ctx, argument)
+        except commands.BadArgument:
+            user = await ctx.bot.fetch_user(argument)
+        return user
+
 
 
     @modlogs.command(description="Transfer all modlogs to a different user")
