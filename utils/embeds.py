@@ -248,6 +248,7 @@ class AboutWithButtons:
 
         support_server_button = Button(
             label="Support Server", 
+            emoji="<:chat:1338368124239478817>",
             style=discord.ButtonStyle.primary, 
             url="https://discord.gg/rkRrRfRTwg"
         )
@@ -255,6 +256,7 @@ class AboutWithButtons:
         
         invite_button = Button(
             label="Invite Strive", 
+            emoji="<:Strive:1330583510406267070>",
             style=discord.ButtonStyle.link, 
             url="https://discord.com/oauth2/authorize?client_id=1328678328370204672&permissions=8&integration_type=0&scope=bot"
         )
