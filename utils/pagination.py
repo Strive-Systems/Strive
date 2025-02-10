@@ -114,7 +114,7 @@ class ReminderPaginationView(discord.ui.View):
             
 
 class GuildPaginator(discord.ui.View):
-    def __init__(self, ctx, guilds, per_page=5):
+    def __init__(self, ctx, guilds, per_page=10):
         super().__init__()
         self.ctx = ctx
         self.guilds = guilds
@@ -128,7 +128,7 @@ class GuildPaginator(discord.ui.View):
         start = self.page * self.per_page
         end = start + self.per_page
         guild_list = "\n".join(
-            [f"> **Guild Name:** {g.name}\n> **Member Count:** {g.member_count}\n> **Guild ID:** `({g.id})`" for g in self.guilds[start:end]]
+            [f"> **Guild Name:** {g.name}\n> **Member Count:** {g.member_count}\n> **Guild ID:** `({g.id})`\n\n" for g in self.guilds[start:end]]
         )
 
         embed = discord.Embed(title="Guilds by Member Count", description=guild_list or "No guilds available", color=discord.Color.blue())
