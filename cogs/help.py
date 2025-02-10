@@ -120,13 +120,8 @@ class HelpCommandsCog(commands.Cog):
 
 
         embed = HelpCenterEmbed(
-            description=(
-                "<:help:1337272037617696812> Welcome to Strive's interactive help menu! Here's how to get started:\n\n"
-                "- Select a category from the dropdown menu below\n"
-                "- Browse through the available commands\n"
-                "- Click on any command to use it directly\n\n"
-                "Need more help? Join our support server or contact our team!"
-            )
+            description="Welcome to Strive, select a help topic from the dropdown to view the commands. Once you find the command you want simply run it. \n\n Use the select menu below to browse categories or search for commands.",
+            color=constants.strive_embed_color_setup()
         )
         
         
