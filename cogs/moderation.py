@@ -485,7 +485,7 @@ class ModerationCommandCog(commands.Cog):
                 embed.add_field(name="",value=(""),inline=False)
                 
                 embed.add_field(
-                    name=f"Case ID #{result.get('case_id')} | {result.get('type').title()}",
+                    name=f"Case #{result.get('case_id')} | {result.get('type').title()}",
                     value=(
                         f"Date: <t:{result.get('timestamp')}:F>\n"
                         f"Moderator: <@{result.get('moderator_id')}> `({result.get('moderator_id')})`\n"
