@@ -50,15 +50,27 @@ class HelpCommandsCog(commands.Cog):
                 self.category_emojis = category_emojis
                 
                 
-                options = [
-                    discord.SelectOption(
-                        label=cat,
-                        description=f"Commands for {cat}",
-                        emoji=self.category_emojis.get(cat, "")
-                    )
-                    for cat in categories
-                ]
-                
+                options = []
+                for cat in categories:
+                    emoji = self.category_emojis.get(cat, "")
+                    
+
+                    if isinstance(emoji, str) and not emoji.startswith("<:"):
+                        options.append(
+                            discord.SelectOption(
+                                label=cat,
+                                description=f"Commands for {cat}",
+                                emoji=emoji
+                            )
+                        )
+                    else:
+                        options.append(
+                            discord.SelectOption(
+                                label=cat,
+                                description=f"Commands for {cat}"
+                            )
+                        )
+
                 
                 super().__init__(placeholder="Select a help topic", options=options)
 
@@ -120,8 +132,13 @@ class HelpCommandsCog(commands.Cog):
 
 
         embed = HelpCenterEmbed(
-            description="Welcome to Strive, select a help topic from the dropdown to view the commands. Once you find the command you want simply run it. \n\n Use the select menu below to browse categories or search for commands.",
-            color=constants.strive_embed_color_setup()
+            description=(
+                "<:help:1337272037617696812> Welcome to Strive's interactive help menu! Here's how to get started:\n\n"
+                "- Select a category from the dropdown menu below\n"
+                "- Browse through the available commands\n"
+                "- Click on any command to use it directly\n\n"
+                "Need more help? Join our support server or contact our team!"
+            )
         )
         
         
