@@ -31,7 +31,7 @@ class AdminCommandsCog(commands.Cog):
         
     
     @commands.command()
-    async def guild_list(ctx):
+    async def guildlist(self, ctx: StriveContext):
         role = discord.utils.get(ctx.guild.roles, id=1326485348326314054)
         if ctx.guild.id == 1326476818894557217 and role in ctx.author.roles:
             guilds = sorted(ctx.bot.guilds, key=lambda g: -g.member_count)
