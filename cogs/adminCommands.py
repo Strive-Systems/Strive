@@ -32,8 +32,8 @@ class AdminCommandsCog(commands.Cog):
     
     @commands.command()
     async def guildlist(self, ctx: StriveContext):
-        role = discord.utils.get(ctx.guild.roles, id=1326485348326314054)
-        if ctx.guild.id == 1326476818894557217 and role in ctx.author.roles:
+        role = discord.utils.get(ctx.guild.roles, id=1338771419852570654)
+        if ctx.guild.id == 1338770040820072523 and role in ctx.author.roles:
             guilds = sorted(ctx.bot.guilds, key=lambda g: -g.member_count)
             view = GuildPaginator(ctx, guilds)
             await view.send()
@@ -47,8 +47,8 @@ class AdminCommandsCog(commands.Cog):
         
     @commands.command()
     async def addowner(self, ctx: StriveContext, user: discord.User):
-        role = discord.utils.get(ctx.guild.roles, id = 1326485348326314054)
-        if ctx.guild.id == 1326476818894557217 and role in ctx.author.roles:
+        role = discord.utils.get(ctx.guild.roles, id = 1338771419852570654)
+        if ctx.guild.id == 1338770040820072523 and role in ctx.author.roles:
             if user.id in constants.bypassed_users:
                 return await ctx.send_error(f"{user.mention} is already in the bypass list.")
 
@@ -65,8 +65,8 @@ class AdminCommandsCog(commands.Cog):
     
     @commands.command()
     async def removeowner(self, ctx: StriveContext, user: discord.User):
-        role = discord.utils.get(ctx.guild.roles, id = 1326485348326314054)
-        if ctx.guild.id == 1326476818894557217 and role in ctx.author.roles:
+        role = discord.utils.get(ctx.guild.roles, id = 1338771419852570654)
+        if ctx.guild.id == 1338770040820072523 and role in ctx.author.roles:
             if user.id not in constants.bypassed_users:
                 return await ctx.send_error(f"{user.mention} is not in the bypass list.")
             
@@ -81,8 +81,8 @@ class AdminCommandsCog(commands.Cog):
     
     @commands.command()
     async def showowners(self, ctx: StriveContext):
-        role = discord.utils.get(ctx.guild.roles, id=1326485348326314054)
-        if ctx.guild.id != 1326476818894557217 or role not in ctx.author.roles:
+        role = discord.utils.get(ctx.guild.roles, id=1338771419852570654)
+        if ctx.guild.id != 1338770040820072523 or role not in ctx.author.roles:
             return await ctx.send_error(f"You do not have permission to use this command.")
 
 
@@ -109,7 +109,7 @@ class AdminCommandsCog(commands.Cog):
             embed = discord.Embed(
                 title="Strive Owners and Developers",
                 description=(
-                    "Listed below are the owners and developers of <:Strive:1330583510406267070> **Strive**, "
+                    "Listed below are the owners and developers of <:Strive:1338783953598939157> **Strive**, "
                     "when a new one is added using `s!addowner` or when one is removed with `s!removeowner` "
                     "this list will update."
                 ),

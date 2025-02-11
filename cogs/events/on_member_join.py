@@ -63,7 +63,7 @@ class OnMemberJoin(commands.Cog):
 
 
         view = View()
-        guild = self.strive.get_guild(1326476818894557217)
+        guild = self.strive.get_guild(1338770040820072523)
 
 
         try:
@@ -76,7 +76,7 @@ class OnMemberJoin(commands.Cog):
                     view = View().add_item(
                         Button(
                             label="Strive Staff",
-                            emoji="<:Strive:1330583510406267070>",
+                            emoji="<:Strive:1338783953598939157>",
                             disabled=True,
                             style=discord.ButtonStyle.grey,
                         )
@@ -93,7 +93,7 @@ class OnMemberJoin(commands.Cog):
 
 
         member_count = member.guild.member_count
-        welcome_message = f"<:wave:1326749927405129818> {member.mention} Welcome to <:Strive:1330583510406267070> **{member.guild.name}**! Feel free to explore. 🎉"
+        welcome_message = f"<:wave:1326749927405129818> {member.mention} Welcome to <:Strive:1338783953598939157> **{member.guild.name}**! Feel free to explore. 🎉"
 
 
         view.add_item(

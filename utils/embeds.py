@@ -127,9 +127,9 @@ class SetupEmbeds:
 
     def get_welcome_embed(self):
         embed = discord.Embed(
-            title="<:Strive:1330583510406267070> Welcome to Strive \n\n",
+            title="<:Strive:1338783953598939157> Welcome to Strive \n\n",
             description=(
-                "> This is the setup system for <:Strive:1330583510406267070> **Strive** to configure your server and set up customization. We will walk you through setting up basic settings like prefix, embed color, and bot nickname. Then we will configure the modules and logging. \n\n"
+                "> This is the setup system for <:Strive:1338783953598939157> **Strive** to configure your server and set up customization. We will walk you through setting up basic settings like prefix, embed color, and bot nickname. Then we will configure the modules and logging. \n\n"
                 "**Current Configuration** \n - **Prefix:** `!` \n - **Disabled Commands:** `None`"
             ),
             color=constants.strive_embed_color_setup()
@@ -256,7 +256,7 @@ class AboutWithButtons:
         
         invite_button = Button(
             label="Invite Strive", 
-            emoji="<:Strive:1330583510406267070>",
+            emoji="<:Strive:1338783953598939157>",
             style=discord.ButtonStyle.link, 
             url="https://discord.com/oauth2/authorize?client_id=1328678328370204672&permissions=8&integration_type=0&scope=bot"
         )
@@ -417,7 +417,7 @@ class PingCommandEmbed:
     @staticmethod
     def create_ping_embed(latency: float, database_latency: int, uptime, shard_info: List[dict], page: int = 0):
         embed = discord.Embed(
-            title="<:Strive:1330583510406267070> Strive",
+            title="<:Strive:1338783953598939157> Strive",
             color=constants.strive_embed_color_setup(),
         )
         
@@ -468,7 +468,7 @@ class UserInformationEmbed:
         badges = []
         try:
             
-            guild = self.strive.get_guild(1326476818894557217)
+            guild = self.strive.get_guild(1338770040820072523)
             guild_member = await guild.fetch_member(self.member.id)
 
 
@@ -476,7 +476,7 @@ class UserInformationEmbed:
             early_supporter_role_id = 1326781391861710899
 
             # Check for Strive Team role first
-            if any(discord.utils.get(guild_member.roles, id=role_id) for role_id in [1326485348326314054]):
+            if any(discord.utils.get(guild_member.roles, id=role_id) for role_id in [1338771419852570654]):
                 badges.append("> <:striveVerified:1337235198085042196> Strive Team")
 
             # Check for staff roles second
@@ -485,7 +485,7 @@ class UserInformationEmbed:
 
             # Check for Early Supporter role third
             if discord.utils.get(guild_member.roles, id=early_supporter_role_id):
-                badges.append("> <:Strive:1330583510406267070> Contributor")
+                badges.append("> <:Strive:1338783953598939157> Contributor")
                 
         except (discord.NotFound, discord.Forbidden):
             pass

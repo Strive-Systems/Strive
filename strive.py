@@ -21,7 +21,7 @@ class Strive(commands.AutoShardedBot):
         self.token = None
         self.start_time = datetime.now()
         self.beta_guilds = [
-            1326476818894557217 # Strive Support
+            1338770040820072523 # Strive Support
         ]
 
         self.error = "<:striveFail:1337205769900130425>"
