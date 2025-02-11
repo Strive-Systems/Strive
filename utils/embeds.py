@@ -422,7 +422,7 @@ class PingCommandEmbed:
         )
         
         
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1326735526740496444/1333643206226739312/StriveLogoGrey.png")
+        embed.set_thumbnail(url="https://media.discordapp.net/attachments/1338788379806011422/1338794770977259570/StriveLogoGrey.png")
         
 
         if page == 0:
@@ -767,7 +767,7 @@ class RolesInformationEmbed:
         )
 
         
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1326735526740496444/1333643206226739312/StriveLogoGrey.png")
+        embed.set_thumbnail(url="https://media.discordapp.net/attachments/1338788379806011422/1338794770977259570/StriveLogoGrey.png")
 
 
         return embed

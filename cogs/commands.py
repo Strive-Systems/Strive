@@ -75,7 +75,7 @@ class CommandsCog(commands.Cog):
             cluster=cluster,
             environment=environment,
             command_run_time=formatted_time,
-            thumbnail_url="https://cdn.discordapp.com/attachments/1326735526740496444/1333643206226739312/StriveLogoGrey.png"
+            thumbnail_url="https://media.discordapp.net/attachments/1338788379806011422/1338794770977259570/StriveLogoGrey.png"
         )
 
 
@@ -282,7 +282,7 @@ class CommandsCog(commands.Cog):
             color=constants.strive_embed_color_setup()
         )
             
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1326735526740496444/1333643206226739312/StriveLogoGrey.png")
+        embed.set_thumbnail(url="https://media.discordapp.net/attachments/1338788379806011422/1338794770977259570/StriveLogoGrey.png")
             
         
         donate_url = "https://buy.stripe.com/bIY7uncmy3rW1kk144"
