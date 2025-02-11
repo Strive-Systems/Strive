@@ -3,7 +3,7 @@ from discord.ext import commands
 import traceback
 import sys
 from utils.embeds import AutoModListWordsEmbed
-from utils.constants import StriveConstants
+from utils.constants import StriveConstants, welcomer
 from utils.utils import StriveContext
 
 constants = StriveConstants()
@@ -27,7 +27,7 @@ class ServerCog(commands.Cog):
     async def welcome_message(self, member: discord.Member):
         """Send a welcome message for a member which joins the server"""
 
-        async for doc in self.strive.db.welcomer.find({"guild_id": member.guild.id}):
+        async for doc in welcomer.find({"guild_id": member.guild.id}):
             channel = self.strive.get_channel(doc.get('channel_id'))
             if channel:
                 try:
@@ -67,7 +67,7 @@ class ServerCog(commands.Cog):
         """Add a welcome message for a channel"""
 
         try:
-            await self.strive.db.welcomer.insert_one({
+            await welcomer.insert_one({
                 "guild_id": ctx.guild.id,
                 "channel_id": channel.id,
                 "message": message or f"Welcome {{user.mention}} to {ctx.guild.name}!"
@@ -87,7 +87,7 @@ class ServerCog(commands.Cog):
     async def welcome_remove(self, ctx: StriveContext, channel: discord.TextChannel):
         """Remove a welcome message for a channel"""
 
-        result = await self.strive.db.welcomer.delete_one({
+        result = await welcomer.delete_one({
             "guild_id": ctx.guild.id,
             "channel_id": channel.id
         })
@@ -107,7 +107,7 @@ class ServerCog(commands.Cog):
     async def welcome_test(self, ctx: StriveContext):
         """Test the welcome message system"""
         
-        welcomer_exists = await self.strive.db.welcomer.find_one({"guild_id": ctx.guild.id})
+        welcomer_exists = await welcomer.find_one({"guild_id": ctx.guild.id})
         if not welcomer_exists:
             return await ctx.send_error("No welcome messages have been set up. Use `welcome add` first!")
 
@@ -123,7 +123,7 @@ class ServerCog(commands.Cog):
         """View all welcome channels"""
 
         channels = []
-        async for doc in self.strive.db.welcomer.find({"guild_id": ctx.guild.id}):
+        async for doc in welcomer.find({"guild_id": ctx.guild.id}):
             channel = ctx.guild.get_channel(doc.get("channel_id"))
             if channel:
                 channels.append(channel.mention)
