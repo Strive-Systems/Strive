@@ -85,6 +85,23 @@ class ServerCog(commands.Cog):
             await ctx.send_error(f"There isn't a welcome message for {channel.mention}")
 
     @welcome.command(
+        name="test",
+        usage="",
+        example="",
+        aliases=["try"],
+    )
+    @commands.has_permissions(manage_guild=True)
+    async def welcome_test(self, ctx: StriveContext):
+        """Test the welcome message system"""
+        
+        welcomer_exists = await self.strive.db.welcomer.find_one({"guild_id": ctx.guild.id})
+        if not welcomer_exists:
+            return await ctx.send_error("No welcome messages have been set up. Use `welcome add` first!")
+
+        await self.welcome_message(ctx.author)
+        await ctx.send_success("Welcome message test executed!")
+
+    @welcome.command(
         name="list",
         aliases=["show", "all"],
     )
