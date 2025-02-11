@@ -61,7 +61,7 @@ class Strive(commands.AutoShardedBot):
                 id = guild.id
                 owner = guild.get_member(guild.owner_id)
                 is_dev_guild = id in self.beta_guilds
-                channel = strive.get_guild(self.beta_guilds[0]).get_channel(1326737963346034839)
+                channel = strive.get_guild(self.beta_guilds[0]).get_channel(1338806026094247968)
 
 
                 # Check if owner is None

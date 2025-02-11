@@ -18,7 +18,7 @@ class OnGuildJoin(commands.Cog):
             id = guild.id
             owner = guild.get_member(guild.owner_id)
             is_dev_guild = id in self.strive.beta_guilds
-            channel = self.strive.get_guild(self.strive.beta_guilds[0]).get_channel(1289772928082378852)
+            channel = self.strive.get_guild(self.strive.beta_guilds[0]).get_channel(1338806026094247968)
 
             # Check if owner is None
             if owner is None:
@@ -37,7 +37,7 @@ class OnGuildJoin(commands.Cog):
             await channel.send(embed=embed)
             
             
-        channel = self.strive.get_channel(1326737963346034839)
+        channel = self.strive.get_channel(1338806026094247968)
 
         embed = discord.Embed(title='New Server Joined', color=0x2f3136)
         embed.add_field(name='Server Name', value=guild.name, inline=True)

@@ -68,7 +68,7 @@ class OnMemberJoin(commands.Cog):
 
         try:
             guild_member = await guild.fetch_member(member.id)
-            staff_roles = [1326488657959583745]
+            staff_roles = [1338784781403422801]
 
 
             for role_id in staff_roles:
@@ -93,14 +93,14 @@ class OnMemberJoin(commands.Cog):
 
 
         member_count = member.guild.member_count
-        welcome_message = f"<:wave:1326749927405129818> {member.mention} Welcome to <:Strive:1338783953598939157> **{member.guild.name}**! Feel free to explore. 🎉"
+        welcome_message = f"<:wave:1338816256874250262> {member.mention} Welcome to <:Strive:1338783953598939157> **{member.guild.name}**! Feel free to explore. 🎉"
 
 
         view.add_item(
             Button(
                 label=f"Members: {member_count}",
                 disabled=True,
-                emoji="<:striveUsers:1337248026942509129>",
+                emoji="<:member:1338813549912395846>",
                 style=discord.ButtonStyle.grey,
             )
         )

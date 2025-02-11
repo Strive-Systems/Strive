@@ -472,7 +472,7 @@ class UserInformationEmbed:
             guild_member = await guild.fetch_member(self.member.id)
 
 
-            staff_roles = [1326488657959583745]  # Staff Role
+            staff_roles = [1338784781403422801]  # Staff Role
             early_supporter_role_id = 1326781391861710899
 
             # Check for Strive Team role first

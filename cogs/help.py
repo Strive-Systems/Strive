@@ -122,7 +122,7 @@ class HelpCommandsCog(commands.Cog):
 
         embed = HelpCenterEmbed(
             description=(
-                "<:help:1337272037617696812> Welcome to Strive's interactive help menu! Here's how to get started:\n\n"
+                "<:help:1338816011763187773> Welcome to Strive's interactive help menu! Here's how to get started:\n\n"
                 "- Select a category from the dropdown menu below\n"
                 "- Browse through the available commands\n"
                 "- Click on any command to use it directly\n\n"

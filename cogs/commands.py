@@ -278,7 +278,7 @@ class CommandsCog(commands.Cog):
         
         embed = discord.Embed(
             title="",
-            description=f"**<:Donation:1336885507455582248> Donate to Strive Systems** \n\n> Thank you for wanting to donate! It goes a long way in terms of supporting this project as its completely free, here is your donation link.",
+            description=f"**<:Donation:1338814111970099314> Donate to Strive Systems** \n\n> Thank you for wanting to donate! It goes a long way in terms of supporting this project as its completely free, here is your donation link.",
             color=constants.strive_embed_color_setup()
         )
             
