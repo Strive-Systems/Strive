@@ -28,6 +28,7 @@ reminder_counters = db.reminder_counters
 timezones = db.timezones
 socials = db.socials
 lastfm = db.lastfm
+welcomer = db.welcomer
 
 
 class StriveConstants:
