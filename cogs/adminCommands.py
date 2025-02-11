@@ -138,11 +138,11 @@ class AdminCommandsCog(commands.Cog):
                 self.current_page = 0
 
 
-                self.previous_button = Button(emoji="<:left:1332555046956826646>", style=discord.ButtonStyle.gray, disabled=True)
+                self.previous_button = Button(emoji="<:left:1338812178731503616>", style=discord.ButtonStyle.gray, disabled=True)
                 self.previous_button.callback = self.previous_page
 
 
-                self.next_button = Button(emoji="<:right:1332554985153626113>", style=discord.ButtonStyle.gray, disabled=(len(embeds) <= 1))
+                self.next_button = Button(emoji="<:right:1338812220825665650>", style=discord.ButtonStyle.gray, disabled=(len(embeds) <= 1))
                 self.next_button.callback = self.next_page
 
 

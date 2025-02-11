@@ -26,7 +26,7 @@ class Strive(commands.AutoShardedBot):
 
         self.error = "<:striveFail:1337205769900130425>"
         self.success = "<:striveSuccess:1337205815031103645>"
-        self.loading = "<a:loading:1336666887760777216>"
+        self.loading = "<a:loading:1338811352692817920>"
         self.warning = "<:striveWarning:1337206012528295976>"
         self.base_color = 0x66d8ff
         self.context = StriveContext

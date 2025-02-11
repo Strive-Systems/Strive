@@ -33,10 +33,10 @@ class PingPaginationView(discord.ui.View):
         self.prev_button.disabled = self.page == 0
         self.next_button.disabled = self.page >= self.max_page
         self.page_button.label = "Network" if self.page == 0 else "Shards"
-        self.page_button.emoji = "<:settings:1327195042602942508>" if self.page == 0 else "<:clock:1334022552326111353>"
+        self.page_button.emoji = "<:settings:1338809252948738152>" if self.page == 0 else "<:clock:1338811480451055719>"
 
 
-    @discord.ui.button(emoji="<:left:1332555046956826646>", style=discord.ButtonStyle.gray, disabled=True)
+    @discord.ui.button(emoji="<:left:1338812178731503616>", style=discord.ButtonStyle.gray, disabled=True)
     async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.page > 0:
             self.page -= 1
@@ -46,12 +46,12 @@ class PingPaginationView(discord.ui.View):
             await self.update_message(interaction)
 
 
-    @discord.ui.button(emoji="<:settings:1327195042602942508>", label="Network", style=discord.ButtonStyle.blurple, disabled=True)
+    @discord.ui.button(emoji="<:settings:1338809252948738152>", label="Network", style=discord.ButtonStyle.blurple, disabled=True)
     async def page_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass
 
 
-    @discord.ui.button(emoji="<:right:1332554985153626113>", style=discord.ButtonStyle.gray)
+    @discord.ui.button(emoji="<:right:1338812220825665650>", style=discord.ButtonStyle.gray)
     async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.page < self.max_page:
             self.page += 1
@@ -98,14 +98,14 @@ class ReminderPaginationView(discord.ui.View):
             self.next_button.disabled = self.page >= self.max_page - 1
 
 
-    @discord.ui.button(emoji="<:left:1332555046956826646>", style=discord.ButtonStyle.gray, disabled=True)
+    @discord.ui.button(emoji="<:left:1338812178731503616>", style=discord.ButtonStyle.gray, disabled=True)
     async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.page > 0:
             self.page -= 1
             await self.update_message(interaction)
 
 
-    @discord.ui.button(emoji="<:right:1332554985153626113>", style=discord.ButtonStyle.gray)
+    @discord.ui.button(emoji="<:right:1338812220825665650>", style=discord.ButtonStyle.gray)
     async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.page < self.max_page - 1:
             self.page += 1
@@ -141,7 +141,7 @@ class GuildPaginator(discord.ui.View):
             await self.message.edit(embed=self.get_embed(), view=self)
 
 
-    @discord.ui.button(emoji="<:left:1332555046956826646>", style=discord.ButtonStyle.primary, disabled=True)
+    @discord.ui.button(emoji="<:left:1338812178731503616>", style=discord.ButtonStyle.primary, disabled=True)
     async def previous_page(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.page -= 1
         self.next_page.disabled = False
@@ -151,7 +151,7 @@ class GuildPaginator(discord.ui.View):
         await interaction.response.defer()
 
 
-    @discord.ui.button(emoji="<:right:1332554985153626113>", style=discord.ButtonStyle.primary)
+    @discord.ui.button(emoji="<:right:1338812220825665650>", style=discord.ButtonStyle.primary)
     async def next_page(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.page += 1
         self.previous_page.disabled = False

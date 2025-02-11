@@ -763,7 +763,7 @@ class ModerationCommandCog(commands.Cog):
                 failed_roles.append(role.name)
 
         if removed_roles:
-            await ctx.send_success(f"Removed **{len(removed_roles)}** dangerous roles from {member.mention}\n-# <:right:1332554985153626113>  {', '.join(removed_roles)}")
+            await ctx.send_success(f"Removed **{len(removed_roles)}** dangerous roles from {member.mention}\n-# <:right:1338812220825665650>  {', '.join(removed_roles)}")
         else:
             await ctx.send_error(f"Failed to remove any roles from {member.mention}")
 

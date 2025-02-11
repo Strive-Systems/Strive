@@ -28,10 +28,10 @@ class HelpCommandsCog(commands.Cog):
         self.strive = strive
         self.categories = self.get_command_categories()
         self.category_emojis = {
-            "General": "<:Development:1327195371771789324>",
-            "LastFM": "<:shouts:1338375688520077404>",
-            "Moderation": "<:banned:1326788110305988659>",
-            "Other": "<:settings:1327195042602942508>",
+            "General": "<:Development:1338809302298656890>",
+            "LastFM": "<:shouts:1338809811973963849>",
+            "Moderation": "<:banned:1338809377993523230>",
+            "Other": "<:settings:1338809252948738152>",
         }
         
 

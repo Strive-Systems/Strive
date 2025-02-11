@@ -13,7 +13,7 @@ class OnMessage(commands.Cog):
     async def on_command(self, ctx: StriveContext):
 
 
-        log_channel_id = 1326737938041667628
+        log_channel_id = 1338806081605861386
         channel = self.strive.get_channel(log_channel_id)
 
 

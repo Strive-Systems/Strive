@@ -21,7 +21,7 @@ constants = StriveConstants()
 class DonateButton(discord.ui.View):
         def __init__(self, donate_url: str):
             super().__init__()
-            self.add_item(discord.ui.Button(label="Donate", emoji="<:developer:1336896473518047333>", url=donate_url, style=discord.ButtonStyle.gray))
+            self.add_item(discord.ui.Button(label="Donate", emoji="<:developer:1338808856335089674>", url=donate_url, style=discord.ButtonStyle.gray))
 
 
 

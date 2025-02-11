@@ -248,9 +248,9 @@ class AboutWithButtons:
 
         support_server_button = Button(
             label="Support Server", 
-            emoji="<:chat:1338368124239478817>",
+            emoji="<:chat:1338807815036338199>",
             style=discord.ButtonStyle.primary, 
-            url="https://discord.gg/rkRrRfRTwg"
+            url="https://discord.gg/CaFGe87hR2"
         )
         
         
@@ -427,7 +427,7 @@ class PingCommandEmbed:
 
         if page == 0:
             embed.add_field(
-                name="<:settings:1327195042602942508> **Network Information**",
+                name="<:settings:1338809252948738152> **Network Information**",
                 value=(
                     f"**Latency:** `{round(latency * 1000)}ms` \n"
                     f"**Database:** `{'Connected' if database_latency else 'Disconnected'}\n` "
@@ -444,7 +444,7 @@ class PingCommandEmbed:
 
             for shard in shards_to_display:
                 embed.add_field(
-                    name=f"<:clock:1334022552326111353> **Shard {shard['id']}**",
+                    name=f"<:clock:1338811480451055719> **Shard {shard['id']}**",
                     value=f"> **Latency:** `{shard['latency']}ms` \n> **Guilds:** `{shard['guilds']}`",
                     inline=False
                 )

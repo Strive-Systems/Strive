@@ -83,7 +83,7 @@ class ManagementCommandCog(commands.Cog):
 
 
                 message = (
-                    f"<:clock:1334022552326111353> On {reminder_time}, you told me to remind you:\n"
+                    f"<:clock:1338811480451055719> On {reminder_time}, you told me to remind you:\n"
                     f"> **Message:** {reminder['message']}\n"
                     f"> **Guild:** {guild_name}"
                 )
@@ -580,7 +580,7 @@ class ManagementCommandCog(commands.Cog):
 
                     
                     await message.channel.send(
-                        f"**<:clock:1334022552326111353> {user} is currently AFK because:** {result.get('message')}.\n"
+                        f"**<:clock:1338811480451055719> {user} is currently AFK because:** {result.get('message')}.\n"
                         f"-# They have been AFK since {formatted_time}."
                     )
                     
