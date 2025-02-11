@@ -32,6 +32,13 @@ class ServerCog(commands.Cog):
             if channel:
                 try:
                     message = doc.get('message', f"Welcome {member.mention} to {member.guild.name}!")
+                    ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
+                    message = message.format(
+                        user=member,
+                        guild=member.guild,
+                        guild_count=len(member.guild.members),
+                        guild_count_ordinal=ordinal(len(member.guild.members))
+                    )
                     await channel.send(
                         content=message,
                         allowed_mentions=discord.AllowedMentions(
@@ -55,6 +62,31 @@ class ServerCog(commands.Cog):
     async def welcome(self, ctx: StriveContext):
         """Set up welcome messages in one or multiple channels"""
         await ctx.send_help()
+
+    @welcome.command(
+        name="variables",
+        usage="",
+        example="",
+        aliases=["vars"],
+    )
+    @commands.has_permissions(manage_guild=True)
+    async def welcome_variables(self, ctx: StriveContext):
+        """Shows all available variables for welcome messages"""
+        variables = [
+            "{user.mention} - Mentions the joining user",
+            "{user.id} - The user ID",
+            "{user.avatar} - The user's avatar URL",
+            "{guild.count} - Shows the guild member count",
+            "{guild.count_ordinal} - The member count with ordinal suffix (1st, 2nd, etc)",
+            "{guild.name} - Guild name"
+        ]
+        
+        embed = discord.Embed(
+            title="Welcome Message Variables",
+            description="\n".join(variables),
+            color=constants.strive_embed_color_setup()
+        )
+        await ctx.send(embed=embed)
 
     @welcome.command(
         name="add",
