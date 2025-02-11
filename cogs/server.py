@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands
+import traceback
+import sys
 from utils.embeds import AutoModListWordsEmbed
 from utils.constants import StriveConstants
 from utils.utils import StriveContext
@@ -9,6 +11,17 @@ constants = StriveConstants()
 class ServerCog(commands.Cog):
     def __init__(self, strive):
         self.strive = strive
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        """Handle command errors and log them to console"""
+        error = getattr(error, 'original', error)
+        
+        if isinstance(error, commands.CommandNotFound):
+            return
+            
+        print('[WELCOMER] {}:'.format(ctx.command), file=sys.stderr)
+        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
     @commands.Cog.listener("on_member_join")
     async def welcome_message(self, member: discord.Member):
