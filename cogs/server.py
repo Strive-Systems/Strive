@@ -73,13 +73,18 @@ class ServerCog(commands.Cog):
     async def welcome_variables(self, ctx: StriveContext):
         """Shows all available variables for welcome messages"""
         variables = [
-            "{user.mention} - Mentions the joining user",
-            "{user.id} - The user ID",
-            "{user.avatar} - The user's avatar URL",
-            "{guild.count} - Shows the guild member count",
-            "{guild.count_ordinal} - The member count with ordinal suffix (1st, 2nd, etc)",
-            "{guild.name} - Guild name"
+            "`{user.mention}` - Mentions the joining user",
+            "`{user.id}` - The user ID",
+            "`{user.avatar}` - The user's avatar URL",
+            "`{guild.count}` - Shows the guild member count",
+            "`{guild.count_ordinal}` - The member count with ordinal suffix (1st, 2nd, etc)",
+            "`{guild.name}` - Guild name"
         ]
+
+        embed.add_field(
+            name="Information",
+            value="```\nExample: !welcome add #chat Hi {user.mention}\nSyntax: (channel) (message)\n```",
+        )
         
         embed = discord.Embed(
             title="Welcome Message Variables",
