@@ -24,10 +24,10 @@ class Strive(commands.AutoShardedBot):
             1338770040820072523 # Strive Support
         ]
 
-        self.error = "<:striveFail:1337205769900130425>"
-        self.success = "<:striveSuccess:1337205815031103645>"
+        self.error = "<:strivefail:1338900416972193902>"
+        self.success = "<:strivesuccess:1338900384932036618>"
         self.loading = "<a:loading:1338811352692817920>"
-        self.warning = "<:striveWarning:1337206012528295976>"
+        self.warning = "<:striveWarning:1338900771823030373>"
         self.base_color = 0x66d8ff
         self.context = StriveContext
         
