@@ -80,16 +80,16 @@ class ServerCog(commands.Cog):
             "`{guild.count_ordinal}` - The member count with ordinal suffix (1st, 2nd, etc)",
             "`{guild.name}` - Guild name"
         ]
-
-        embed.add_field(
-            name="Information",
-            value="```\nExample: !welcome add #chat Hi {user.mention}\nSyntax: (channel) (message)\n```",
-        )
         
         embed = discord.Embed(
             title="Welcome Message Variables",
             description="\n".join(variables),
             color=constants.strive_embed_color_setup()
+        )
+
+        embed.add_field(
+            name="Information",
+            value="```\nExample: !welcome add #chat Hi {user.mention}\nSyntax: (channel) (message)\n```",
         )
         await ctx.send(embed=embed)
 
