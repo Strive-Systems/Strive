@@ -662,7 +662,7 @@ class PrefixSuccessEmbed(discord.Embed):
     def __init__(self, new_prefix: str):
         super().__init__(
             title="",
-            description=f"<:success:1326752811219947571> Prefix successfully changed to `{new_prefix}`.",
+            description=f"<:strivesuccess:1338900384932036618> Prefix successfully changed to `{new_prefix}`.",
             color=discord.Color.green()
         )
         
@@ -686,7 +686,7 @@ class ReminderEmbed(discord.Embed):
         # Set the embed title and color
         
         self.title = ""
-        self.description = f"<:success:1326752811219947571> Got it! I have set a reminder. It will go off at <t:{reminder_time}:R>."
+        self.description = f"<:strivesuccess:1338900384932036618> Got it! I have set a reminder. It will go off at <t:{reminder_time}:R>."
         self.color = discord.Color.green()
         
 
