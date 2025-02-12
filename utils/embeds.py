@@ -40,7 +40,7 @@ class MissingArgsEmbed(discord.Embed):
     def __init__(self, param_name):
         super().__init__(
             title="",
-            description=f"<:error:1326752911870660704> Please specify a {param_name}",
+            description=f"<:strivefail:1338900416972193902> Please specify a {param_name}",
             color=discord.Color.red()
         )
                
@@ -52,7 +52,7 @@ class BadArgumentEmbed(discord.Embed):
     def __init__(self):
         super().__init__(
             title="",
-            description="<:error:1326752911870660704> You provided an incorrect argument type.",
+            description="<:strivefail:1338900416972193902> You provided an incorrect argument type.",
             color=discord.Color.red()
         )
 
@@ -63,7 +63,7 @@ class ForbiddenEmbed(discord.Embed):
     def __init__(self):
         super().__init__(
             title="",
-            description="<:error:1326752911870660704> I couldn't send you a DM. Please check your DM settings.",
+            description="<:strivefail:1338900416972193902> I couldn't send you a DM. Please check your DM settings.",
             color=discord.Color.red()
         )
 
@@ -75,7 +75,7 @@ class MissingPermissionsEmbed(discord.Embed):
     def __init__(self):
         super().__init__(
             title="",
-            description="<:error:1326752911870660704> You don't have the required permissions to run this command.",
+            description="<:strivefail:1338900416972193902> You don't have the required permissions to run this command.",
             color=discord.Color.red()
         )
 
