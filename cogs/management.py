@@ -19,7 +19,7 @@ class SocialLinksButton(discord.ui.Button):
             label="Social Links",
             style=discord.ButtonStyle.gray,
             custom_id=f"social_links_{user_id}",
-            emoji="<:striveLink:1337227857621155860>"
+            emoji="<:striveLink:1338900764474609757>"
         )
         self.user_id = user_id
 
