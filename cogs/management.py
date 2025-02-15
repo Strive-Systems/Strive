@@ -767,9 +767,14 @@ class ManagementCommandCog(commands.Cog):
         if member in ctx.channel.members:
             return await ctx.send_error(f"{member.mention} is already in this thread!")
             
-        await ctx.channel.add_user(member)
-        await ctx.send_success(f"Added {member.mention} to {ctx.channel.mention}")    
-        
+        try:
+            await ctx.channel.add_user(member)
+            await ctx.send_success(f"Added {member.mention} to {ctx.channel.mention}")
+        except discord.Forbidden:
+            await ctx.send_error("I don't have permission to add members to this thread!")
+        except discord.HTTPException:
+            await ctx.send_error("Failed to add member to the thread; please try again later.")    
+
     @commands.hybrid_group(description='Allows modification of user notes.', with_app_command=True)
     async def note(self, ctx: StriveContext):
         return
