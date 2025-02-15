@@ -748,7 +748,7 @@ class ManagementCommandCog(commands.Cog):
 
     @thread.command(name="remove", description="Remove a member from the thread", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def remove(self, ctx: StriveContext, member: discord.Member):        
+    async def remove(self, ctx: StriveContext, member: discord.User):        
         if not isinstance(ctx.channel, discord.Thread):
             return await ctx.send_error("This command can only be used in thread channels!")
             
@@ -760,7 +760,7 @@ class ManagementCommandCog(commands.Cog):
 
     @thread.command(name="add", description="Add a member to the thread", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def add(self, ctx: StriveContext, member: discord.Member):
+    async def add(self, ctx: StriveContext, member: discord.User):
         if not isinstance(ctx.channel, discord.Thread):
             return await ctx.send_error("This command can only be used in thread channels!")
             
