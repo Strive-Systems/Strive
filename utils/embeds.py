@@ -501,12 +501,12 @@ class UserInformationEmbed:
 
 
         badge_map = {
-            "hypesquad_bravery": "> <:sbHypeSquadBalanceBravery:1327111323477344379> HypeSquad Bravery",
-            "hypesquad_brilliance": "> <:sbHypeSquadBalanceBrilliance:1327111453471281193> HypeSquad Brilliance",
-            "hypesquad_balance": "> <:sbHypeSquadBalance:1327111176030785667> HypeSquad Balance",
-            "verified_bot": "> <:sbVerified:1327112226913521695> Verified Bot",
-            "early_supporter": "> <:sbDiscordStaff:1327112897884590162> Early Supporter",
-            "active_developer": "> <:sbVerifiedDeveloper:1327111587139555422> Active Developer",
+            "hypesquad_bravery": "> <:sbHypeSquadBalanceBravery:1340230643300433951> HypeSquad Bravery",
+            "hypesquad_brilliance": "> <:sbHypeSquadBalanceBrilliance:1340230702712754206> HypeSquad Brilliance",
+            "hypesquad_balance": "> <:sbHypeSquadBalance:1340230593492811776> HypeSquad Balance",
+            "verified_bot": "> <:sbVerified:1340231015091802245> Verified Bot",
+            "early_supporter": "> <:sbDiscordStaff:1340230948565815336> Early Supporter",
+            "active_developer": "> <:sbVerifiedDeveloper:1340230792571256842> Active Developer",
         }
 
 
