@@ -744,7 +744,35 @@ class ManagementCommandCog(commands.Cog):
             
         old_name = thread.name
         await thread.edit(name=new_name)
-        await ctx.send_success(f"Thread renamed from `{old_name}` to `{new_name}`")    
+        await ctx.send_success(f"Thread renamed from `{old_name}` to `{new_name}`") 
+
+    @thread.command(name="remove", description="Remove a member from the thread", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def remove(self, ctx: StriveContext, member: discord.Member, thread: discord.TextChannel = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        if member not in thread.members:
+            return await ctx.send_error(f"{member.mention} is not in this thread!")
+            
+        await thread.remove_user(member)
+        await ctx.send_success(f"Removed {member.mention} from {thread.mention}")
+
+    @thread.command(name="add", description="Add a member to the thread", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def add(self, ctx: StriveContext, member: discord.Member, thread: discord.TextChannel = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        if member in thread.members:
+            return await ctx.send_error(f"{member.mention} is already in this thread!")
+            
+        await thread.add_user(member)
+        await ctx.send_success(f"Added {member.mention} to {thread.mention}")       
                     
                     
                     
