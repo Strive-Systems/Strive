@@ -748,10 +748,7 @@ class ManagementCommandCog(commands.Cog):
 
     @thread.command(name="remove", description="Remove a member from the thread", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def remove(self, ctx: StriveContext, member: discord.Member = None):
-        if member is None:
-            return await ctx.send_error("You must specify a member to remove!")
-            
+    async def remove(self, ctx: StriveContext, member: discord.Member):        
         if not isinstance(ctx.channel, discord.Thread):
             return await ctx.send_error("This command can only be used in thread channels!")
             
@@ -763,10 +760,7 @@ class ManagementCommandCog(commands.Cog):
 
     @thread.command(name="add", description="Add a member to the thread", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def add(self, ctx: StriveContext, member: discord.Member = None):
-        if member is None:
-            return await ctx.send_error("You must specify a member to add!")
-            
+    async def add(self, ctx: StriveContext, member: discord.Member):
         if not isinstance(ctx.channel, discord.Thread):
             return await ctx.send_error("This command can only be used in thread channels!")
             
@@ -774,7 +768,8 @@ class ManagementCommandCog(commands.Cog):
             return await ctx.send_error(f"{member.mention} is already in this thread!")
             
         await ctx.channel.add_user(member)
-        await ctx.send_success(f"Added {member.mention} to {ctx.channel.mention}")                                               
+        await ctx.send_success(f"Added {member.mention} to {ctx.channel.mention}")    
+        
     @commands.hybrid_group(description='Allows modification of user notes.', with_app_command=True)
     async def note(self, ctx: StriveContext):
         return
