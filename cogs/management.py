@@ -695,6 +695,56 @@ class ManagementCommandCog(commands.Cog):
                         f"**<:clock:1338811480451055719> {user} is currently AFK because:** {result.get('message')}.\n"
                         f"-# They have been AFK since {formatted_time}."
                     )
+
+    
+    @commands.hybrid_group(description="Allows users to manage threads", with_app_command=True)
+    async def thread(self, ctx: StriveContext):
+        return
+    
+    @thread.command(name="close", description="Close a thread channel", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def close(self, ctx: StriveContext, thread: discord.Thread = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        await thread.archive(locked=True)
+        await ctx.send_success(f"Thread {thread.mention} has been closed.")
+    
+    @thread.command(name="lock", description="Lock a thread channel", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def lock(self, ctx: StriveContext, thread: discord.Thread = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        await thread.edit(locked=True)
+        await ctx.send_success(f"Thread {thread.mention} has been locked.")
+    
+    @thread.command(name="unlock", description="Unlock a thread channel", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def unlock(self, ctx: StriveContext, thread: discord.Thread = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        await thread.edit(locked=False)
+        await ctx.send_success(f"Thread {thread.mention} has been unlocked.")
+    
+    @thread.command(name="rename", description="Rename a thread channel", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def rename(self, ctx: StriveContext, new_name: str, thread: discord.Thread = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        old_name = thread.name
+        await thread.edit(name=new_name)
+        await ctx.send_success(f"Thread renamed from `{old_name}` to `{new_name}`")    
                     
                     
                     
