@@ -748,32 +748,27 @@ class ManagementCommandCog(commands.Cog):
 
     @thread.command(name="remove", description="Remove a member from the thread", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def remove(self, ctx: StriveContext, member: discord.Member, thread: discord.TextChannel = None):
-        thread = thread or ctx.channel
-        
-        if not isinstance(thread, discord.Thread):
+    async def remove(self, ctx: StriveContext, member: discord.Member):
+        if not isinstance(ctx.channel, discord.Thread):
             return await ctx.send_error("This command can only be used in thread channels!")
             
-        if member not in thread.members:
+        if member not in ctx.channel.members:
             return await ctx.send_error(f"{member.mention} is not in this thread!")
             
-        await thread.remove_user(member)
-        await ctx.send_success(f"Removed {member.mention} from {thread.mention}")
+        await ctx.channel.remove_user(member)
+        await ctx.send_success(f"Removed {member.mention} from {ctx.channel.mention}")
 
     @thread.command(name="add", description="Add a member to the thread", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def add(self, ctx: StriveContext, member: discord.Member, thread: discord.TextChannel = None):
-        thread = thread or ctx.channel
-        
-        if not isinstance(thread, discord.Thread):
+    async def add(self, ctx: StriveContext, member: discord.Member):
+        if not isinstance(ctx.channel, discord.Thread):
             return await ctx.send_error("This command can only be used in thread channels!")
             
-        if member in thread.members:
+        if member in ctx.channel.members:
             return await ctx.send_error(f"{member.mention} is already in this thread!")
             
-        await thread.add_user(member)
-        await ctx.send_success(f"Added {member.mention} to {thread.mention}")       
-                    
+        await ctx.channel.add_user(member)
+        await ctx.send_success(f"Added {member.mention} to {ctx.channel.mention}")                           
                     
                     
     @commands.hybrid_group(description='Allows modification of user notes.', with_app_command=True)
