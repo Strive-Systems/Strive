@@ -703,7 +703,7 @@ class ManagementCommandCog(commands.Cog):
     
     @thread.command(name="close", description="Close a thread channel", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def close(self, ctx: StriveContext, thread: discord.Thread = None):
+    async def close(self, ctx: StriveContext, thread: discord.TextChannel = None):
         thread = thread or ctx.channel
         
         if not isinstance(thread, discord.Thread):
@@ -714,7 +714,7 @@ class ManagementCommandCog(commands.Cog):
     
     @thread.command(name="lock", description="Lock a thread channel", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def lock(self, ctx: StriveContext, thread: discord.Thread = None):
+    async def lock(self, ctx: StriveContext, thread: discord.TextChannel = None):
         thread = thread or ctx.channel
         
         if not isinstance(thread, discord.Thread):
@@ -725,7 +725,7 @@ class ManagementCommandCog(commands.Cog):
     
     @thread.command(name="unlock", description="Unlock a thread channel", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def unlock(self, ctx: StriveContext, thread: discord.Thread = None):
+    async def unlock(self, ctx: StriveContext, thread: discord.TextChannel = None):
         thread = thread or ctx.channel
         
         if not isinstance(thread, discord.Thread):
@@ -736,7 +736,7 @@ class ManagementCommandCog(commands.Cog):
     
     @thread.command(name="rename", description="Rename a thread channel", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
-    async def rename(self, ctx: StriveContext, new_name: str, thread: discord.Thread = None):
+    async def rename(self, ctx: StriveContext, new_name: str, thread: discord.TextChannel = None):
         thread = thread or ctx.channel
         
         if not isinstance(thread, discord.Thread):
