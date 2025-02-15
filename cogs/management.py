@@ -708,9 +708,9 @@ class ManagementCommandCog(commands.Cog):
         
         if not isinstance(thread, discord.Thread):
             return await ctx.send_error("This command can only be used in thread channels!")
-            
-        await thread.archive(locked=True)
-        await ctx.send_success(f"Thread {thread.mention} has been closed.")
+        await ctx.send_loading(f"This thread will be closed in 5 seconds.")
+        await asyncio.sleep(5)
+        await thread.delete()
     
     @thread.command(name="lock", description="Lock a thread channel", with_app_command=True, extras={"category": "General"})
     @commands.has_permissions(manage_threads=True)
