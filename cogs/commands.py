@@ -293,36 +293,56 @@ class CommandsCog(commands.Cog):
         
 
     @commands.hybrid_group(description="Allows you to set your timezone or view another users", aliases=["tz"], extras={"category": "General"}, with_app_command=True)
-    async def timezone(self, ctx, user: discord.Member = None):
+    async def timezone(self, ctx, input: str = None):
         try:
-            if user is None:
+            if input is None:
                 user = ctx.author
+                timezone_data = await timezones.find_one({"user_id": str(user.id)})
+                
+                if not timezone_data:
+                    embed = discord.Embed(
+                        title="",
+                        description=f"{self.strive.error} You have not set a timezone yet.",
+                        color=constants.strive_embed_color_setup()
+                    )
+                    await ctx.send(embed=embed)
+                    return
+                
+                timezone_str = timezone_data["timezone"]
+                user_name = user.name
+            else:
+                try:
+                    user = await commands.MemberConverter().convert(ctx, input)
+                    timezone_data = await timezones.find_one({"user_id": str(user.id)})
+                    
+                    if not timezone_data:
+                        embed = discord.Embed(
+                            title="",
+                            description=f"{self.strive.error} {user.name} has not set a timezone yet.",
+                            color=constants.strive_embed_color_setup()
+                        )
+                        await ctx.send(embed=embed)
+                        return
+                    
+                    timezone_str = timezone_data["timezone"]
+                    user_name = user.name
+                except:
+                    matching_timezones = [tz for tz in pytz.all_timezones if input.lower() in tz.lower()]
+                    if not matching_timezones:
+                        await ctx.send_error(f"No matching timezone found for `{input}`, try a city name or abbreviation")
+                        return
+                    timezone_str = matching_timezones[0]
+                    user_name = timezone_str
 
-
-            timezone_data = await timezones.find_one({"user_id": str(user.id)})
-         
-            
-            if not timezone_data:
-                embed = discord.Embed(
-                    title="",
-                    description=f"{self.strive.error} {'You have' if user == ctx.author else f'{user.name} has'} not set a timezone yet.",
-                    color=constants.strive_embed_color_setup()
-                )
-                await ctx.send(embed=embed)
-                return
-
-
-            timezone = pytz.timezone(timezone_data["timezone"])
+            timezone = pytz.timezone(timezone_str)
             current_time = datetime.now(timezone)
 
-
             embed = discord.Embed(
-                title=f"Timezone - {user.name}",
-                description=f"> **Timezone:** {timezone_data['timezone']}\n> **Local Time:** {current_time.strftime('%I:%M %p %Z')}",
+                title=f"Timezone - {user_name}",
+                description=f"> **Timezone:** {timezone_str}\n> **Local Time:** {current_time.strftime('%I:%M %p %Z')}",
                 color=constants.strive_embed_color_setup()
             )
             await ctx.send(embed=embed)
-
 
         except Exception as e:
             print(f"Error viewing timezone: {e}")
@@ -332,7 +352,6 @@ class CommandsCog(commands.Cog):
                 color=constants.strive_embed_color_setup()
             )
             await ctx.send(embed=embed)
-
 
     @timezone.command(name="set", description="Set your timezone", extras={"category": "General"}, with_app_command=True)
     async def timezone_set(self, ctx, timezone: str):
