@@ -310,14 +310,9 @@ class ManagementCommandCog(commands.Cog):
         embed = RolesInformationEmbed(role, constants).create()
         await ctx.send(embed=embed)
 
-    @role.group(description="Addition roles")
+    @role.command(description="Add a role to all human members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def add(self, ctx: StriveContext):
-        pass
-
-    @add.command(description="Add a role to all human members in the server.", with_app_command=True, extras={"category": "Administration"})
-    @commands.has_permissions(manage_roles=True)
-    async def humans(self, ctx: StriveContext, role: discord.Role):
+    async def add_humans(self, ctx: StriveContext, role: discord.Role):
         dangerous_perms = [
             'administrator',
             'manage_guild',
@@ -353,9 +348,9 @@ class ManagementCommandCog(commands.Cog):
         await msg.delete() 
         await ctx.send_success(f"Added {role.mention} to `{len(humans)}` humans.")
 
-    @add.command(description="Add a role to all bot members in the server.", with_app_command=True, extras={"category": "Administration"})
+    @role.command(description="Add a role to all bot members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def bots(self, ctx: StriveContext, role: discord.Role):
+    async def add_bots(self, ctx: StriveContext, role: discord.Role):
         dangerous_perms = [
             'administrator',
             'manage_guild',
@@ -391,9 +386,9 @@ class ManagementCommandCog(commands.Cog):
         await msg.delete() 
         await ctx.send_success(f"Added {role.mention} to `{len(bots)}` bots.")   
 
-    @add.command(description="Add a role to all members in the server.", with_app_command=True, extras={"category": "Administration"})
+    @role.command(description="Add a role to all members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def all(self, ctx: StriveContext, role: discord.Role):
+    async def add_all(self, ctx: StriveContext, role: discord.Role):
         dangerous_perms = [
             'administrator',
             'manage_guild',
@@ -427,8 +422,7 @@ class ManagementCommandCog(commands.Cog):
             await asyncio.sleep(2)
 
         await msg.delete() 
-        await ctx.send_success(f"Added {role.mention} to `{len(members)}` members.")     
-
+        await ctx.send_success(f"Added {role.mention} to `{len(members)}` members.")
     # Purge command to purge user messages from discord channels.
     
     @commands.hybrid_command(name="purge", description="Clear a large number of messages from the current channel.", with_app_command=True, extras={"category": "General"})
