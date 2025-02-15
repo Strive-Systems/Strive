@@ -312,7 +312,7 @@ class ManagementCommandCog(commands.Cog):
 
     @role.command(description="Add a role to all human members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def add_humans(self, ctx: StriveContext, role: discord.Role):
+    async def humans(self, ctx: StriveContext, role: discord.Role):
         dangerous_perms = [
             'administrator',
             'manage_guild',
@@ -350,7 +350,7 @@ class ManagementCommandCog(commands.Cog):
 
     @role.command(description="Add a role to all bot members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def add_bots(self, ctx: StriveContext, role: discord.Role):
+    async def bots(self, ctx: StriveContext, role: discord.Role):
         dangerous_perms = [
             'administrator',
             'manage_guild',
@@ -388,7 +388,7 @@ class ManagementCommandCog(commands.Cog):
 
     @role.command(description="Add a role to all members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def add_all(self, ctx: StriveContext, role: discord.Role):
+    async def all(self, ctx: StriveContext, role: discord.Role):
         dangerous_perms = [
             'administrator',
             'manage_guild',
