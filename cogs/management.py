@@ -310,9 +310,30 @@ class ManagementCommandCog(commands.Cog):
         embed = RolesInformationEmbed(role, constants).create()
         await ctx.send(embed=embed)
 
-    @role.command(description="Add a role to all human members in the server.", with_app_command=True, extras={"category": "Administration"})
+    @role.group(description="Addition roles")
+    @commands.has_permissions(manage_roles=True)
+    async def add(self, ctx: StriveContext):
+        pass
+
+    @add.command(description="Add a role to all human members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
     async def humans(self, ctx: StriveContext, role: discord.Role):
+        dangerous_perms = [
+            'administrator',
+            'manage_guild',
+            'manage_roles',
+            'manage_channels',
+            'manage_webhooks',
+            'manage_nicknames',
+            'manage_emojis',
+            'ban_members',
+            'kick_members'
+        ]
+        
+        has_dangerous_perms = any(getattr(role.permissions, perm) for perm in dangerous_perms)
+        if has_dangerous_perms and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("Only the server owner can add roles with dangerous permissions!")
+
         if role >= ctx.author.top_role and ctx.author.id != ctx.guild.owner_id:
             return await ctx.send_error("You cannot add a role that is higher than or equal to your highest role!")
         if role >= ctx.guild.me.top_role:
@@ -322,7 +343,7 @@ class ManagementCommandCog(commands.Cog):
         humans = [m for m in ctx.guild.members if not m.bot]
         
         estimated_time = (len(humans) // 10 + 1) * 2
-        msg = await ctx.send_loading(f"Adding {role.mention} to `{len(humans)}` humans, this will roughly take **{estimated_time}** seconds)")
+        msg = await ctx.send_loading(f"Adding {role.mention} to `{len(humans)}` humans, this will roughly take **{estimated_time}** seconds")
         
         for i in range(0, len(humans), 10):
             for member in humans[i:i + 10]:
@@ -330,11 +351,27 @@ class ManagementCommandCog(commands.Cog):
             await asyncio.sleep(2)
 
         await msg.delete() 
-        await ctx.send(f"{ctx.strive.success} Added {role.mention} to `{len(humans)}` humans.")
+        await ctx.send_success(f"Added {role.mention} to `{len(humans)}` humans.")
 
-    @role.command(description="Add a role to all bot members in the server.", with_app_command=True, extras={"category": "Administration"})
+    @add.command(description="Add a role to all bot members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
     async def bots(self, ctx: StriveContext, role: discord.Role):
+        dangerous_perms = [
+            'administrator',
+            'manage_guild',
+            'manage_roles',
+            'manage_channels',
+            'manage_webhooks',
+            'manage_nicknames',
+            'manage_emojis',
+            'ban_members',
+            'kick_members'
+        ]
+        
+        has_dangerous_perms = any(getattr(role.permissions, perm) for perm in dangerous_perms)
+        if has_dangerous_perms and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("Only the server owner can add roles with dangerous permissions!")
+
         if role >= ctx.author.top_role and ctx.author.id != ctx.guild.owner_id:
             return await ctx.send_error("You cannot add a role that is higher than or equal to your highest role!")
         if role >= ctx.guild.me.top_role:
@@ -344,7 +381,7 @@ class ManagementCommandCog(commands.Cog):
         bots = [m for m in ctx.guild.members if m.bot]
         
         estimated_time = (len(bots) // 10 + 1) * 2
-        msg = await ctx.send_loading(f"Adding {role.mention} to `{len(bots)}` bots, this will roughly take **{estimated_time}** seconds)")
+        msg = await ctx.send_loading(f"Adding {role.mention} to `{len(bots)}` bots, this will roughly take **{estimated_time}** seconds")
         
         for i in range(0, len(bots), 10):
             for member in bots[i:i + 10]:
@@ -352,9 +389,9 @@ class ManagementCommandCog(commands.Cog):
             await asyncio.sleep(2)
 
         await msg.delete() 
-        await ctx.send(f"{ctx.strive.success} Added {role.mention} to `{len(bots)}` bots.")   
+        await ctx.send_success(f"Added {role.mention} to `{len(bots)}` bots.")   
 
-    @role.command(description="Add a role to all members in the server.", with_app_command=True, extras={"category": "Administration"})
+    @add.command(description="Add a role to all members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
     async def all(self, ctx: StriveContext, role: discord.Role):
         dangerous_perms = [
@@ -382,7 +419,7 @@ class ManagementCommandCog(commands.Cog):
         members = ctx.guild.members
         
         estimated_time = (len(members) // 10 + 1) * 2
-        msg = await ctx.send_loading(f"Adding {role.mention} to `{len(members)}` members, this will roughly take **{estimated_time}** seconds)")
+        msg = await ctx.send_loading(f"Adding {role.mention} to `{len(members)}` members, this will roughly take **{estimated_time}** seconds")
         
         for i in range(0, len(members), 10):
             for member in members[i:i + 10]:
@@ -390,8 +427,8 @@ class ManagementCommandCog(commands.Cog):
             await asyncio.sleep(2)
 
         await msg.delete() 
-        await ctx.send(f"{ctx.strive.success} Added {role.mention} to `{len(members)}` members.")     
-               
+        await ctx.send_success(f"Added {role.mention} to `{len(members)}` members.")     
+
     # Purge command to purge user messages from discord channels.
     
     @commands.hybrid_command(name="purge", description="Clear a large number of messages from the current channel.", with_app_command=True, extras={"category": "General"})
