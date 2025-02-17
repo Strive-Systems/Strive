@@ -2,6 +2,7 @@ import discord
 import uuid
 import time
 import re
+import asyncio
 from typing import List, Literal
 from discord.ext import commands, tasks
 from datetime import datetime, timedelta
@@ -308,9 +309,120 @@ class ManagementCommandCog(commands.Cog):
     async def info(self, ctx: commands.Context, role: discord.Role):
         embed = RolesInformationEmbed(role, constants).create()
         await ctx.send(embed=embed)
-            
-            
-            
+
+    @role.command(description="Add a role to all human members in the server.", with_app_command=True, extras={"category": "Administration"})
+    @commands.has_permissions(manage_roles=True)
+    async def humans(self, ctx: StriveContext, role: discord.Role):
+        dangerous_perms = [
+            'administrator',
+            'manage_guild',
+            'manage_roles',
+            'manage_channels',
+            'manage_webhooks',
+            'manage_nicknames',
+            'manage_emojis',
+            'ban_members',
+            'kick_members'
+        ]
+        
+        has_dangerous_perms = any(getattr(role.permissions, perm) for perm in dangerous_perms)
+        if has_dangerous_perms and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("Only the server owner can add roles with dangerous permissions!")
+
+        if role >= ctx.author.top_role and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("You cannot add a role that is higher than or equal to your highest role!")
+        if role >= ctx.guild.me.top_role:
+            return await ctx.send_error("I cannot add a role that is higher than my highest role!")
+
+        await ctx.guild.chunk()
+        humans = [m for m in ctx.guild.members if not m.bot]
+        
+        estimated_time = (len(humans) // 10 + 1) * 2
+        msg = await ctx.send_loading(f"Adding {role.mention} to `{len(humans)}` humans, this will roughly take **{estimated_time}** seconds")
+        
+        for i in range(0, len(humans), 10):
+            for member in humans[i:i + 10]:
+                await member.add_roles(role, reason=f"Mass role add by {ctx.author}")
+            await asyncio.sleep(2)
+
+        await msg.delete() 
+        await ctx.send_success(f"Added {role.mention} to `{len(humans)}` humans.")
+
+    @role.command(description="Add a role to all bot members in the server.", with_app_command=True, extras={"category": "Administration"})
+    @commands.has_permissions(manage_roles=True)
+    async def bots(self, ctx: StriveContext, role: discord.Role):
+        dangerous_perms = [
+            'administrator',
+            'manage_guild',
+            'manage_roles',
+            'manage_channels',
+            'manage_webhooks',
+            'manage_nicknames',
+            'manage_emojis',
+            'ban_members',
+            'kick_members'
+        ]
+        
+        has_dangerous_perms = any(getattr(role.permissions, perm) for perm in dangerous_perms)
+        if has_dangerous_perms and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("Only the server owner can add roles with dangerous permissions!")
+
+        if role >= ctx.author.top_role and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("You cannot add a role that is higher than or equal to your highest role!")
+        if role >= ctx.guild.me.top_role:
+            return await ctx.send_error("I cannot add a role that is higher than my highest role!")
+
+        await ctx.guild.chunk()
+        bots = [m for m in ctx.guild.members if m.bot]
+        
+        estimated_time = (len(bots) // 10 + 1) * 2
+        msg = await ctx.send_loading(f"Adding {role.mention} to `{len(bots)}` bots, this will roughly take **{estimated_time}** seconds")
+        
+        for i in range(0, len(bots), 10):
+            for member in bots[i:i + 10]:
+                await member.add_roles(role, reason=f"Mass role add by {ctx.author}")
+            await asyncio.sleep(2)
+
+        await msg.delete() 
+        await ctx.send_success(f"Added {role.mention} to `{len(bots)}` bots.")   
+
+    @role.command(description="Add a role to all members in the server.", with_app_command=True, extras={"category": "Administration"})
+    @commands.has_permissions(manage_roles=True)
+    async def all(self, ctx: StriveContext, role: discord.Role):
+        dangerous_perms = [
+            'administrator',
+            'manage_guild',
+            'manage_roles',
+            'manage_channels',
+            'manage_webhooks',
+            'manage_nicknames',
+            'manage_emojis',
+            'ban_members',
+            'kick_members'
+        ]
+        
+        has_dangerous_perms = any(getattr(role.permissions, perm) for perm in dangerous_perms)
+        if has_dangerous_perms and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("Only the server owner can add roles with dangerous permissions!")
+
+        if role >= ctx.author.top_role and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("You cannot add a role that is higher than or equal to your highest role!")
+        if role >= ctx.guild.me.top_role:
+            return await ctx.send_error("I cannot add a role that is higher than my highest role!")
+
+        await ctx.guild.chunk()
+        members = ctx.guild.members
+        
+        estimated_time = (len(members) // 10 + 1) * 2
+        msg = await ctx.send_loading(f"Adding {role.mention} to `{len(members)}` members, this will roughly take **{estimated_time}** seconds")
+        
+        for i in range(0, len(members), 10):
+            for member in members[i:i + 10]:
+                await member.add_roles(role, reason=f"Mass role add by {ctx.author}")
+            await asyncio.sleep(2)
+
+        await msg.delete() 
+        await ctx.send_success(f"Added {role.mention} to `{len(members)}` members.")
     # Purge command to purge user messages from discord channels.
     
     @commands.hybrid_command(name="purge", description="Clear a large number of messages from the current channel.", with_app_command=True, extras={"category": "General"})
@@ -583,9 +695,86 @@ class ManagementCommandCog(commands.Cog):
                         f"**<:clock:1338811480451055719> {user} is currently AFK because:** {result.get('message')}.\n"
                         f"-# They have been AFK since {formatted_time}."
                     )
-                    
-                    
-                    
+
+    
+    @commands.hybrid_group(description="Allows users to manage threads", with_app_command=True)
+    async def thread(self, ctx: StriveContext):
+        return
+    
+    @thread.command(name="close", description="Close a thread channel", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def close(self, ctx: StriveContext, thread: discord.TextChannel = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+        await ctx.send_loading(f"This thread will be closed in 5 seconds.")
+        await asyncio.sleep(5)
+        await thread.delete()
+    
+    @thread.command(name="lock", description="Lock a thread channel", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def lock(self, ctx: StriveContext, thread: discord.TextChannel = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        await thread.edit(locked=True)
+        await ctx.send_success(f"Thread {thread.mention} has been locked.")
+    
+    @thread.command(name="unlock", description="Unlock a thread channel", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def unlock(self, ctx: StriveContext, thread: discord.TextChannel = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        await thread.edit(locked=False)
+        await ctx.send_success(f"Thread {thread.mention} has been unlocked.")
+    
+    @thread.command(name="rename", description="Rename a thread channel", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def rename(self, ctx: StriveContext, new_name: str, thread: discord.TextChannel = None):
+        thread = thread or ctx.channel
+        
+        if not isinstance(thread, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        old_name = thread.name
+        await thread.edit(name=new_name)
+        await ctx.send_success(f"Thread renamed from `{old_name}` to `{new_name}`") 
+
+    @thread.command(name="remove", description="Remove a member from the thread", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def remove(self, ctx: StriveContext, member: discord.User):        
+        if not isinstance(ctx.channel, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        if member not in ctx.channel.members:
+            return await ctx.send_error(f"{member.mention} is not in this thread!")
+            
+        await ctx.channel.remove_user(member)
+        await ctx.send_success(f"Removed {member.mention} from {ctx.channel.mention}")
+
+    @thread.command(name="add", description="Add a member to the thread", with_app_command=True, extras={"category": "General"})
+    @commands.has_permissions(manage_threads=True)
+    async def add(self, ctx: StriveContext, member: discord.User):
+        if not isinstance(ctx.channel, discord.Thread):
+            return await ctx.send_error("This command can only be used in thread channels!")
+            
+        if member in ctx.channel.members:
+            return await ctx.send_error(f"{member.mention} is already in this thread!")
+            
+        try:
+            await ctx.channel.add_user(member)
+            await ctx.send_success(f"Added {member.mention} to {ctx.channel.mention}")
+        except discord.Forbidden:
+            await ctx.send_error("I don't have permission to add members to this thread!")
+        except discord.HTTPException:
+            await ctx.send_error("Failed to add member to the thread; please try again later.")    
+
     @commands.hybrid_group(description='Allows modification of user notes.', with_app_command=True)
     async def note(self, ctx: StriveContext):
         return
