@@ -666,13 +666,21 @@ class ManagementCommandCog(commands.Cog):
 
         afk_key = {'user_id': message.author.id, 'guild_id': message.guild.id}
         if afk_key in afk_data:
+            result = await afks.find_one({'user_id': message.author.id, 'guild_id': message.guild.id})
+            afk_timestamp = result.get("timestamp", int(time.time()))
+            duration = int(time.time()) - afk_timestamp
+            
+            hours = duration // 3600
+            minutes = (duration % 3600) // 60
+            seconds = duration % 60
+            
+            duration_str = f"{hours}h {minutes}m {seconds}s" if hours > 0 else f"{minutes}m {seconds}s" if minutes > 0 else f"{seconds}s"
             
             await afks.delete_one({"user_id": message.author.id, 'guild_id': message.guild.id})
             
-            
             embed = discord.Embed(
                 title="",
-                description=f"{self.strive.success} Your AFK has ended as you sent a message indicating your return.",
+                description=f"{self.strive.success} Your AFK has ended as you sent a message indicating your return.\n> You were AFK for: {duration_str}",
                 color=self.strive.base_color
             )
                 
@@ -689,13 +697,18 @@ class ManagementCommandCog(commands.Cog):
                     
                     afk_timestamp = result.get("timestamp", int(time.time()))
                     formatted_time = f"<t:{afk_timestamp}:F>"
-
                     
+                    duration = int(time.time()) - afk_timestamp
+                    hours = duration // 3600
+                    minutes = (duration % 3600) // 60
+                    seconds = duration % 60
+                    
+                    duration_str = f"{hours}h {minutes}m {seconds}s" if hours > 0 else f"{minutes}m {seconds}s" if minutes > 0 else f"{seconds}s"
+
                     await message.channel.send(
                         f"**<:clock:1338811480451055719> {user} is currently AFK because:** {result.get('message')}.\n"
-                        f"-# They have been AFK since {formatted_time}."
+                        f"-# They have been AFK for {duration_str} (since {formatted_time})."
                     )
-
     
     @commands.hybrid_group(description="Allows users to manage threads", with_app_command=True)
     async def thread(self, ctx: StriveContext):
