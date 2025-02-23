@@ -8,6 +8,7 @@ from utils.utils import StriveContext
 
 constants = StriveConstants()
 
+
 class ServerCog(commands.Cog):
     def __init__(self, strive):
         self.strive = strive
@@ -15,13 +16,15 @@ class ServerCog(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         """Handle command errors and log them to console"""
-        error = getattr(error, 'original', error)
-        
+        error = getattr(error, "original", error)
+
         if isinstance(error, commands.CommandNotFound):
             return
-            
-        print('[WELCOMER] {}:'.format(ctx.command), file=sys.stderr)
-        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+
+        print("[WELCOMER] {}:".format(ctx.command), file=sys.stderr)
+        traceback.print_exception(
+            type(error), error, error.__traceback__, file=sys.stderr
+        )
 
     @commands.Cog.listener("on_member_join")
     async def welcome_message(self, member: discord.Member):
@@ -29,25 +32,27 @@ class ServerCog(commands.Cog):
 
         doc = await welcomer.find_one({"guild_id": member.guild.id})
         if doc:
-            channel = self.strive.get_channel(doc.get('channel_id'))
+            channel = self.strive.get_channel(doc.get("channel_id"))
             if channel:
                 try:
-                    message = doc.get('message', f"Welcome {member.mention} to {member.guild.name}!")
-                    ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
+                    message = doc.get(
+                        "message", f"Welcome {member.mention} to {member.guild.name}!"
+                    )
+                    ordinal = lambda n: "%d%s" % (
+                        n,
+                        "tsnrhtdd"[(n // 10 % 10 != 1) * (n % 10 < 4) * n % 10 :: 4],
+                    )
                     message = message.format(
                         user=member,
                         guild=member.guild,
                         guild_count=len(member.guild.members),
-                        guild_count_ordinal=ordinal(len(member.guild.members))
+                        guild_count_ordinal=ordinal(len(member.guild.members)),
                     )
                     await channel.send(
                         content=message,
                         allowed_mentions=discord.AllowedMentions(
-                            everyone=True,
-                            users=True,
-                            roles=True,
-                            replied_user=False
-                        )
+                            everyone=True, users=True, roles=True, replied_user=False
+                        ),
                     )
                 except discord.Forbidden:
                     return
@@ -79,13 +84,13 @@ class ServerCog(commands.Cog):
             "`{user.avatar}` - The user's avatar URL",
             "`{guild.count}` - Shows the guild member count",
             "`{guild.count_ordinal}` - The member count with ordinal suffix (1st, 2nd, etc)",
-            "`{guild.name}` - Guild name"
+            "`{guild.name}` - Guild name",
         ]
-        
+
         embed = discord.Embed(
             title="Welcome Message Variables",
             description="\n".join(variables),
-            color=constants.strive_embed_color_setup()
+            color=constants.strive_embed_color_setup(),
         )
 
         embed.add_field(
@@ -101,22 +106,31 @@ class ServerCog(commands.Cog):
         aliases=["create"],
     )
     @commands.has_permissions(manage_guild=True)
-    async def welcome_add(self, ctx: StriveContext, channel: discord.TextChannel, *, message: str = None):
+    async def welcome_add(
+        self, ctx: StriveContext, channel: discord.TextChannel, *, message: str = None
+    ):
         """Add a welcome message for a channel"""
 
         existing = await welcomer.find_one({"guild_id": ctx.guild.id})
         if existing:
-            await ctx.send_error(f"A welcome channel is already set up. Remove it first using `welcome remove`")
+            await ctx.send_error(
+                f"A welcome channel is already set up. Remove it first using `welcome remove`"
+            )
             return
 
         try:
-            await welcomer.insert_one({
-                "guild_id": ctx.guild.id,
-                "channel_id": channel.id,
-                "message": message or f"Welcome {{user.mention}} to {ctx.guild.name}!"
-            })
+            await welcomer.insert_one(
+                {
+                    "guild_id": ctx.guild.id,
+                    "channel_id": channel.id,
+                    "message": message
+                    or f"Welcome {{user.mention}} to {ctx.guild.name}!",
+                }
+            )
         except:
-            await ctx.send_error(f"Failed to set up welcome message for {channel.mention}")
+            await ctx.send_error(
+                f"Failed to set up welcome message for {channel.mention}"
+            )
         else:
             await ctx.send_success(f"Created welcome message for {channel.mention}")
 
@@ -130,11 +144,10 @@ class ServerCog(commands.Cog):
     async def welcome_remove(self, ctx: StriveContext, channel: discord.TextChannel):
         """Remove a welcome message for a channel"""
 
-        result = await welcomer.delete_one({
-            "guild_id": ctx.guild.id,
-            "channel_id": channel.id
-        })
-        
+        result = await welcomer.delete_one(
+            {"guild_id": ctx.guild.id, "channel_id": channel.id}
+        )
+
         if result.deleted_count:
             await ctx.send_success(f"Removed the welcome message for {channel.mention}")
         else:
@@ -149,10 +162,12 @@ class ServerCog(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def welcome_test(self, ctx: StriveContext):
         """Test the welcome message system"""
-        
+
         welcomer_exists = await welcomer.find_one({"guild_id": ctx.guild.id})
         if not welcomer_exists:
-            return await ctx.send_error("No welcome message has been set up. Use `welcome add` first!")
+            return await ctx.send_error(
+                "No welcome message has been set up. Use `welcome add` first!"
+            )
 
         await self.welcome_message(ctx.author)
         await ctx.send_success("Welcome message test executed!")
@@ -176,10 +191,11 @@ class ServerCog(commands.Cog):
         embed = discord.Embed(
             title="Welcome Channel",
             description=channel.mention,
-            color=constants.strive_embed_color_setup()
+            color=constants.strive_embed_color_setup(),
         )
 
         await ctx.send(embed=embed)
+
 
 async def setup(strive):
     await strive.add_cog(ServerCog(strive))

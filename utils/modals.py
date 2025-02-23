@@ -14,7 +14,8 @@ constants = StriveConstants()
 # This modal is for the setup command for bot config
 # This is the bot configuration modal, this determins what is shown in the modal to the user along
 # with the modals logic on submit and how everything is handelled. The models are sill buggy but
-# work fine.  
+# work fine.
+
 
 class BotConfigModal(Modal):
     def __init__(self, bot, setup_id: str, guild_id: int):
@@ -23,13 +24,16 @@ class BotConfigModal(Modal):
         self.setup_id = setup_id
         self.guild_id = guild_id
 
-        self.prefix = TextInput(label="Bot Prefix", placeholder="Enter bot prefix", required=True)
-        self.theme_color = TextInput(label="Theme Color", placeholder="#RRGGBB", required=True)
+        self.prefix = TextInput(
+            label="Bot Prefix", placeholder="Enter bot prefix", required=True
+        )
+        self.theme_color = TextInput(
+            label="Theme Color", placeholder="#RRGGBB", required=True
+        )
 
         self.add_item(self.prefix)
         self.add_item(self.theme_color)
-        
-        
+
     # This is the modal onsubmit logic to send it to the database. We do this so that the data is stored
 
     async def on_submit(self, interaction: Interaction):
@@ -41,17 +45,22 @@ class BotConfigModal(Modal):
 
         await setup_col.update_one(
             {"setup_id": self.setup_id},
-            {"$set": {"guild_id": self.guild_id, "prefix": prefix, "theme_color": theme_color}},
-            upsert=True
+            {
+                "$set": {
+                    "guild_id": self.guild_id,
+                    "prefix": prefix,
+                    "theme_color": theme_color,
+                }
+            },
+            upsert=True,
         )
 
         response_message = f"<:strivesuccess:1338900384932036618> Bot prefix set to `{prefix}` and theme color set to `{theme_color}`."
-        setup_cog = self.bot.get_cog('SetupCog')
+        setup_cog = self.bot.get_cog("SetupCog")
         if setup_cog.setup_message_id:
             await interaction.response.send_message(response_message, ephemeral=True)
         else:
             await interaction.response.send_message(response_message, ephemeral=True)
-            
 
 
 # This modal is for the setup command for benner config
@@ -62,17 +71,17 @@ class BotConfigModal(Modal):
 class PluginConfigModal(Modal):
     def __init__(self, bot, setup_id: str, guild_id: int):
         super().__init__(title="Module Configuration")
-        
+
         self.bot = bot
         self.setup_id = setup_id
         self.guild_id = guild_id
-        
+
         # Text input for modules
         self.modules_input = TextInput(
             label="Modules",
             placeholder="Enter module names separated by commas",
             style=discord.TextStyle.short,
-            required=True
+            required=True,
         )
 
         self.add_item(self.modules_input)
@@ -82,7 +91,9 @@ class PluginConfigModal(Modal):
             return
 
         # Gather selected modules from the input
-        selected_modules = [module.strip() for module in self.modules_input.value.split(',')]
+        selected_modules = [
+            module.strip() for module in self.modules_input.value.split(",")
+        ]
 
         # Update the database with the enabled/disabled modules
         enabled_modules = {module: True for module in selected_modules}
@@ -90,15 +101,17 @@ class PluginConfigModal(Modal):
         await setup_col.update_one(
             {"setup_id": self.setup_id},
             {"$set": {"guild_id": self.guild_id, "enabled_modules": enabled_modules}},
-            upsert=True
+            upsert=True,
         )
 
         response_message = f"<:strivesuccess:1338900384932036618> Modules updated: {', '.join(selected_modules)}."
 
         # Retrieve the setup cog and update the setup message
-        setup_cog = self.bot.get_cog('SetupCog')
+        setup_cog = self.bot.get_cog("SetupCog")
         if setup_cog.setup_message_id:
-            setup_message = await interaction.channel.fetch_message(setup_cog.setup_message_id)
+            setup_message = await interaction.channel.fetch_message(
+                setup_cog.setup_message_id
+            )
             await setup_message.edit(content=response_message, embed=None, view=None)
         else:
             await interaction.response.send_message(response_message, ephemeral=True)
