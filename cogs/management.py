@@ -312,7 +312,7 @@ class ManagementCommandCog(commands.Cog):
 
     @role.command(description="Add a role to all human members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
-    async def humans(self, ctx: StriveContext, role: discord.Role):
+    async def humans_add(self, ctx: StriveContext, role: discord.Role):
         dangerous_perms = [
             'administrator',
             'manage_guild',
@@ -347,6 +347,44 @@ class ManagementCommandCog(commands.Cog):
 
         await msg.delete() 
         await ctx.send_success(f"Added {role.mention} to `{len(humans)}` humans.")
+
+    @role.command(description="Remove a role to all human members in the server.", with_app_command=True, extras={"category": "Administration"})
+    @commands.has_permissions(manage_roles=True)
+    async def humans_remove(self, ctx: StriveContext, role: discord.Role):
+        dangerous_perms = [
+            'administrator',
+            'manage_guild',
+            'manage_roles',
+            'manage_channels',
+            'manage_webhooks',
+            'manage_nicknames',
+            'manage_emojis',
+            'ban_members',
+            'kick_members'
+        ]
+        
+        has_dangerous_perms = any(getattr(role.permissions, perm) for perm in dangerous_perms)
+        if has_dangerous_perms and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("Only the server owner can remove roles with dangerous permissions!")
+
+        if role >= ctx.author.top_role and ctx.author.id != ctx.guild.owner_id:
+            return await ctx.send_error("You cannot remove a role that is higher than or equal to your highest role!")
+        if role >= ctx.guild.me.top_role:
+            return await ctx.send_error("I cannot remove a role that is higher than my highest role!")
+
+        await ctx.guild.chunk()
+        humans = [m for m in ctx.guild.members if not m.bot]
+        
+        estimated_time = (len(humans) // 10 + 1) * 2
+        msg = await ctx.send_loading(f"Removing {role.mention} to `{len(humans)}` humans, this will roughly take **{estimated_time}** seconds")
+        
+        for i in range(0, len(humans), 10):
+            for member in humans[i:i + 10]:
+                await member.remove_roles(role, reason=f"Mass role remove by {ctx.author}")
+            await asyncio.sleep(2)
+
+        await msg.delete() 
+        await ctx.send_success(f"Removed {role.mention} from `{len(humans)}` humans.")
 
     @role.command(description="Add a role to all bot members in the server.", with_app_command=True, extras={"category": "Administration"})
     @commands.has_permissions(manage_roles=True)
