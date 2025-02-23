@@ -1,6 +1,8 @@
 import discord
 import json
+import os
 import time
+from dotenv import load_dotenv
 from discord.ext import commands, tasks
 from utils.constants import StriveConstants, lastfm
 from utils.utils import StriveContext
@@ -9,12 +11,13 @@ from datetime import datetime
 from typing import Literal
 
 constants = StriveConstants()
+load_dotenv()
 
 
 class LastFMCommandCog(commands.Cog):
     def __init__(self, strive):
         self.strive = strive
-        self.lastfmhandler = LastFMHandler("b800358c32d9d0551f90492cf18fac9a")
+        self.lastfmhandler = LastFMHandler(os.getenv("LASTFM_KEY"))
         self.lastfm_crowns = {}
         self.globalwhoknows_cache = {}
 
