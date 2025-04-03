@@ -29,6 +29,7 @@ timezones = db.timezones
 socials = db.socials
 lastfm = db.lastfm
 welcomer = db.welcomer
+giveaways = db.giveaways
 
 
 class StriveConstants:
