@@ -180,20 +180,16 @@ async def global_blacklist_check(ctx):
 
     # Check if the guild is blacklisted
 
-    if (
-        ctx.guild
-        and ctx.guild.id in constants.blacklists
-        and ctx.command.name != "unblacklist"
-    ):
-
+    if ctx.guild and ctx.guild.id in constants.blacklists and ctx.command.name != "unblacklist":
+        
         em = discord.Embed(
             title="",
-            description=f"{strive.warning} **Blacklisted Guild** \n\n> This server is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
+            description="<:warning:1335369524291178506> **Blacklisted Guild** \n\n> This server is blacklisted from Strive - Please appeal within our [Support Server](https://discord.gg/rkRrRfRTwg) or email `support@strivebot.xyz`!",
             color=constants.strive_embed_color_setup(),
         )
-
+        
         await ctx.send(embed=em)
-
+        
         raise commands.CheckFailure("This guild is blacklisted from using Strive.")
 
     # Prevent the command from being run in DMs
